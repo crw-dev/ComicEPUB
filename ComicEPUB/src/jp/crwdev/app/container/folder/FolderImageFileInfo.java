@@ -67,7 +67,7 @@ public class FolderImageFileInfo extends ImageFileInfoBase {
 	@Override
 	public InputStream getInputStream() {
 		try {
-			return new BufferedInputStream(new FileInputStream(getFullPath()));
+			return new FileInputStream(getFullPath());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

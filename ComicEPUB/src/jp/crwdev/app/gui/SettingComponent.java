@@ -1,13 +1,18 @@
 ﻿package jp.crwdev.app.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.TextEvent;
+import java.awt.event.TextListener;
 import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,8 +42,8 @@ public class SettingComponent {
 	public JLabel labelBookType = new JLabel("EPUB種別");
 	public JLabel labelFileType = new JLabel("保存形式");
 	public JLabel labelGamma = new JLabel("ガンマ補正値");
-	public JLabel labelContrast = new JLabel("Co");
-	public JLabel labelBrightness = new JLabel("Br");
+	public JLabel labelContrast = new JLabel("Co:0");
+	public JLabel labelBrightness = new JLabel("Br:0");
 
 	// CheckBox
 	public JCheckBox filterEnable = new JCheckBox("無変換");
@@ -104,7 +109,11 @@ public class SettingComponent {
 	public JSlider brightnessValue = new JSlider();
 	
 	// TextField
-	public JTextField outputFolder = new JTextField(30);
+	public DefaultTextField outputFolder = new DefaultTextField(30, "出力先フォルダ");
+	public DefaultTextField outputTitle = new DefaultTextField(12, "タイトル");
+	public DefaultTextField outputTitleKana = new DefaultTextField(10, "タイトルカナ");
+	public DefaultTextField outputAuthor = new DefaultTextField(12, "作者名");
+	public DefaultTextField outputAuthorKana = new DefaultTextField(10, "作者名カナ");
 	
 	// Button
 	public JButton chooseFolderButton = new JButton("出力先フォルダ");
@@ -175,6 +184,10 @@ public class SettingComponent {
 		
 		// TextField
 		parent.add(outputFolder);
+		parent.add(outputTitle);
+		parent.add(outputTitleKana);
+		parent.add(outputAuthor);
+		parent.add(outputAuthorKana);
 		
 		// Button
 		parent.add(chooseFolderButton);
@@ -266,9 +279,29 @@ public class SettingComponent {
 		layout.putConstraint(SpringLayout.WEST, labelFileType, 5, SpringLayout.EAST, outputFileType);
 		layout.putConstraint(SpringLayout.SOUTH, labelFileType, 0, SpringLayout.SOUTH, outputFileType);
 
+		// filename
+		layout.putConstraint(SpringLayout.WEST, outputTitle, 0, SpringLayout.WEST, mParent);
+		layout.putConstraint(SpringLayout.WEST, outputTitleKana, 3, SpringLayout.EAST, outputTitle);
+		layout.putConstraint(SpringLayout.EAST, outputTitleKana, 0, SpringLayout.EAST, mParent);
+		layout.putConstraint(SpringLayout.WEST, outputAuthor, 0, SpringLayout.WEST, mParent);
+		layout.putConstraint(SpringLayout.WEST, outputAuthorKana, 3, SpringLayout.EAST, outputAuthor);
+		layout.putConstraint(SpringLayout.EAST, outputAuthorKana, 0, SpringLayout.EAST, mParent);
+		
+		layout.putConstraint(SpringLayout.NORTH, outputTitle, 3, SpringLayout.SOUTH, labelFileType);
+		layout.putConstraint(SpringLayout.NORTH, outputTitleKana, 0, SpringLayout.NORTH, outputTitle);
+		layout.putConstraint(SpringLayout.NORTH, outputAuthor, 3, SpringLayout.SOUTH, outputTitle);
+		layout.putConstraint(SpringLayout.NORTH, outputAuthorKana, 0, SpringLayout.NORTH, outputAuthor);
+		
+		//TODO
+//		outputTitle.addFocusListener(new DefaultTextFocusListener("タイトル", outputTitle));
+//		outputTitleKana.addFocusListener(new DefaultTextFocusListener("タイトルカナ", outputTitleKana));
+//		outputAuthor.addFocusListener(new DefaultTextFocusListener("作者名", outputAuthor));
+//		outputAuthorKana.addFocusListener(new DefaultTextFocusListener("作者名カナ", outputAuthorKana));
+		
+		
 		layout.putConstraint(SpringLayout.WEST, outputFolder, 0, SpringLayout.WEST, mParent);
 		layout.putConstraint(SpringLayout.EAST, outputFolder, 0, SpringLayout.EAST, mParent);
-		layout.putConstraint(SpringLayout.NORTH, outputFolder, 3, SpringLayout.SOUTH, outputFileType);
+		layout.putConstraint(SpringLayout.NORTH, outputFolder, 3, SpringLayout.SOUTH, outputAuthor);
 		layout.putConstraint(SpringLayout.NORTH, chooseFolderButton, 3, SpringLayout.SOUTH, outputFolder);
 		layout.putConstraint(SpringLayout.NORTH, convertButton, 3, SpringLayout.SOUTH, chooseFolderButton);
 		
@@ -413,8 +446,10 @@ public class SettingComponent {
 		convertButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(mParent != null){
-					mParent.onStartConvert();
+				if(!outputFolder.getText().isEmpty()){
+					if(mParent != null){
+						mParent.onStartConvert();
+					}
 				}
 			}
 		});
@@ -547,8 +582,13 @@ public class SettingComponent {
 		// TextField
 		String outFolder = outputFolder.getText();
 		
-		return new OutputSettingParam(outFolder, "output", fileType, bookType, imageSize);
+		OutputSettingParam param = new OutputSettingParam(outFolder, fileType, bookType, imageSize);
+		param.setTitle(outputTitle.getText());
+		param.setTitleKana(outputTitleKana.getText());
+		param.setAuthor(outputAuthor.getText());
+		param.setAuthorKana(outputAuthorKana.getText());
 		
+		return param;
 	}
 	
 
@@ -671,6 +711,147 @@ public class SettingComponent {
 	
 	public void applyOutputParam(OutputSettingParam param){
 		
+		// ComboBox
+		Dimension size = param.getImageSize();
+		int selectedIndex = -1;
+		if(size != null && size.width != 0 && size.height != 0){
+			String textValue = size.width + "x" + size.height;
+			for(int i=0; i<outputImageSize.getItemCount(); i++){
+				String value = (String)outputImageSize.getItemAt(i);
+				if(textValue.equals(value)){
+					selectedIndex = i;
+					break;
+				}
+			}
+		}
+		if(selectedIndex >= 0){
+			outputImageSize.setSelectedIndex(selectedIndex);
+		}else{
+			outputImageSize.setSelectedIndex(outputImageSize.getItemCount()-1);
+		}
+		
+		//String bookType = (String)outputBookType.getSelectedItem();
+		//String fileType = (String)outputFileType.getSelectedItem();
+		
+		if(!param.getOutputPath().isEmpty()){
+			// TextField
+			outputFolder.setText(param.getOutputPath());
+		}
+		
+		if(!param.getTitle().isEmpty()){
+			outputTitle.setText(param.getTitle());
+		}
+		if(!param.getTitleKana().isEmpty()){
+			outputTitleKana.setText(param.getTitleKana());
+		}
+		if(!param.getAuthor().isEmpty()){
+			outputAuthor.setText(param.getAuthor());
+		}
+		if(!param.getAuthorKana().isEmpty()){
+			outputAuthorKana.setText(param.getAuthorKana());
+		}
+		
 	}
+	
+	/**
+	 * 背景文字列付きテキストフィールド
+	 * @author USER
+	 *
+	 */
+	private class DefaultTextField extends JTextField implements FocusListener {
+		
+		private String mDefaultText = "";
+		private boolean mIsEmpty = true;
+		
+		public DefaultTextField(int size, String text){
+			super(size);
+			mDefaultText = text;
+			mIsEmpty = true;
+			super.setText(mDefaultText);
+			super.setForeground(Color.LIGHT_GRAY);
+			addFocusListener(this);
+		}
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			if(mIsEmpty){
+				super.setText("");
+			}
+			setForeground(Color.BLACK);
+			mIsEmpty = false;
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			if(super.getText().isEmpty()){
+				mIsEmpty = true;
+				super.setText(mDefaultText);
+				setForeground(Color.LIGHT_GRAY);
+			}
+		}
+		
+		@Override
+		public void setText(String text){
+			super.setText(text);
+			if(text.isEmpty()){
+				mIsEmpty = true;
+				setForeground(Color.LIGHT_GRAY);
+			}else{
+				mIsEmpty = false;
+				setForeground(Color.BLACK);
+			}
+		}
+		
+		@Override
+		public String getText(){
+			if(mIsEmpty){
+				return "";
+			}
+			else{
+				return super.getText();
+			}
+		}
+		
+	}
+	
+	private class DefaultTextFocusListener implements FocusListener {
+
+		private String mDefaultText = "";
+		private JTextField mField = null;
+		private boolean mIsEmpty = true;
+		private boolean mIsOwnEdit = false;
+		
+		public DefaultTextFocusListener(String defaultText, JTextField field){
+			mDefaultText = defaultText;
+			mField = field;
+			mField.setText(mDefaultText);
+			mField.setForeground(Color.LIGHT_GRAY);
+		}
+		
+		@Override
+		public void focusGained(FocusEvent e) {
+			if(mIsEmpty){
+				mField.setText("");
+			}else{
+				
+			}
+			mField.setForeground(Color.BLACK);
+			mIsEmpty = false;
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			if(mField.getText().isEmpty()){
+				mIsEmpty = true;
+				mField.setText(mDefaultText);
+				mField.setForeground(Color.LIGHT_GRAY);
+			}
+		}
+	
+	}
+//	private String mTitle = "";
+//	private String mTitleKana = "";
+//	private String mAuthor = "";
+//	private String mAuthorKana = "";
 	
 }

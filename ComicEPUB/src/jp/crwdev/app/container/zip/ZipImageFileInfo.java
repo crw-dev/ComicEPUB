@@ -58,7 +58,7 @@ public class ZipImageFileInfo extends ImageFileInfoBase {
 	public InputStream getInputStream() {
 		if(mZipFile != null){
 			try {
-				return new BufferedInputStream(mZipFile.getInputStream(mZipFile.getEntry(mEntryName)));
+				return mZipFile.getInputStream(mZipFile.getEntry(mEntryName));
 			} catch (ZipException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

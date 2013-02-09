@@ -21,6 +21,15 @@ public class OutputSettingParam {
 	private String mOutputEpubType;
 	/** 出力イメージサイズ */
 	private String mOutputImageSize;
+	
+	/** タイトル */
+	private String mTitle = "";
+	/** タイトルカナ */
+	private String mTitleKana = "";
+	/** 作者名 */
+	private String mAuthor = "";
+	/** 作者名カナ */
+	private String mAuthorKana = "";
 
 	/**
 	 * コンストラクタ
@@ -30,12 +39,19 @@ public class OutputSettingParam {
 	 * @param epubType
 	 * @param imageSize
 	 */
-	public OutputSettingParam(String path, String filename, String fileType, String epubType, String imageSize){
+	public OutputSettingParam(String path, String fileType, String epubType, String imageSize){
 		mOutputPath = path;
-		mOutputFileName = filename;
 		mOutputFileType = fileType;
 		mOutputEpubType = epubType;
 		mOutputImageSize = imageSize;
+	}
+	
+	/**
+	 * 出力先フォルダパス設定
+	 * @param path
+	 */
+	public void setOutputPath(String path){
+		mOutputPath = path;
 	}
 	
 	/**
@@ -51,7 +67,24 @@ public class OutputSettingParam {
 	 * @return
 	 */
 	public String getOutputFileName(){
-		return mOutputFileName + getSuffixByFileType();
+		if(mOutputFileName != null && !mOutputFileName.isEmpty()){
+			return mOutputFileName + getSuffixByFileType();
+		}
+		else{
+			StringBuilder sb = new StringBuilder();
+			if(!mAuthor.isEmpty()){
+				sb.append("[" + mAuthor + "] ");
+			}
+			if(!mTitle.isEmpty()){
+				sb.append(mTitle);
+			}
+			if(sb.length() == 0){
+				sb.append("NoTitle");
+			}
+			sb.append(getSuffixByFileType());
+			
+			return new String(sb);
+		}
 	}
 	
 	/**
@@ -77,6 +110,20 @@ public class OutputSettingParam {
 	 */
 	public String getEpubType(){
 		return mOutputEpubType.toLowerCase();
+	}
+	
+	/**
+	 * 出力画像サイズを設定
+	 * @param width
+	 * @param height
+	 */
+	public void setImageSize(int width, int height){
+		if(width <= 0 || height <= 0){
+			mOutputImageSize = "リサイズ無し";
+		}
+		else{
+			mOutputImageSize = width + "x" + height;
+		}
 	}
 	
 	/**
@@ -112,5 +159,69 @@ public class OutputSettingParam {
 		else{
 			return "";
 		}
+	}
+	
+	/**
+	 * タイトル設定
+	 * @param title
+	 */
+	public void setTitle(String title){
+		mTitle = title;
+	}
+	
+	/**
+	 * タイトル取得
+	 * @return
+	 */
+	public String getTitle(){
+		return mTitle;
+	}
+	
+	/**
+	 * タイトルカナ設定
+	 * @param title
+	 */
+	public void setTitleKana(String title){
+		mTitleKana = title;
+	}
+	
+	/**
+	 * タイトルカナ取得
+	 * @return
+	 */
+	public String getTitleKana(){
+		return mTitleKana;
+	}
+	
+	/**
+	 * 作者名設定
+	 * @param author
+	 */
+	public void setAuthor(String author){
+		mAuthor = author;
+	}
+	
+	/**
+	 * 作者名取得
+	 * @return
+	 */
+	public String getAuthor(){
+		return mAuthor;
+	}
+	
+	/**
+	 * 作者名カナ設定
+	 * @param author
+	 */
+	public void setAuthorKana(String author){
+		mAuthorKana = author;
+	}
+	
+	/**
+	 * 作者名カナ取得
+	 * @return
+	 */
+	public String getAuthorKana(){
+		return mAuthorKana;
 	}
 }

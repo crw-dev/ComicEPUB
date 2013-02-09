@@ -175,20 +175,22 @@ public class MainFrame extends JFrame implements OnEventListener {
 							String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
 							mSettingFilePath = settingFilePath;
 							
+							OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
+							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
+							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
 								//TODO: implement setting file reader/writer
 								XmlWriter loader = new XmlWriter();
 								loader.openLoadSettingFile(mSettingFilePath);
-								OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
 								ImageFilterParam param = new ImageFilterParam();
 								loader.loadSetting(outputParam, param, list);
 								
 								// update setting
-								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
 								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParam, param);
 							}
-							
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
+		
 							mTable.setImageFileInfoList(list);
 					
 						}catch(Exception e){
@@ -202,6 +204,48 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     }));
 	     
 
+	}
+	
+	
+	/**
+	 * 入力ファイル名から出力ファイル名を自動設定　"[作者名]タイトル.zip"
+	 * @param param
+	 * @param filepath
+	 */
+	private void setOutputParamByFilename(OutputSettingParam param, String filepath){
+		File file = new File(filepath);
+		String name = file.getName();
+		
+		int dotIndex = name.lastIndexOf(".");
+		if(dotIndex >= 0){
+			name = name.substring(0, dotIndex);
+		}
+
+		String title = null;
+		String author = null;
+		int start = -1;
+		int end = -1;
+		if((start = name.indexOf("[")) >= 0){
+			end = name.indexOf("]");
+			start += 1;
+			if(end > start){
+				author = name.substring(start, end);
+			}
+		}
+		if(author == null){
+			title = name;
+		}
+		else{
+			String text = name.substring(end+1);
+			title = text.trim();
+		}
+		
+		if(title != null && !title.isEmpty()){
+			param.setTitle(title);
+		}
+		if(author != null && !author.isEmpty()){
+			param.setAuthor(author);
+		}
 	}
 	
 	private void saveSettingFile(String filepath){

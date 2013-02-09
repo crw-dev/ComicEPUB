@@ -1,10 +1,10 @@
 package jp.crwdev.app.setting;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +25,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import jp.crwdev.app.ImageFileInfoBase;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
@@ -116,6 +115,51 @@ public class XmlWriter {
 		}
 
 		//TODO:
+		// <folder>
+		Element folderElem = mDocument.createElement("folder");
+		folderElem.appendChild(mDocument.createTextNode(output.getOutputPath()));
+		parent.appendChild(folderElem);
+
+		// <size>
+		Dimension size = output.getImageSize();
+		if(size != null && size.width != 0 && size.height != 0){
+			Element sizeElem = mDocument.createElement("size");
+			folderElem.setAttribute("width", Integer.toString(size.width));
+			folderElem.setAttribute("height", Integer.toString(size.height));
+			parent.appendChild(sizeElem);
+		}
+		
+		// <title>
+		String title = output.getTitle();
+		if(!title.isEmpty()){
+			Element titleElem = mDocument.createElement("title");
+			titleElem.appendChild(mDocument.createTextNode(title));
+			parent.appendChild(titleElem);
+		}
+
+		// <title_kana>
+		String titleKana = output.getTitleKana();
+		if(!titleKana.isEmpty()){
+			Element titleKanaElem = mDocument.createElement("title_kana");
+			titleKanaElem.appendChild(mDocument.createTextNode(titleKana));
+			parent.appendChild(titleKanaElem);
+		}
+		
+		// <author>
+		String author = output.getAuthor();
+		if(!author.isEmpty()){
+			Element authorElem = mDocument.createElement("author");
+			authorElem.appendChild(mDocument.createTextNode(author));
+			parent.appendChild(authorElem);
+		}
+
+		// <title_kana>
+		String authorKana = output.getAuthorKana();
+		if(!authorKana.isEmpty()){
+			Element authorKanaElem = mDocument.createElement("author_kana");
+			authorKanaElem.appendChild(mDocument.createTextNode(authorKana));
+			parent.appendChild(authorKanaElem);
+		}
 
 	}
 	
@@ -306,6 +350,39 @@ public class XmlWriter {
 	private void loadOutput(Node outputNode, OutputSettingParam output){
 		if(outputNode.getNodeName().equalsIgnoreCase("output")){
 			//TODO:
+
+			NodeList nodes = outputNode.getChildNodes();
+			for(int i=0; i<nodes.getLength(); i++){
+				Node node = nodes.item(i);
+				NamedNodeMap attrs = node.getAttributes();
+				String name = node.getNodeName();
+				if(name.equalsIgnoreCase("folder")){
+					String path = node.getFirstChild().getNodeValue();
+					output.setOutputPath(path);
+				}
+				else if(name.equalsIgnoreCase("size")){
+					String width = getAttributeValue(attrs, "width");
+					String height = getAttributeValue(attrs, "height");
+					output.setImageSize(Integer.parseInt(width), Integer.parseInt(height));
+				}
+				else if(name.equalsIgnoreCase("title")){
+					String value = node.getFirstChild().getNodeValue();
+					output.setTitle(value);
+				}
+				else if(name.equalsIgnoreCase("title_kana")){
+					String value = node.getFirstChild().getNodeValue();
+					output.setTitleKana(value);
+				}
+				else if(name.equalsIgnoreCase("author")){
+					String value = node.getFirstChild().getNodeValue();
+					output.setAuthor(value);
+				}
+				else if(name.equalsIgnoreCase("author_kana")){
+					String value = node.getFirstChild().getNodeValue();
+					output.setAuthorKana(value);
+				}
+			}
+
 		}
 	}
 	
@@ -319,7 +396,6 @@ public class XmlWriter {
 				Node node = nodes.item(i);
 				if(node.getNodeName().equalsIgnoreCase("filename")){
 					filenameNode = node;
-					//String filename = node.getNodeValue();
 				}
 				else if(node.getNodeName().equalsIgnoreCase("param")){
 					paramNode = node;
@@ -329,13 +405,6 @@ public class XmlWriter {
 			if(filenameNode != null && paramNode != null){
 				String filename = filenameNode.getFirstChild().getNodeValue();
 				IImageFileInfo info = map.get(filename);
-//				for(int i=0; i<list.size(); i++){
-//					IImageFileInfo item = list.get(i);
-//					if(item.getFileName().equals(filename)){
-//						info = item;
-//						break;
-//					}
-//				}
 				if(info != null){
 					loadParam(paramNode, info.getFilterParam());
 				}
@@ -444,13 +513,4 @@ public class XmlWriter {
 		return node.getNodeValue();
 	}
 	
-	private void showNodes(Node node, String space) {
-		NodeList nodes = node.getChildNodes();
-		for (int i=0; i<nodes.getLength(); i++) {
-			Node node2 = nodes.item(i);
-			System.out.println(space + "「" + node2.getNodeName() + "/" + node2.getNodeValue() + "」");
-			showNodes(node2, space + "    ");
-		}	
-	}
-
 }
