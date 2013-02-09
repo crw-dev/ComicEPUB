@@ -46,6 +46,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private LineHandleSet guideLineHandle = new LineHandleSet();
 	
 	private boolean mIsPreviewMode = false;
+	private boolean mIsZoomDrag = false;
+	private Point mZoomPoint = new Point();
 	private Rectangle mImageArea = new Rectangle();
 	
 	
@@ -89,7 +91,26 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int x = (w - imageW)/2;
 			int y = (h - imageH)/2;
 			mImageArea.setBounds(x, y, imageW, imageH);
-			g.drawImage(mDisplayImage, x, y, this);
+			if(!mIsPreviewMode && mIsZoomDrag){
+				//TODO
+				float imageScale = 1.5f;
+				if(imageW > w || imageH > h){
+					imageScale = 1.0f;
+				}
+				int dw = (int)(imageW * imageScale);
+				int dh = (int)(imageH * imageScale);
+				int dx = (w - dw)/2;
+				int dy = (h - dh)/2;
+				float scale = dw / (float)w;
+				int offsetx = mZoomPoint.x - w/2;
+				int offsety = mZoomPoint.y - h/2;
+				dx -= offsetx * scale;
+				dy -= offsety * scale;
+				g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+			}
+			else{
+				g.drawImage(mDisplayImage, x, y, this);
+			}
 			
 			if(guideLineHandle.isDragHandle()){
 				
@@ -260,6 +281,15 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					ptRightBottom.setLocation(x, y);
 				}
 			}
+			else{
+				// Zoom start
+				//TODO
+				if(mImageArea.contains(x, y)){
+					mIsZoomDrag = true;
+					mZoomPoint.setLocation(x, y);
+					repaint();
+				}
+			}
 		}
 	}
 
@@ -331,6 +361,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						return;
 					}
 				}
+			}
+			else{
+				// Zoom end
+				//TODO
+				mIsZoomDrag = false;
 			}
 
 		}
@@ -433,6 +468,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						ptLeftTop.y = mBasePoint.y;
 					}
 				}
+				repaint();
+			}
+			else{
+				// Zoom
+				//TODO
+				mZoomPoint.setLocation(x, y);
+
 				repaint();
 			}
 		}
