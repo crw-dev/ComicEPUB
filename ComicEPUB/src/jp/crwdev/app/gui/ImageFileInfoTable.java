@@ -319,10 +319,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		String position = param.getTranslateX() + "," + param.getTranslateY();
 		String width = Integer.toString(info.getWidth());
 		String height = Integer.toString(info.getHeight());
-		String size = Long.toString(info.getSize());
+		//String size = Long.toString(info.getSize());
 		String splitType = Constant.getSplitTypeText(param.getSplitType());
 		
-		return new String[]{info.getFileName(), pageType , rotate, position, width, height, size, splitType};
+		return new String[]{info.getFileName(), pageType , rotate, position, width, height, splitType};
 	}
 
 	

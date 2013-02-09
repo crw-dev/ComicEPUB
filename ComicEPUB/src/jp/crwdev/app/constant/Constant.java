@@ -25,7 +25,7 @@ public class Constant {
 	public static final String TABLE_HEADER_POSITION = "座標";
 	public static final String TABLE_HEADER_WIDTH = "幅";
 	public static final String TABLE_HEADER_HEIGHT = "高さ";
-	public static final String TABLE_HEADER_SIZE = "サイズ";
+	//public static final String TABLE_HEADER_SIZE = "サイズ";
 	public static final String TABLE_HEADER_SPLITTYPE = "分割";
 	
 	public static final int TABLE_COLUMN_ENTRYNAME = 0;
@@ -34,8 +34,8 @@ public class Constant {
 	public static final int TABLE_COLUMN_POSITION = 3;
 	public static final int TABLE_COLUMN_WIDTH = 4;
 	public static final int TABLE_COLUMN_HEIGHT = 5;
-	public static final int TABLE_COLUMN_SIZE = 6;
-	public static final int TABLE_COLUMN_SPLITTYPE = 7;
+	//public static final int TABLE_COLUMN_SIZE = 6;
+	public static final int TABLE_COLUMN_SPLITTYPE = 6;
 	
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
 		TABLE_HEADER_ENTRYNAME,
@@ -44,7 +44,7 @@ public class Constant {
 		TABLE_HEADER_POSITION,
 		TABLE_HEADER_WIDTH,
 		TABLE_HEADER_HEIGHT,
-		TABLE_HEADER_SIZE,
+		//TABLE_HEADER_SIZE,
 		TABLE_HEADER_SPLITTYPE,
 	};
 	

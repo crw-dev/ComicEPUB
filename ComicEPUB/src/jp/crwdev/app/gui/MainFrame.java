@@ -173,12 +173,12 @@ public class MainFrame extends JFrame implements OnEventListener {
 							IImageFileInfoList list = scanner.getImageFileInfoList();
 							
 							String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
+							mSettingFilePath = settingFilePath;
 							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
 								//TODO: implement setting file reader/writer
 								XmlWriter loader = new XmlWriter();
-								mSettingFilePath = settingFilePath;
 								loader.openLoadSettingFile(mSettingFilePath);
 								OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
 								ImageFilterParam param = new ImageFilterParam();

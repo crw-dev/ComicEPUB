@@ -45,7 +45,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 				mFormat = getFormat(suffix);
 				mWidth = reader.getWidth(0);
 				mHeight = reader.getHeight(0);
-				mSize = stream.length();
+				mSize = 0;//in.available();//stream.length();
 			} catch (IOException e) {
 				throw e;
 			} finally {
