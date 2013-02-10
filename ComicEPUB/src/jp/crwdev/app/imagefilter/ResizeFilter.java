@@ -15,6 +15,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.mortennobel.imagescaling.ResampleOp;
 
 import jp.crwdev.app.interfaces.IImageFilter;
 
@@ -62,7 +66,12 @@ public class ResizeFilter implements IImageFilter {
 		mResizedScaleW = scalew;
 		mResizedScaleH = scaleh;
 		
-		if(!param.isPreview() || true){
+		if(true){
+			ResampleOp resizeOp = new ResampleOp(rwidth, rheight);
+			
+			return resizeOp.filter(image, null);
+		}
+		else if(!param.isPreview() || true){
 			// 低速・高品質
 			ImageFilter filter = new AreaAveragingScaleFilter(rwidth, rheight);
 			ImageProducer im = new FilteredImageSource(image.getSource(), filter);
@@ -133,6 +142,5 @@ public class ResizeFilter implements IImageFilter {
 		}
 		return new Dimension(imgWidth, imgHeight);
 	}
-
 
 }

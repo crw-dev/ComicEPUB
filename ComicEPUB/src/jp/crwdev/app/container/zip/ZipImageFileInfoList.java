@@ -9,7 +9,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import jp.crwdev.app.BufferedImageIO;
-import jp.crwdev.app.ImageFileInfoList;
+import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 

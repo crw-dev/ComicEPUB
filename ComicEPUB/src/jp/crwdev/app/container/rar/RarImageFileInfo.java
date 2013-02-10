@@ -8,7 +8,7 @@ import com.github.junrar.exception.RarException;
 import com.github.junrar.rarfile.FileHeader;
 
 
-import jp.crwdev.app.ImageFileInfoBase;
+import jp.crwdev.app.container.ImageFileInfoBase;
 
 public class RarImageFileInfo extends ImageFileInfoBase {
 

@@ -5,6 +5,7 @@ package jp.crwdev.app;
 
 import java.awt.Dimension;
 
+import jp.crwdev.app.container.epub.EpubImageFileWriter;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -99,7 +100,7 @@ public class OutputSettingParam {
 			return new FolderImageFileWriter();
 		}
 		else if(mOutputFileType.equalsIgnoreCase("epub")){
-			return null;
+			return new EpubImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana(), getEpubType());
 		}
 		return null;
 	}

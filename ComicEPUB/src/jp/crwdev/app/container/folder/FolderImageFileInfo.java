@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import jp.crwdev.app.ImageFileInfoBase;
+import jp.crwdev.app.container.ImageFileInfoBase;
 
 public class FolderImageFileInfo extends ImageFileInfoBase {
 

@@ -5,6 +5,8 @@ package jp.crwdev.app.imagefilter;
 
 import java.awt.image.BufferedImage;
 
+import com.mortennobel.imagescaling.ImageUtils;
+
 import jp.crwdev.app.interfaces.IImageFilter;
 
 public class GrayscaleFilter implements IImageFilter {

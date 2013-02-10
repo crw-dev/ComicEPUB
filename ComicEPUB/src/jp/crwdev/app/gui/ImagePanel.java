@@ -20,6 +20,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SpringLayout;
 
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
@@ -50,8 +51,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private Point mZoomPoint = new Point();
 	private Rectangle mImageArea = new Rectangle();
 	
-	
 	public ImagePanel(){
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);

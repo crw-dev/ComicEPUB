@@ -122,7 +122,6 @@ public class SettingComponent {
 	// ProgressBar
 	public JProgressBar progressBar = new JProgressBar();
 	
-
 	private SettingPanel mParent = null;
 	
 	public SettingComponent(SettingPanel parent){
@@ -134,6 +133,7 @@ public class SettingComponent {
 		
 		filterResize.setSelected(true);
 		filterPreview.setSelected(true);
+		
 		
 		// Label
 		parent.add(labelImageSize);

@@ -7,7 +7,7 @@ import com.github.junrar.Archive;
 import com.github.junrar.rarfile.FileHeader;
 
 import jp.crwdev.app.BufferedImageIO;
-import jp.crwdev.app.ImageFileInfoList;
+import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 
 public class RarImageFileInfoList extends ImageFileInfoList {

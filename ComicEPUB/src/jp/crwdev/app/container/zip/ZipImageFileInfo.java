@@ -10,7 +10,7 @@ import java.util.zip.ZipException;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
-import jp.crwdev.app.ImageFileInfoBase;
+import jp.crwdev.app.container.ImageFileInfoBase;
 
 
 public class ZipImageFileInfo extends ImageFileInfoBase {
