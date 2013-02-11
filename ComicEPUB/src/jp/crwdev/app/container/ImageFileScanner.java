@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.crwdev.app.container.folder.FolderImageFileScanner;
+import jp.crwdev.app.container.pdf.PdfImageFileScanner;
 import jp.crwdev.app.container.rar.RarFileScanner;
 import jp.crwdev.app.container.zip.ZipFileScanner;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
@@ -36,6 +37,7 @@ public class ImageFileScanner implements IImageFileScanner {
 		mScanners.add(new FolderImageFileScanner());
 		mScanners.add(new ZipFileScanner());
 		mScanners.add(new RarFileScanner());
+		mScanners.add(new PdfImageFileScanner());
 	}
 
 	@Override

@@ -3,7 +3,6 @@
  */
 package jp.crwdev.app.container.zip;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipException;

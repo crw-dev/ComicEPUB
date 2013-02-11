@@ -515,7 +515,7 @@ public class SettingComponent {
 	
 	public void setValues(){
 		
-		gammaValue.setValue(new Double(1.0f));
+		gammaValue.setValue(new Double(1.6f));
 		
 		outputImageSize.addItem("600x800");
 		outputImageSize.addItem("800x1200");

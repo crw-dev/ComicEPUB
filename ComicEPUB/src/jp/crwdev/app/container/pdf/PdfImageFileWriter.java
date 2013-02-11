@@ -95,11 +95,11 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				}
 				
 				
-				//Rectangle pageSize = document.getPageSize();
 				int imageWidth = image.getWidth();
 				int imageHeight = image.getHeight();
 				
 				if(document == null){
+					// Open前にサイズ指定しないと１ページ目に反映されない…
 					document = new Document(PageSize.A4, 0, 0, 0, 0);
 					document.setPageSize(new Rectangle(0, 0, imageWidth, imageHeight));
 					
@@ -115,9 +115,6 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				}
 
 				Image jpeg2pdfImage = Image.getInstance(image, null);
-				float pageHeight = document.top() + document.bottom();
-				float pageWidth = document.left() + document.right();
-				//jpeg2pdfImage.scaleToFit(pageHeight, pageWidth);
 				document.add(jpeg2pdfImage);
 				
 				if(listener != null){

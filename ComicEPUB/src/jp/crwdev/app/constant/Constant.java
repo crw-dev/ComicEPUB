@@ -1,6 +1,16 @@
 ﻿package jp.crwdev.app.constant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Constant {
+
+	public static final List<String> SUPPORT_INPUT_PREFIX = new ArrayList<String>();
+	static{
+		SUPPORT_INPUT_PREFIX.add("zip");
+		SUPPORT_INPUT_PREFIX.add("rar");
+		SUPPORT_INPUT_PREFIX.add("pdf");
+	}
 
 	public static final int PAGETYPE_AUTO = 0;
 	public static final int PAGETYPE_TEXT = 1;

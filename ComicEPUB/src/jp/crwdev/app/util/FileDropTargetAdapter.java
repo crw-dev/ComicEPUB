@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import jp.crwdev.app.constant.Constant;
+
 public class FileDropTargetAdapter extends DropTargetAdapter {
 
 	public interface OnDropListener {
@@ -50,7 +52,12 @@ public class FileDropTargetAdapter extends DropTargetAdapter {
 					dropFile = fileName;
 				}
 				else{
-					if(fileName.contains(".zip") || fileName.contains(".rar")){
+					int dotIndex = fileName.lastIndexOf(".");
+					String suffix = "";
+					if(dotIndex >= 0){
+						suffix = fileName.substring(dotIndex + 1);
+					}
+					if(Constant.SUPPORT_INPUT_PREFIX.contains(suffix.toLowerCase())){
 						dropFile = fileName;
 					}else{
 						String parent = file.getParent();
