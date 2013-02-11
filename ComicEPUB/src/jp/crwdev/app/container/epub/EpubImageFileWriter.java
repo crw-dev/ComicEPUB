@@ -1,5 +1,6 @@
 package jp.crwdev.app.container.epub;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -8,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -120,10 +123,10 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		    }
 		    
 			mkdir(IMAGE_DIR, zipOut);
-			writeImageFiles(IMAGE_DIR, list, zipOut, listener);
+			List<Dimension> sizeList = writeImageFiles(IMAGE_DIR, list, zipOut, listener);
 
 		    mkdir(XHTML_DIR, zipOut);
-		    writeXHtmlFiles(list, zipOut);
+		    writeXHtmlFiles(sizeList, zipOut);
 		    
 		    writeNcxFile(uuid, mTitle, zipOut);
 
@@ -241,7 +244,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		zipOut.closeEntry();
 	}
 	
-	private void writeImageFiles(String imageDir, IImageFileInfoList list, ZipOutputStream zipOut, OnProgressListener listener) throws Exception {
+	private List<Dimension> writeImageFiles(String imageDir, IImageFileInfoList list, ZipOutputStream zipOut, OnProgressListener listener) throws Exception {
 
 		if(!imageDir.isEmpty()){
 			imageDir += "/";
@@ -250,6 +253,8 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		int size = list.size();
 		float progressOffset = 95 / (float)size;
+		
+		List<Dimension> sizeList = new ArrayList<Dimension>(size);
 		
 		for(int i=0; i<size; i++){
 			IImageFileInfo info = list.get(i);
@@ -274,19 +279,24 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				
 				in.close();
 
+				sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
+
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}
 			
 			zipOut.closeEntry();
 			
+			
 			if(listener != null){
 				listener.onProgress((int)((i*1)*progressOffset)+5, null);
 			}
 		}
 		
+		return sizeList;
 	}
-	private void writeXHtmlFiles(IImageFileInfoList list, ZipOutputStream zipOut) throws Exception {
+	
+	private void writeXHtmlFiles(List<Dimension> list, ZipOutputStream zipOut) throws Exception {
 		
 		int size = list.size();
 		for(int i=0; i<size; i++){
@@ -294,7 +304,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				throw new Exception("user cancel");
 			}
 			
-			IImageFileInfo info = list.get(i);
+			Dimension imageSize = list.get(i);
 
 			String filename = getXhtmlFileName(i);
 			
@@ -302,7 +312,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			
 			PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
 			
-			out.write(getXhtml(info, getImageFileName(i, ".jpg")));
+			out.write(getXhtml(imageSize, getImageFileName(i, ".jpg")));
 			
 			out.flush();
 			
@@ -494,12 +504,9 @@ public class EpubImageFileWriter implements IImageFileWriter {
 
 	
 	
-	private String getXhtml(IImageFileInfo info, String imageFilename){
+	private String getXhtml(Dimension size, String imageFilename){
 		StringBuilder sb = new StringBuilder();
-		
-		int width = info.getWidth();
-		int height = info.getHeight();
-		
+				
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		sb.append("<!DOCTYPE html>\n");
 		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:epub=\"http://www.idpf.org/2007/ops\" xml:lang=\"ja\">\n");
@@ -508,12 +515,12 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("<title></title>\n");
 		sb.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"../style/fixed-layout-jp.css\"/>\n");
 		
-		sb.append("<meta name=\"viewport\" content=\"width=" + width + ", height=" + height + "\"/>\n");
+		sb.append("<meta name=\"viewport\" content=\"width=" + size.width + ", height=" + size.height + "\"/>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
 		sb.append("<div class=\"main\">\n");
-		sb.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"100%\" height=\"100%\" viewBox=\"0 0 " + width + " " + height + "\">\n");
-		sb.append("<image width=\"" + width + "\" height=\"" + height + "\" xlink:href=\"../image/" + imageFilename + "\"/>\n");
+		sb.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"100%\" height=\"100%\" viewBox=\"0 0 " + size.width + " " + size.height + "\">\n");
+		sb.append("<image width=\"" + size.width + "\" height=\"" + size.height + "\" xlink:href=\"../image/" + imageFilename + "\"/>\n");
 		sb.append("</svg>\n");
 		sb.append("</div>\n");
 		sb.append("</body>\n");
