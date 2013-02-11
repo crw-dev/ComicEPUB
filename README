@@ -1,4 +1,4 @@
-Imagefile edit Application
+﻿自炊画像編集＆出力アプリ
 
 
 input - folder .zip .rar .pdf(implementing)
@@ -19,4 +19,5 @@ http://code.google.com/p/java-image-scaling/
 
 iText
 http://itextpdf.com/
+
 
