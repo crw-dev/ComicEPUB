@@ -3,6 +3,7 @@
  */
 package jp.crwdev.app;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +36,7 @@ public class BufferedImageIO {
 			JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(stream);
 			try {
 				BufferedImage image = decoder.decodeAsBufferedImage();
-				return image;
+				return prepareBufferedImage(image);
 			} catch (ImageFormatException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -44,12 +45,24 @@ public class BufferedImageIO {
 		}
 		else{
 			try {
-				return ImageIO.read(stream);
+				return prepareBufferedImage(ImageIO.read(stream));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		return null;
+	}
+	
+	private static BufferedImage prepareBufferedImage(BufferedImage image){
+		int type = image.getType();
+		if(type == BufferedImage.TYPE_BYTE_INDEXED){
+			BufferedImage dest = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+			Graphics2D g = dest.createGraphics();
+			g.drawImage(image, 0, 0, null);
+			g.dispose();
+			return dest;
+		}
+		return image;
 	}
 	
 	public static boolean write(BufferedImage image, String format, float quality, OutputStream out){

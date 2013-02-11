@@ -5,6 +5,10 @@ package jp.crwdev.app.interfaces;
 
 public interface IImageFileWriter {
 
+	public interface OnProgressListener{
+		void onProgress(int progress, String message);
+	}
+	
 	/**
 	 * 出力ファイルオープン
 	 * @param filepath
@@ -23,7 +27,12 @@ public interface IImageFileWriter {
 	 * @param list IImageFileInfoListオブジェクト
 	 * @return true=成功、false=失敗
 	 */
-	boolean write(IImageFileInfoList list);
+	boolean write(IImageFileInfoList list, OnProgressListener listener);
+	
+	/**
+	 * ファイル出力処理キャンセル
+	 */
+	void cancel();
 	
 	/**
 	 * 出力ファイルクローズ

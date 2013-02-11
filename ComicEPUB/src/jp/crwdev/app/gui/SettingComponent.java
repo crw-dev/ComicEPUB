@@ -44,6 +44,7 @@ public class SettingComponent {
 	public JLabel labelGamma = new JLabel("ガンマ補正値");
 	public JLabel labelContrast = new JLabel("Co:0");
 	public JLabel labelBrightness = new JLabel("Br:0");
+	public JLabel labelMessage = new JLabel("");
 
 	// CheckBox
 	public JCheckBox filterEnable = new JCheckBox("無変換");
@@ -118,9 +119,11 @@ public class SettingComponent {
 	// Button
 	public JButton chooseFolderButton = new JButton("出力先フォルダ");
 	public JButton convertButton = new JButton("変換");
+	public JButton cancelButton = new JButton("Cancel");
 
 	// ProgressBar
 	public JProgressBar progressBar = new JProgressBar();
+	
 	
 	private SettingPanel mParent = null;
 	
@@ -134,6 +137,10 @@ public class SettingComponent {
 		filterResize.setSelected(true);
 		filterPreview.setSelected(true);
 		
+		// ProgressBar
+		parent.add(progressBar);
+		parent.add(labelMessage);
+		parent.add(cancelButton);
 		
 		// Label
 		parent.add(labelImageSize);
@@ -193,8 +200,6 @@ public class SettingComponent {
 		parent.add(chooseFolderButton);
 		parent.add(convertButton);
 		
-		// ProgressBar
-		parent.add(progressBar);
 	}
 	
 	public void applyLayout(SpringLayout layout){
@@ -303,7 +308,8 @@ public class SettingComponent {
 		layout.putConstraint(SpringLayout.EAST, outputFolder, 0, SpringLayout.EAST, mParent);
 		layout.putConstraint(SpringLayout.NORTH, outputFolder, 3, SpringLayout.SOUTH, outputAuthor);
 		layout.putConstraint(SpringLayout.NORTH, chooseFolderButton, 3, SpringLayout.SOUTH, outputFolder);
-		layout.putConstraint(SpringLayout.NORTH, convertButton, 3, SpringLayout.SOUTH, chooseFolderButton);
+		layout.putConstraint(SpringLayout.NORTH, convertButton, 0, SpringLayout.NORTH, chooseFolderButton);
+		layout.putConstraint(SpringLayout.WEST, convertButton, 3, SpringLayout.EAST, chooseFolderButton);
 		
 		cropFullTop.setPreferredSize(new Dimension(50, 20));
 		cropFullLeft.setPreferredSize(new Dimension(50, 20));
@@ -357,11 +363,29 @@ public class SettingComponent {
 		layout.putConstraint(SpringLayout.WEST, cropPictBottom, 50, SpringLayout.WEST, mParent);
 		
 		
+		layout.putConstraint(SpringLayout.WEST, cancelButton, 0, SpringLayout.WEST, mParent);
+		layout.putConstraint(SpringLayout.SOUTH, cancelButton, 0, SpringLayout.SOUTH, mParent);
+		
 		layout.putConstraint(SpringLayout.SOUTH, progressBar, 0, SpringLayout.SOUTH, mParent);
+		layout.putConstraint(SpringLayout.WEST, progressBar, 2, SpringLayout.EAST, cancelButton);
 		layout.putConstraint(SpringLayout.EAST, progressBar, 0, SpringLayout.EAST, mParent);
-		layout.putConstraint(SpringLayout.WEST, progressBar, 0, SpringLayout.WEST, mParent);
+		
+		layout.putConstraint(SpringLayout.SOUTH, labelMessage, 2, SpringLayout.NORTH, progressBar);
+		layout.putConstraint(SpringLayout.EAST, labelMessage, 2, SpringLayout.EAST, mParent);
+		layout.putConstraint(SpringLayout.WEST, labelMessage, 2, SpringLayout.WEST, progressBar);
+		
 		
 		progressBar.setIndeterminate(false);
+	
+		cancelButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(mParent != null){
+					mParent.cancelConvert();
+				}
+			}
+		});
+		cancelButton.setEnabled(false);
 		
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
@@ -448,7 +472,9 @@ public class SettingComponent {
 			public void actionPerformed(ActionEvent arg0) {
 				if(!outputFolder.getText().isEmpty()){
 					if(mParent != null){
-						mParent.onStartConvert();
+						convertButton.setEnabled(false);
+						cancelButton.setEnabled(true);
+						mParent.startConvert();
 					}
 				}
 			}
@@ -754,6 +780,22 @@ public class SettingComponent {
 	}
 	
 	/**
+	 * 変換終了イベント
+	 */
+	public void onFinishConvert(){
+		convertButton.setEnabled(true);
+		cancelButton.setEnabled(false);
+	}
+	
+	/**
+	 * 進捗メッセージ設定
+	 * @param message
+	 */
+	public void setProgressMessage(String message){
+		labelMessage.setText(message);
+	}
+	
+	/**
 	 * 背景文字列付きテキストフィールド
 	 * @author USER
 	 *
@@ -849,9 +891,5 @@ public class SettingComponent {
 		}
 	
 	}
-//	private String mTitle = "";
-//	private String mTitleKana = "";
-//	private String mAuthor = "";
-//	private String mAuthorKana = "";
 	
 }

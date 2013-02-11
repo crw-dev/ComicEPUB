@@ -124,8 +124,8 @@ public class XmlWriter {
 		Dimension size = output.getImageSize();
 		if(size != null && size.width != 0 && size.height != 0){
 			Element sizeElem = mDocument.createElement("size");
-			folderElem.setAttribute("width", Integer.toString(size.width));
-			folderElem.setAttribute("height", Integer.toString(size.height));
+			sizeElem.setAttribute("width", Integer.toString(size.width));
+			sizeElem.setAttribute("height", Integer.toString(size.height));
 			parent.appendChild(sizeElem);
 		}
 		
@@ -169,16 +169,21 @@ public class XmlWriter {
 			parent = mRootElement;
 		}
 		
-		Element infoElem = mDocument.createElement("info");
-
-		Element filenameElem = mDocument.createElement("filename");
-		filenameElem.appendChild(mDocument.createTextNode(info.getFileName()));
+		ImageFilterParam param = info.getFilterParam();
+		if(param.isEdit()){
 		
-		infoElem.appendChild(filenameElem);
+			Element infoElem = mDocument.createElement("info");
+	
+			Element filenameElem = mDocument.createElement("filename");
+			filenameElem.appendChild(mDocument.createTextNode(info.getFileName()));
+			
+			infoElem.appendChild(filenameElem);
+			
+			writeParam(infoElem, param);
+			
+			parent.appendChild(infoElem);
 		
-		writeParam(infoElem, info.getFilterParam());
-		
-		parent.appendChild(infoElem);
+		}
 		
 	}
 	

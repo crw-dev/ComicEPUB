@@ -35,6 +35,7 @@ import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
 import jp.crwdev.app.interfaces.IImageFileWriter;
+import jp.crwdev.app.interfaces.IImageFileWriter.OnProgressListener;
 import jp.crwdev.app.setting.XmlWriter;
 import jp.crwdev.app.util.FileDropTargetAdapter;
 import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
@@ -42,6 +43,7 @@ import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
 public class MainFrame extends JFrame implements OnEventListener {
 
 	private IImageFileScanner mCurrentFile = null;
+	private IImageFileWriter mFileWriter = null;
 	private String mSettingFilePath = null;
 	
 	private ImageFileInfoTable mTable;
@@ -53,6 +55,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private boolean mIsUnificationTextPage = false;
 	
 	private EventObserver mEventObserver = new EventObserver();
+	private Object mLock = new Object();
 	
 	public MainFrame(){
 		 setSize(new Dimension(950,750));
@@ -306,12 +309,16 @@ public class MainFrame extends JFrame implements OnEventListener {
 			public void run(){
 				mEventObserver.startProgress();
 				
+				// 基本変換パラメータ取得
 				ImageFilterParam param = mSettingPanel.getFilterParam();
+				// 出力設定を取得
 				OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
 				
+				//　ファイルリストを取得
 				IImageFileInfoList list = mTable.getImageFileInfoList();
 				param.setPreview(false);
 				
+				// 出力サイズを設定
 				Dimension size = outSetting.getImageSize();
 				if(size == null || (size.width == 0 || size.height == 0)){
 					param.setResize(false);
@@ -320,20 +327,43 @@ public class MainFrame extends JFrame implements OnEventListener {
 					param.setResizeDimension(size);
 				}
 				
+				// 基本出力フィルタを生成
 				OutputImageFilter imageFilter = new OutputImageFilter(param);
 				
+				// 出力設定からImageFileWriterを生成
 				IImageFileWriter writer = outSetting.getImageFileWriter();
 				writer.setImageFilter(imageFilter);
 				
+				// 出力ファイル(フォルダ)パスを作成
 				File file = new File(outSetting.getOutputPath(), outSetting.getOutputFileName());
 				
+				// 出力ファイル(フォルダ)オープン
 				if(writer.open(file.getAbsolutePath())){
-					writer.write(list);
+					synchronized(mLock){
+						mFileWriter = writer; // ここからCancel可能
+					}
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "start");
+					// 出力処理開始
+					writer.write(list, new OnProgressListener(){
+						@Override
+						public void onProgress(int progress, String message) {
+							if(message == null){
+								message = progress + "%";
+							}
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
+						}
+					});
+					// 出力終了
+					synchronized(mLock){
+						mFileWriter = null;
+					}
 					writer.close();
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
 				}
 				
 				mEventObserver.stopProgress();
 				
+				mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FinishConvert, 0);
 			}
 		}.start();
 	}
@@ -346,6 +376,13 @@ public class MainFrame extends JFrame implements OnEventListener {
 			break;
 		case EventObserver.EventType_BeginConvert:
 			beginConvert();
+			break;
+		case EventObserver.EventType_CancelConvert:
+			synchronized(mLock){
+				if(mFileWriter != null){
+					mFileWriter.cancel();
+				}
+			}
 			break;
 		default:
 			break;

@@ -21,6 +21,8 @@ public class FolderImageFileWriter implements IImageFileWriter {
 	private File mOutputFolder = null;
 	/** 画像フィルタ */
 	private IImageFilter mBaseFilter = null;
+	/** 処理中断フラグ */
+	private boolean mIsCancel = false;
 	
 
 	/**
@@ -61,9 +63,23 @@ public class FolderImageFileWriter implements IImageFileWriter {
 	}
 
 	@Override
-	public boolean write(IImageFileInfoList list) {
+	public boolean write(IImageFileInfoList list, OnProgressListener listener) {
 		
-		for(int i=0; i<list.size(); i++){
+		mIsCancel = false;
+		
+		if(listener != null){
+			listener.onProgress(0, null);
+		}
+		
+		int size = list.size();
+		float progressOffset = 100 / (float)size;
+		
+		for(int i=0; i<size; i++){
+			
+			if(mIsCancel){
+				return false;
+			}
+			
 			IImageFileInfo info = list.get(i);
 			BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
 			if(mBaseFilter != null){
@@ -82,13 +98,24 @@ public class FolderImageFileWriter implements IImageFileWriter {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if(listener != null){
+				listener.onProgress((int)((i+1)*progressOffset), null);
+			}
 		}
+		
 		return true;
 	}
 
 	@Override
 	public void close() {
-
+		if(mIsCancel){
+			// NOP
+		}
+	}
+	
+	@Override
+	public void cancel() {
+		mIsCancel = true;
 	}
 
 }

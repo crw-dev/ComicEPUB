@@ -22,6 +22,9 @@ public class EventObserver {
 	public static final int EventType_BeginConvert = 3;	// no param
 	public static final int EventType_Progress = 4;		// arg1: 0=stop other=start
 	public static final int EventType_UpdateOutputParam = 5;	// obj: OutputSettingParam
+	public static final int EventType_ProgressMessage = 6;		// obj: String
+	public static final int EventType_FinishConvert = 7;		// no param
+	public static final int EventType_CancelConvert = 8;		// no param
 	
 
 	/** イベントリスナ 4種類  */

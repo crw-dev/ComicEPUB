@@ -34,10 +34,13 @@ public class SettingPanel extends JPanel implements OnEventListener {
 		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_UpdateFilterParam, param);
 	}
 	
-	public void onStartConvert(){
+	public void startConvert(){
 		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginConvert, 0);
 	}
 	
+	public void cancelConvert(){
+		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_CancelConvert, 0);
+	}
 	
 	public ImageFilterParam getFilterParam(){
 		return mComponent.getCurrentFilterParam();
@@ -75,6 +78,12 @@ public class SettingPanel extends JPanel implements OnEventListener {
 			break;
 		case EventObserver.EventType_UpdateOutputParam:
 			mComponent.applyOutputParam((OutputSettingParam)obj);
+			break;
+		case EventObserver.EventType_ProgressMessage:
+			mComponent.setProgressMessage((String)obj);
+			break;
+		case EventObserver.EventType_FinishConvert:
+			mComponent.onFinishConvert();
 			break;
 		default:
 			break;

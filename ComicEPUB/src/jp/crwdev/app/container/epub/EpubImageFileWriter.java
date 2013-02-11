@@ -36,6 +36,8 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	private File mOutputFile = null;
 	/** 画像フィルタ */
 	private IImageFilter mBaseFilter = null;
+	/** 処理中断フラグ */
+	private boolean mIsCancel = false;
 	
 	private String mTitle = "";
 	private String mTitleKana = "";
@@ -80,12 +82,18 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	}
 
 	@Override
-	public boolean write(IImageFileInfoList list) {
+	public boolean write(IImageFileInfoList list, OnProgressListener listener) {
 
 		if(mOutputFile == null){
 			return false;
 		}
 		
+		mIsCancel = false;
+		
+		if(listener != null){
+			listener.onProgress(0, null);
+		}
+
 		ZipOutputStream zipOut = null;
 		
 		String uuid = getUUID();
@@ -103,9 +111,16 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		    mkdir(STYLE_DIR, zipOut);
 		    writeCssFile(zipOut);
 		    
+		    if(listener != null){
+		    	listener.onProgress(5, null);
+		    }
+		    
+		    if(mIsCancel){
+		    	return false;
+		    }
 		    
 			mkdir(IMAGE_DIR, zipOut);
-			writeImageFiles(IMAGE_DIR, list, zipOut);
+			writeImageFiles(IMAGE_DIR, list, zipOut, listener);
 
 		    mkdir(XHTML_DIR, zipOut);
 		    writeXHtmlFiles(list, zipOut);
@@ -115,10 +130,10 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		    mkdir(ITEM_DIR, zipOut);
 		    writeStandardOpf(zipOut, list, uuid, mBookType, mTitle, mTitleKana, "", 0, mAuthor, mAuthorKana, -1, -1);
 
-			zipOut.close();
-	
 		}catch(Exception e){
-			e.printStackTrace();
+			if(!e.getMessage().equals("user cancel")){
+				e.printStackTrace();
+			}
 		}finally{
 			if(zipOut != null){
 				try {
@@ -130,14 +145,27 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				zipOut = null;
 			}
 		}
+
 		return true;
 	}
 
 	@Override
 	public void close() {
+		if(mIsCancel){
+			if(mOutputFile != null){
+				if(mOutputFile.exists()){
+					mOutputFile.delete();
+				}
+			}
+		}
 		if(mOutputFile != null){
 			mOutputFile = null;
 		}
+	}
+	
+	@Override
+	public void cancel() {
+		mIsCancel = true;
 	}
 	
 	public String getUUID(){
@@ -208,15 +236,22 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		zipOut.closeEntry();
 	}
 	
-	private void writeImageFiles(String imageDir, IImageFileInfoList list, ZipOutputStream zipOut) throws IOException {
+	private void writeImageFiles(String imageDir, IImageFileInfoList list, ZipOutputStream zipOut, OnProgressListener listener) throws Exception {
 
 		if(!imageDir.isEmpty()){
 			imageDir += "/";
 		}
 		
+		
 		int size = list.size();
+		float progressOffset = 95 / (float)size;
+		
 		for(int i=0; i<size; i++){
 			IImageFileInfo info = list.get(i);
+			
+			if(mIsCancel){
+				throw new Exception("user cancel");
+			}
 			
 			String filename = getImageFileName(i, ".jpg");
 			
@@ -239,13 +274,21 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			}
 			
 			zipOut.closeEntry();
+			
+			if(listener != null){
+				listener.onProgress((int)((i*1)*progressOffset)+5, null);
+			}
 		}
 		
 	}
-	private void writeXHtmlFiles(IImageFileInfoList list, ZipOutputStream zipOut) throws IOException {
+	private void writeXHtmlFiles(IImageFileInfoList list, ZipOutputStream zipOut) throws Exception {
 		
 		int size = list.size();
 		for(int i=0; i<size; i++){
+			if(mIsCancel){
+				throw new Exception("user cancel");
+			}
+			
 			IImageFileInfo info = list.get(i);
 
 			String filename = getXhtmlFileName(i);

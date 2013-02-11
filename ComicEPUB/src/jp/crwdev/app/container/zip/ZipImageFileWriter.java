@@ -27,6 +27,8 @@ public class ZipImageFileWriter implements IImageFileWriter {
 	private IImageFilter mBaseFilter = null;
 	/** 圧縮率(0-10) */
 	private int mCompressLevel = 0;
+	/** 処理中断フラグ */
+	private boolean mIsCancel = false;
 
 	/**
 	 * コンストラクタ
@@ -73,46 +75,68 @@ public class ZipImageFileWriter implements IImageFileWriter {
 	}
 
 	@Override
-	public boolean write(IImageFileInfoList list) {
+	public boolean write(IImageFileInfoList list, OnProgressListener listener) {
 		if(list == null && mOutputZipFile != null){
 			return false;
 		}
+		
+		mIsCancel = false;
 
+		if(listener != null){
+			listener.onProgress(0, null);
+		}
+		
 		ZipOutputStream zipOut = null;;
 		try {
 			zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(mOutputZipFile)));
 			zipOut.setLevel(mCompressLevel);
+
+			int size = list.size();
+			float progressOffset = 100 / (float)size;
+			
+			for(int i=0; i<size; i++){
+				IImageFileInfo info = list.get(i);
+				BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+				if(mBaseFilter != null){
+					image = mBaseFilter.filter(image, info.getFilterParam());
+				}
+				
+				if(mIsCancel){
+					return false;
+				}
+				
+				try {
+					String filename = String.format("P%04d.jpg", i);
+					
+					zipOut.putNextEntry(new ZipEntry(filename));
+					
+					BufferedImageIO.write(image, "jpeg", 0.8f, zipOut);
+					
+					zipOut.closeEntry();
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				if(listener != null){
+					listener.onProgress((int)((i+1)*progressOffset), null);
+				}
+			}
+			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 			return false;
 		}
-
-		for(int i=0; i<list.size(); i++){
-			IImageFileInfo info = list.get(i);
-			BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
-			if(mBaseFilter != null){
-				image = mBaseFilter.filter(image, info.getFilterParam());
-			}
-			
+		finally{
 			try {
-				String filename = String.format("P%04d.jpg", i);
-				
-				zipOut.putNextEntry(new ZipEntry(filename));
-				
-				BufferedImageIO.write(image, "jpeg", 0.8f, zipOut);
-				
-				zipOut.closeEntry();
-				
+				if(zipOut != null){
+					zipOut.close();
+					zipOut = null;
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				return false;
 			}
-		}
-		
-		try {
-			zipOut.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
 		}
 		
 		return true;
@@ -120,9 +144,21 @@ public class ZipImageFileWriter implements IImageFileWriter {
 
 	@Override
 	public void close() {
+		if(mIsCancel){
+			if(mOutputZipFile != null){
+				if(mOutputZipFile.exists()){
+					mOutputZipFile.delete();
+				}
+			}
+		}
 		if(mOutputZipFile != null){
 			mOutputZipFile = null;
 		}
+	}
+
+	@Override
+	public void cancel() {
+		mIsCancel = true;
 	}
 
 }
