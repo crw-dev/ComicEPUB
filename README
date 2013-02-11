@@ -6,18 +6,18 @@ input - folder .zip .rar .pdf(implementing)
 output - folder .zip .epub .pdf
 
 
-commons-compress
+commons-compress (Apache License 2.0 http://www.apache.org/licenses/LICENSE-2.0)
 http://commons.apache.org/compress/
 http://commons.apache.org/compress/download_compress.cgi
 
-junrar
+junrar (Free https://raw.github.com/junrar/junrar/master/license.txt)
 http://mvnrepository.com/artifact/com.github.junrar/junrar/0.7
 https://github.com/junrar/junrar
 
-java-image-scaling
+java-image-scaling (LGPL)
 http://code.google.com/p/java-image-scaling/
 
-iText
+iText (GPLv3)
 http://itextpdf.com/
 
 

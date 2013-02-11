@@ -116,9 +116,12 @@ public class XmlWriter {
 
 		//TODO:
 		// <folder>
-		Element folderElem = mDocument.createElement("folder");
-		folderElem.appendChild(mDocument.createTextNode(output.getOutputPath()));
-		parent.appendChild(folderElem);
+		String outputFolder = output.getOutputPath();
+		if(!outputFolder.isEmpty()){
+			Element folderElem = mDocument.createElement("folder");
+			folderElem.appendChild(mDocument.createTextNode(outputFolder));
+			parent.appendChild(folderElem);
+		}
 
 		// <size>
 		Dimension size = output.getImageSize();
@@ -362,8 +365,10 @@ public class XmlWriter {
 				NamedNodeMap attrs = node.getAttributes();
 				String name = node.getNodeName();
 				if(name.equalsIgnoreCase("folder")){
-					String path = node.getFirstChild().getNodeValue();
-					output.setOutputPath(path);
+					if(node.hasChildNodes()){
+						String path = node.getFirstChild().getNodeValue();
+						output.setOutputPath(path);
+					}
 				}
 				else if(name.equalsIgnoreCase("size")){
 					String width = getAttributeValue(attrs, "width");
@@ -371,20 +376,28 @@ public class XmlWriter {
 					output.setImageSize(Integer.parseInt(width), Integer.parseInt(height));
 				}
 				else if(name.equalsIgnoreCase("title")){
-					String value = node.getFirstChild().getNodeValue();
-					output.setTitle(value);
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setTitle(value);
+					}
 				}
 				else if(name.equalsIgnoreCase("title_kana")){
-					String value = node.getFirstChild().getNodeValue();
-					output.setTitleKana(value);
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setTitleKana(value);
+					}
 				}
 				else if(name.equalsIgnoreCase("author")){
-					String value = node.getFirstChild().getNodeValue();
-					output.setAuthor(value);
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setAuthor(value);
+					}
 				}
 				else if(name.equalsIgnoreCase("author_kana")){
-					String value = node.getFirstChild().getNodeValue();
-					output.setAuthorKana(value);
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setAuthorKana(value);
+					}
 				}
 			}
 
