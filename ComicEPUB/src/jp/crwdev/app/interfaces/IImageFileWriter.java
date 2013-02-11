@@ -35,6 +35,12 @@ public interface IImageFileWriter {
 	void cancel();
 	
 	/**
+	 * 拡張子取得
+	 * @return
+	 */
+	String getSuffix();
+	
+	/**
 	 * 出力ファイルクローズ
 	 */
 	void close();

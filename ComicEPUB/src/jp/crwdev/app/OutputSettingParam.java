@@ -7,6 +7,7 @@ import java.awt.Dimension;
 
 import jp.crwdev.app.container.epub.EpubImageFileWriter;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
+import jp.crwdev.app.container.pdf.PdfImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.interfaces.IImageFileWriter;
 
@@ -67,7 +68,7 @@ public class OutputSettingParam {
 	 * 出力ファイル名取得
 	 * @return
 	 */
-	public String getOutputFileName(){
+	public String getOutputFileName(String suffix){
 		if(mOutputFileName != null && !mOutputFileName.isEmpty()){
 			return mOutputFileName + getSuffixByFileType();
 		}
@@ -82,7 +83,7 @@ public class OutputSettingParam {
 			if(sb.length() == 0){
 				sb.append("NoTitle");
 			}
-			sb.append(getSuffixByFileType());
+			sb.append(suffix);
 			
 			return new String(sb);
 		}
@@ -101,6 +102,9 @@ public class OutputSettingParam {
 		}
 		else if(mOutputFileType.equalsIgnoreCase("epub")){
 			return new EpubImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana(), getEpubType());
+		}
+		else if(mOutputFileType.equalsIgnoreCase("pdf")){
+			return new PdfImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana());
 		}
 		return null;
 	}
@@ -156,6 +160,9 @@ public class OutputSettingParam {
 		}
 		else if(mOutputFileType.equalsIgnoreCase("epub")){
 			return ".epub";
+		}
+		else if(mOutputFileType.equalsIgnoreCase("pdf")){
+			return ".pdf";
 		}
 		else{
 			return "";

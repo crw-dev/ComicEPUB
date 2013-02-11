@@ -160,5 +160,10 @@ public class ZipImageFileWriter implements IImageFileWriter {
 	public void cancel() {
 		mIsCancel = true;
 	}
+	
+	@Override
+	public String getSuffix(){
+		return ".zip";
+	}
 
 }

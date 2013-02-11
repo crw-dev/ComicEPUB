@@ -118,4 +118,8 @@ public class FolderImageFileWriter implements IImageFileWriter {
 		mIsCancel = true;
 	}
 
+	@Override
+	public String getSuffix() {
+		return "";
+	}
 }

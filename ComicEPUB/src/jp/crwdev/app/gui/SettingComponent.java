@@ -39,7 +39,7 @@ public class SettingComponent {
 	
 	// Label
 	public JLabel labelImageSize = new JLabel("出力サイズ");
-	public JLabel labelBookType = new JLabel("EPUB種別");
+	//public JLabel labelBookType = new JLabel("EPUB種別");
 	public JLabel labelFileType = new JLabel("保存形式");
 	public JLabel labelGamma = new JLabel("ガンマ補正値");
 	public JLabel labelContrast = new JLabel("Co:0");
@@ -53,7 +53,7 @@ public class SettingComponent {
 	public JCheckBox filterResize = new JCheckBox("リサイズ"); // 不要？
 	public JCheckBox filterGrayscale = new JCheckBox("グレースケール");
 	public JCheckBox filterPreview = new JCheckBox("プレビュー");
-	public JCheckBox filterUnification = new JCheckBox("本文ページサイズ統一");
+	public JCheckBox filterUnification = new JCheckBox("本文ページ画像サイズ統一");
 	public JCheckBox cropFullPage = new JCheckBox("全ページ切り抜き");
 	public JCheckBox cropTextPage = new JCheckBox("本文ページ切り抜き");
 	public JCheckBox cropPictPage = new JCheckBox("挿絵ページ切り抜き");
@@ -144,7 +144,7 @@ public class SettingComponent {
 		
 		// Label
 		parent.add(labelImageSize);
-		parent.add(labelBookType);
+		//parent.add(labelBookType);
 		parent.add(labelFileType);
 		parent.add(labelGamma);
 		parent.add(labelContrast);
@@ -270,18 +270,18 @@ public class SettingComponent {
 
 		
 		layout.putConstraint(SpringLayout.NORTH, outputImageSize, 3, SpringLayout.SOUTH, brightnessValue);
-		layout.putConstraint(SpringLayout.NORTH, outputBookType, 3, SpringLayout.SOUTH, outputImageSize);
-		layout.putConstraint(SpringLayout.NORTH, outputFileType, 3, SpringLayout.SOUTH, outputBookType);
-		
+		layout.putConstraint(SpringLayout.NORTH, outputFileType, 3, SpringLayout.SOUTH, outputImageSize);
+		layout.putConstraint(SpringLayout.NORTH, outputBookType, 0, SpringLayout.NORTH, outputFileType);
+
 		layout.putConstraint(SpringLayout.WEST, outputImageSize, 5, SpringLayout.WEST, mParent);
-		layout.putConstraint(SpringLayout.WEST, outputBookType, 5, SpringLayout.WEST, mParent);
 		layout.putConstraint(SpringLayout.WEST, outputFileType, 5, SpringLayout.WEST, mParent);
+		layout.putConstraint(SpringLayout.WEST, outputBookType, 5, SpringLayout.EAST, outputFileType);
 
 		layout.putConstraint(SpringLayout.WEST, labelImageSize, 5, SpringLayout.EAST, outputImageSize);
 		layout.putConstraint(SpringLayout.SOUTH, labelImageSize, 0, SpringLayout.SOUTH, outputImageSize);
-		layout.putConstraint(SpringLayout.WEST, labelBookType, 5, SpringLayout.EAST, outputBookType);
-		layout.putConstraint(SpringLayout.SOUTH, labelBookType, 0, SpringLayout.SOUTH, outputBookType);
-		layout.putConstraint(SpringLayout.WEST, labelFileType, 5, SpringLayout.EAST, outputFileType);
+		//layout.putConstraint(SpringLayout.WEST, labelBookType, 5, SpringLayout.EAST, outputBookType);
+		//layout.putConstraint(SpringLayout.SOUTH, labelBookType, 0, SpringLayout.SOUTH, outputBookType);
+		layout.putConstraint(SpringLayout.WEST, labelFileType, 5, SpringLayout.EAST, outputBookType);
 		layout.putConstraint(SpringLayout.SOUTH, labelFileType, 0, SpringLayout.SOUTH, outputFileType);
 
 		// filename
@@ -387,6 +387,21 @@ public class SettingComponent {
 		});
 		cancelButton.setEnabled(false);
 		
+		
+		outputFileType.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("comboBoxChanged")){
+					String selected = (String)outputFileType.getSelectedItem();
+					if(selected.equalsIgnoreCase("epub")){
+						outputBookType.setEnabled(true);
+					}
+					else{
+						outputBookType.setEnabled(false);
+					}
+				}
+			}
+		});
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 
@@ -513,6 +528,7 @@ public class SettingComponent {
 		outputFileType.addItem("zip");
 		outputFileType.addItem("folder");
 		outputFileType.addItem("epub");
+		outputFileType.addItem("pdf");
 
 		cropFullTop.setValue(0);
 		cropFullLeft.setValue(0);

@@ -168,6 +168,11 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		mIsCancel = true;
 	}
 	
+	@Override
+	public String getSuffix() {
+		return ".epub";
+	}
+	
 	public String getUUID(){
 		UUID uuid = UUID.randomUUID();
         return uuid.toString();
@@ -193,7 +198,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		zipOut.write(content);
 	}
 
-	private static void writeContainerFile(ZipOutputStream zipOut) throws IOException {
+	private void writeContainerFile(ZipOutputStream zipOut) throws IOException {
 		zipOut.putNextEntry(new ZipEntry(META_INF_DIR + "/" + CONTAINER_FILENAME));
 		
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
@@ -210,7 +215,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		zipOut.closeEntry();
 	}
 
-	private static void writeCssFile(ZipOutputStream zipOut) throws IOException {
+	private void writeCssFile(ZipOutputStream zipOut) throws IOException {
 		zipOut.putNextEntry(new ZipEntry(STYLE_DIR + "/" + STYLE_FILENAME));
 		
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));

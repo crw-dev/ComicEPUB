@@ -335,7 +335,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 				writer.setImageFilter(imageFilter);
 				
 				// 出力ファイル(フォルダ)パスを作成
-				File file = new File(outSetting.getOutputPath(), outSetting.getOutputFileName());
+				File file = new File(outSetting.getOutputPath(), outSetting.getOutputFileName(writer.getSuffix()));
 				
 				// 出力ファイル(フォルダ)オープン
 				if(writer.open(file.getAbsolutePath())){

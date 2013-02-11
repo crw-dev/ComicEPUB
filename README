@@ -1,4 +1,9 @@
-Image file editing software
+Imagefile edit Application
+
+
+input - folder .zip .rar
+
+output - folder .zip .epub .pdf
 
 
 commons-compress
@@ -12,4 +17,6 @@ https://github.com/junrar/junrar
 java-image-scaling
 http://code.google.com/p/java-image-scaling/
 
+iText
+http://itextpdf.com/
 
