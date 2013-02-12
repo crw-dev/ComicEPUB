@@ -183,20 +183,30 @@ public class MainFrame extends JFrame implements OnEventListener {
 							OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
 							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
 							
+							
+							ImageFilterParam param = null;
+							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
 								//TODO: implement setting file reader/writer
 								XmlWriter loader = new XmlWriter();
 								loader.openLoadSettingFile(mSettingFilePath);
-								ImageFilterParam param = new ImageFilterParam();
+								param = new ImageFilterParam();
+								
+								// listに変更を反映する
 								loader.loadSetting(outputParam, param, list);
 								
-								// update setting
-								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParam, param);
 							}
+							// 出力設定を設定画面に反映
 							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
 		
 							mTable.setImageFileInfoList(list);
+							
+							if(param != null){
+								// 全体設定を反映
+								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParam, param);
+							}
+
 					
 						}catch(Exception e){
 							e.printStackTrace();

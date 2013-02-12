@@ -39,15 +39,15 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		if (readers.hasNext()) {
             ImageReader reader = (ImageReader)readers.next();
 			try {
-				InputStream in = getInputStream();
-				ImageInputStream stream = ImageIO.createImageInputStream(in);
-				reader.setInput(stream);
+				//InputStream in = getInputStream();
+				//ImageInputStream stream = ImageIO.createImageInputStream(in);
+				//reader.setInput(stream);
 				mFormat = getFormat(suffix);
-				mWidth = reader.getWidth(0);
-				mHeight = reader.getHeight(0);
+				//mWidth = reader.getWidth(0);
+				//mHeight = reader.getHeight(0);
 				mSize = 0;//in.available();//stream.length();
-			} catch (IOException e) {
-				throw e;
+			//} catch (IOException e) {
+			//	throw e;
 			} finally {
 				reader.dispose();
 			}

@@ -789,6 +789,10 @@ public class SettingComponent {
 			}
 		}
 		
+		if(param.isUnificationTextPage()){
+			update = true;
+		}
+		
 		if(update){
 			updateSettingValues();
 		}

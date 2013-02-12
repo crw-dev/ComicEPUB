@@ -173,7 +173,7 @@ public class XmlWriter {
 		}
 		
 		ImageFilterParam param = info.getFilterParam();
-		if(param.isEdit()){
+		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO){
 		
 			Element infoElem = mDocument.createElement("info");
 	

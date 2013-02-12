@@ -485,7 +485,7 @@ public class ImageFilterParam implements Cloneable {
 	}
 
 	public boolean isEdit() {
-		return (mIsFullPageCrop || mIsTextPageCrop || mIsPictPageCrop || mIsRotate || mIsTranslate || mPageType != Constant.PAGETYPE_AUTO);
+		return (mIsFullPageCrop || mIsTextPageCrop || mIsPictPageCrop || mIsRotate || mIsTranslate);
 	}
 
 
