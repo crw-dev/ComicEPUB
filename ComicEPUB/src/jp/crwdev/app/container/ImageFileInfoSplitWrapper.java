@@ -80,6 +80,11 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	public boolean isJpeg() {
 		return mBaseInfo.isJpeg();
 	}
+	
+	@Override
+	public void update() {
+		// NOP
+	}
 
 	@Override
 	public ImageFilterParam getFilterParam() {

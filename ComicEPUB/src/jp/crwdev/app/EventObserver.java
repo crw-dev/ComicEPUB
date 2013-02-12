@@ -45,6 +45,11 @@ public class EventObserver {
 	public void stopProgress(){
 		sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_Progress, 0);
 	}
+	
+	/** プログレスメッセージ */
+	public void setProgressMessage(String message){
+		sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
+	}
 
 	/**
 	 * イベントリスナ登録

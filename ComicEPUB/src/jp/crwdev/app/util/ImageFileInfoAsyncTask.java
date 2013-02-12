@@ -7,7 +7,7 @@ public class ImageFileInfoAsyncTask {
 
 	public interface OnTaskObserver {
 		void onStart();
-		void onProcess(int index, IImageFileInfo info);
+		void onProcess(int index, int total, IImageFileInfo info);
 		void onFinish();
 	};
 	
@@ -47,10 +47,11 @@ public class ImageFileInfoAsyncTask {
 	
 	private void threadTask(){
 		mTask.onStart();
-		for(int i=0; i<mList.size(); i++){
+		int size = mList.size();
+		for(int i=0; i<size; i++){
 			IImageFileInfo info = mList.get(i);
 			
-			mTask.onProcess(i, info);
+			mTask.onProcess(i, size, info);
 			if(mCancelTask){
 				break;
 			}

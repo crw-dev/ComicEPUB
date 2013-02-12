@@ -113,6 +113,34 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				addData(list.get(i));
 			}
 		}
+		startLoadFileInfoThread();
+	}
+	
+	private void startLoadFileInfoThread(){
+		// FileInfoの読み込まれていない情報をスレッドで順次更新する
+		//TODO
+		ImageFileInfoAsyncTask task = new ImageFileInfoAsyncTask(mInfoList, new OnTaskObserver(){
+			@Override
+			public void onStart() {
+				mEventSender.startProgress();
+			}
+			@Override
+			public void onFinish() {
+				mEventSender.stopProgress();
+				mEventSender.setProgressMessage("");
+			}
+			@Override
+			public void onProcess(int index, int total, IImageFileInfo info) {
+				
+				mEventSender.setProgressMessage(String.format("%d / %d", (index+1), total));
+				
+				info.update();
+				
+				mTableModel.setValueAt(Integer.toString(info.getWidth()), index, Constant.TABLE_COLUMN_WIDTH);
+				mTableModel.setValueAt(Integer.toString(info.getHeight()), index, Constant.TABLE_COLUMN_HEIGHT);
+			}
+		});
+		task.start();
 	}
 	
 	public IImageFileInfoList getImageFileInfoList(){
@@ -237,7 +265,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				mEventSender.stopProgress();
 			}
 			@Override
-			public void onProcess(int index, IImageFileInfo info) {
+			public void onProcess(int index, int total, IImageFileInfo info) {
+				
+				mEventSender.setProgressMessage(String.format("%d / %d", (index+1), total));
+				
 				String disableValue = Constant.TEXT_PAGETYPE_PICT;
 				int pageType = info.getFilterParam().getPageType();
 				if(pageType != Constant.PAGETYPE_PICT){

@@ -35,26 +35,31 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	protected void loadBasicParams() throws Exception{
 		String suffix = getSuffix(getFullPath());
 
-		Iterator readers = ImageIO.getImageReadersBySuffix(suffix);
-		if (readers.hasNext()) {
-            ImageReader reader = (ImageReader)readers.next();
-			try {
-				//InputStream in = getInputStream();
-				//ImageInputStream stream = ImageIO.createImageInputStream(in);
-				//reader.setInput(stream);
-				mFormat = getFormat(suffix);
-				//mWidth = reader.getWidth(0);
-				//mHeight = reader.getHeight(0);
-				mSize = 0;//in.available();//stream.length();
-			//} catch (IOException e) {
-			//	throw e;
-			} finally {
-				reader.dispose();
-			}
-		}
-		else{
-			throw new Exception("No image");
-		}
+		mFormat = getFormat(suffix);
+		mSize = 0;
+		mWidth = 0;
+		mHeight = 0;
+		
+//		Iterator readers = ImageIO.getImageReadersBySuffix(suffix);
+//		if (readers.hasNext()) {
+//            ImageReader reader = (ImageReader)readers.next();
+//			try {
+//				//InputStream in = getInputStream();
+//				//ImageInputStream stream = ImageIO.createImageInputStream(in);
+//				//reader.setInput(stream);
+//				mFormat = getFormat(suffix);
+//				//mWidth = reader.getWidth(0);
+//				//mHeight = reader.getHeight(0);
+//				mSize = 0;//in.available();//stream.length();
+//			//} catch (IOException e) {
+//			//	throw e;
+//			} finally {
+//				reader.dispose();
+//			}
+//		}
+//		else{
+//			throw new Exception("No image");
+//		}
 
 	}
 
@@ -91,6 +96,34 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	@Override
 	public boolean isJpeg() {
 		return "jpeg".equals(mFormat);
+	}
+	
+	@Override
+	public void update() {
+		if(mWidth != 0 && mHeight != 0){
+			// 読み込み済み
+			return;
+		}
+		
+		String suffix = getSuffix(getFullPath());
+
+		Iterator readers = ImageIO.getImageReadersBySuffix(suffix);
+		if (readers.hasNext()) {
+            ImageReader reader = (ImageReader)readers.next();
+			try {
+				InputStream in = getInputStream();
+				ImageInputStream stream = ImageIO.createImageInputStream(in);
+				reader.setInput(stream);
+				//mFormat = getFormat(suffix);
+				mWidth = reader.getWidth(0);
+				mHeight = reader.getHeight(0);
+				//mSize = 0;//in.available();//stream.length();
+			} catch (IOException e) {
+
+			} finally {
+				reader.dispose();
+			}
+		}
 	}
 
 	/**

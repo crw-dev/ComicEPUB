@@ -46,6 +46,11 @@ public interface IImageFileInfo {
 	long getSize();
 	
 	/**
+	 * 画像情報の更新
+	 */
+	void update();
+	
+	/**
 	 * 画像InputStream取得
 	 * @return
 	 */
