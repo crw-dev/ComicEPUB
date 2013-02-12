@@ -169,9 +169,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	private float getScale(){
 		if(mOriginalImage != null && mDisplayImage != null){
-			float ow = (float)mOriginalImage.getWidth();
-			float dw = (float)mDisplayImage.getWidth();
-			return dw/ow;
+			//TODO: SplitModeの場合は表示イメージの幅がオリジナルの半分になってしまうため、ここでは高さを元にスケールを計算する
+			//      今後SplitModeに縦分割等が入る場合は修正が必要
+			float oh = (float)mOriginalImage.getHeight();
+			float dh = (float)mDisplayImage.getHeight();
+			return dh/oh;
 		}
 		return 1.0f;
 	}
@@ -577,7 +579,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 		}
 		
-		JMenuItem item5 = new JMenuItem(check2 + "傾き補正切り替え");
+		JMenuItem item5 = new JMenuItem("傾き補正切り替え");
 		item5.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -655,8 +657,18 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 			}
 		});
+		JMenuItem areaMenuItem3 = new JMenuItem("縦横比変更（上下固定３：４）");
+		areaMenuItem3.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				guideLineHandle.setAspect(600, 800, mImageArea.width, mImageArea.height, true);
+				repaint();
+			}
+		});
+		
 		areaMenu.add(areaMenuItem1);
 		areaMenu.add(areaMenuItem2);
+		areaMenu.add(areaMenuItem3);
 
 		popup.add(areaMenu);
 		

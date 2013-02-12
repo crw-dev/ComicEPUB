@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,8 +35,12 @@ import javax.swing.event.ChangeListener;
 
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
+import jp.crwdev.app.util.InifileProperty;
 
 public class SettingComponent {
+	
+	private boolean mIsInputFileName = false;
+	private String mOutputFileName = "";
 	
 	// Label
 	public JLabel labelImageSize = new JLabel("出力サイズ");
@@ -52,7 +57,7 @@ public class SettingComponent {
 	public JCheckBox filterGamma = new JCheckBox("ガンマ補正");
 	public JCheckBox filterResize = new JCheckBox("リサイズ"); // 不要？
 	public JCheckBox filterGrayscale = new JCheckBox("グレースケール");
-	public JCheckBox filterPreview = new JCheckBox("プレビュー");
+	public JCheckBox filterPreview = new JCheckBox("編集モード");
 	public JCheckBox filterUnification = new JCheckBox("本文ページ画像サイズ統一");
 	public JCheckBox cropFullPage = new JCheckBox("全ページ切り抜き");
 	public JCheckBox cropTextPage = new JCheckBox("本文ページ切り抜き");
@@ -162,6 +167,11 @@ public class SettingComponent {
 		parent.add(cropTextPage);
 		parent.add(cropPictPage);
 		
+		filterEnable.setToolTipText("画像ファイルを変換せずに出力します。（未実装）");
+		filterResize.setToolTipText("プレビュー画面内に収まるようにリサイズして表示します。");
+		filterPreview.setToolTipText("各種編集操作を行えるようにします。");
+		filterUnification.setToolTipText("本文ページのサイズを統一し中央寄せで表示します。");
+		
 		// ComboBox
 		parent.add(outputImageSize);
 		parent.add(outputBookType);
@@ -212,12 +222,15 @@ public class SettingComponent {
 		
 		layout.putConstraint(SpringLayout.NORTH, filterEnable, 3, SpringLayout.NORTH, mParent);
 		layout.putConstraint(SpringLayout.NORTH, filterGamma, 3, SpringLayout.SOUTH, filterEnable);
-		layout.putConstraint(SpringLayout.NORTH, filterResize, 3, SpringLayout.SOUTH, filterGamma);
-		layout.putConstraint(SpringLayout.NORTH, filterGrayscale, 3, SpringLayout.SOUTH, filterResize);
+		layout.putConstraint(SpringLayout.NORTH, filterGrayscale, 3, SpringLayout.SOUTH, filterGamma);
 		layout.putConstraint(SpringLayout.NORTH, filterPreview, 3, SpringLayout.SOUTH, filterGrayscale);
 		layout.putConstraint(SpringLayout.NORTH, filterUnification, 3, SpringLayout.SOUTH, filterPreview);
 		layout.putConstraint(SpringLayout.NORTH, filterContrast, 3, SpringLayout.SOUTH, filterUnification);
 		
+		// ResizeをPreviewの右に
+		layout.putConstraint(SpringLayout.NORTH, filterResize, 0, SpringLayout.NORTH, filterPreview);
+		layout.putConstraint(SpringLayout.WEST, filterResize, 3, SpringLayout.EAST, filterPreview);
+
 		layout.putConstraint(SpringLayout.NORTH, contrastValue, 3, SpringLayout.SOUTH, filterContrast);
 		layout.putConstraint(SpringLayout.NORTH, brightnessValue, 3, SpringLayout.SOUTH, contrastValue);
 		
@@ -263,10 +276,11 @@ public class SettingComponent {
 		
 		gammaValue.setPreferredSize(new Dimension(40, 20));
 		gammaValue.setModel(new SpinnerNumberModel(1.0f, 0.0f, 3.0f, 0.1f));
-		layout.putConstraint(SpringLayout.NORTH, gammaValue, 0, SpringLayout.NORTH, filterGamma);
+		layout.putConstraint(SpringLayout.NORTH, filterGamma, 3, SpringLayout.SOUTH, filterEnable);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, gammaValue, 0, SpringLayout.VERTICAL_CENTER, filterGamma);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, labelGamma, 0, SpringLayout.VERTICAL_CENTER, filterGamma);
 		layout.putConstraint(SpringLayout.WEST, gammaValue, 5, SpringLayout.EAST, filterGamma);
 		layout.putConstraint(SpringLayout.WEST, labelGamma, 5, SpringLayout.EAST, gammaValue);
-		layout.putConstraint(SpringLayout.SOUTH, labelGamma, 0, SpringLayout.SOUTH, gammaValue);
 
 		
 		layout.putConstraint(SpringLayout.NORTH, outputImageSize, 3, SpringLayout.SOUTH, brightnessValue);
@@ -486,7 +500,22 @@ public class SettingComponent {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(!outputFolder.getText().isEmpty()){
-					if(mParent != null){
+					OutputSettingParam param = getOutputSettingParam();
+					boolean ok = true;
+					if(!mIsInputFileName){
+						mOutputFileName = "";
+						param.setOutputFileName("");
+						FilenameSettingDialog dialog = new FilenameSettingDialog(param.getOutputFileName(""));
+						dialog.setLocationRelativeTo(mParent);
+						dialog.setModal(true);
+						dialog.setVisible(true);
+						if(dialog.isOK()){
+							mOutputFileName = dialog.getFileName();
+						} else {
+							ok = false;
+						}
+					}					
+					if(ok){
 						convertButton.setEnabled(false);
 						cancelButton.setEnabled(true);
 						mParent.startConvert();
@@ -499,10 +528,15 @@ public class SettingComponent {
 	private void showOutputFolderDialog(){
 		JFileChooser filechooser = new JFileChooser();
 		filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		File defaultFolder = new File(InifileProperty.getInstance().getOutputFolder());
+		if(defaultFolder.exists() && defaultFolder.isDirectory()){
+			filechooser.setSelectedFile(defaultFolder);
+		}
 		int selected = filechooser.showOpenDialog(mParent);
 		if(selected == JFileChooser.APPROVE_OPTION){
 			 File file = filechooser.getSelectedFile();
 			 outputFolder.setText(file.getAbsolutePath());
+			 InifileProperty.getInstance().setOutputFolder(file.getAbsolutePath());
 		}
 	}
 
@@ -517,8 +551,15 @@ public class SettingComponent {
 		
 		gammaValue.setValue(new Double(1.6f));
 		
-		outputImageSize.addItem("600x800");
-		outputImageSize.addItem("800x1200");
+		String defaultFolder = InifileProperty.getInstance().getOutputFolder();
+		if(!defaultFolder.isEmpty()){
+			outputFolder.setText(defaultFolder);
+		}
+		
+		List<String> imageSizeList = InifileProperty.getInstance().getImageSizeList();
+		for(String size : imageSizeList){
+			outputImageSize.addItem(size);
+		}
 		outputImageSize.addItem("リサイズ無し");
 		
 		outputBookType.addItem("book");
@@ -629,6 +670,8 @@ public class SettingComponent {
 		param.setTitleKana(outputTitleKana.getText());
 		param.setAuthor(outputAuthor.getText());
 		param.setAuthorKana(outputAuthorKana.getText());
+		
+		param.setOutputFileName(mOutputFileName);
 		
 		return param;
 	}

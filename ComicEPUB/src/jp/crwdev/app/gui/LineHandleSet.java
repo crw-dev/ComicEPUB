@@ -44,6 +44,33 @@ public class LineHandleSet implements ILineHandle {
 		setSyncLineHorizontal(true);
 	}
 
+	public void setAspect(float width, float height, int imageWidth, int imageHeight, boolean fixHeight){
+		if(fixHeight){
+			float ratio = width / height;
+			float targetWidth = imageHeight * ratio;
+			float offset = targetWidth / imageWidth;
+			float baseHeight = Math.abs(mHandles[UPPER_HORIZONTAL].getBaseLineOffset()) +
+								Math.abs(mHandles[LOWER_HORIZONTAL].getBaseLineOffset());
+			float base = baseHeight * offset / 2.0f;
+			mHandles[LEFT_VERTICAL].setSyncLine(null);
+			mHandles[RIGHT_VERTICAL].setSyncLine(null);
+			mHandles[LEFT_VERTICAL].setBaseLineOffset(-base);
+			mHandles[RIGHT_VERTICAL].setBaseLineOffset(base);
+		}
+		else{
+			float ratio = height / width;
+			float targetHeight = imageWidth * ratio;
+			float offset = targetHeight / imageHeight;
+			float baseWidth = Math.abs(mHandles[LEFT_VERTICAL].getBaseLineOffset()) +
+								Math.abs(mHandles[RIGHT_VERTICAL].getBaseLineOffset());
+			float base = baseWidth * offset / 2.0f;
+			mHandles[UPPER_HORIZONTAL].setSyncLine(null);
+			mHandles[LOWER_HORIZONTAL].setSyncLine(null);
+			mHandles[UPPER_HORIZONTAL].setBaseLineOffset(-base);
+			mHandles[LOWER_HORIZONTAL].setBaseLineOffset(base);
+		}
+	}
+	
 	/**
 	 * ガイドの上線位置の取得
 	 * @return

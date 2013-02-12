@@ -4,6 +4,7 @@
 package jp.crwdev.app;
 
 import java.awt.Dimension;
+import java.io.File;
 
 import jp.crwdev.app.container.epub.EpubImageFileWriter;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
@@ -23,6 +24,8 @@ public class OutputSettingParam {
 	private String mOutputEpubType;
 	/** 出力イメージサイズ */
 	private String mOutputImageSize;
+	/** ImageSize毎のフォルダ分けフラグ */
+	private boolean mIsCreateImageSizeFolder = false;
 	
 	/** タイトル */
 	private String mTitle = "";
@@ -49,6 +52,24 @@ public class OutputSettingParam {
 	}
 	
 	/**
+	 * 画像サイズフォルダ作成設定
+	 * @param enable
+	 */
+	public void setCreateImageSizeFolder(boolean enable){
+		mIsCreateImageSizeFolder = enable;
+	}
+	
+	public String getFinalOutputPath() {
+		if(mIsCreateImageSizeFolder){
+			File dir = new File(getOutputPath(), mOutputImageSize);
+			return dir.getAbsolutePath();
+		}
+		else{
+			return getOutputPath();
+		}
+	}
+	
+	/**
 	 * 出力先フォルダパス設定
 	 * @param path
 	 */
@@ -70,7 +91,7 @@ public class OutputSettingParam {
 	 */
 	public String getOutputFileName(String suffix){
 		if(mOutputFileName != null && !mOutputFileName.isEmpty()){
-			return mOutputFileName + getSuffixByFileType();
+			return mOutputFileName;// + getSuffixByFileType();
 		}
 		else{
 			StringBuilder sb = new StringBuilder();
@@ -83,10 +104,21 @@ public class OutputSettingParam {
 			if(sb.length() == 0){
 				sb.append("NoTitle");
 			}
+			if(suffix == null || suffix.isEmpty()){
+				suffix = getSuffixByFileType();
+			}
 			sb.append(suffix);
 			
 			return new String(sb);
 		}
+	}
+	
+	/**
+	 * 出力ファイル名設定
+	 * @param filename
+	 */
+	public void setOutputFileName(String filename){
+		mOutputFileName = filename;
 	}
 	
 	/**
@@ -108,13 +140,20 @@ public class OutputSettingParam {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * EPUBのBook typeを取得
 	 * @return "book", "magazine", "comic"
 	 */
 	public String getEpubType(){
 		return mOutputEpubType.toLowerCase();
+	}
+	
+	/**
+	 * FileType取得
+	 */
+	public String getFileType(){
+		return mOutputFileType;
 	}
 	
 	/**

@@ -38,6 +38,7 @@ import jp.crwdev.app.interfaces.IImageFileWriter;
 import jp.crwdev.app.interfaces.IImageFileWriter.OnProgressListener;
 import jp.crwdev.app.setting.XmlWriter;
 import jp.crwdev.app.util.FileDropTargetAdapter;
+import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
 
 public class MainFrame extends JFrame implements OnEventListener {
@@ -72,6 +73,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	    				 saveSettingFile(mSettingFilePath);
 	    			 }
 	    		 }
+	    		 InifileProperty.getInstance().save();
 	    	 }
 	    	 @Override
 	    	 public void windowClosed(WindowEvent e) {
@@ -307,63 +309,86 @@ public class MainFrame extends JFrame implements OnEventListener {
 		new Thread(){
 			@Override
 			public void run(){
-				mEventObserver.startProgress();
-				
-				// 基本変換パラメータ取得
-				ImageFilterParam param = mSettingPanel.getFilterParam();
-				// 出力設定を取得
-				OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
-				
-				//　ファイルリストを取得
-				IImageFileInfoList list = mTable.getImageFileInfoList();
-				param.setPreview(false);
-				
-				// 出力サイズを設定
-				Dimension size = outSetting.getImageSize();
-				if(size == null || (size.width == 0 || size.height == 0)){
-					param.setResize(false);
-				}else{
-					param.setResize(true);
-					param.setResizeDimension(size);
-				}
-				
-				// 基本出力フィルタを生成
-				OutputImageFilter imageFilter = new OutputImageFilter(param);
-				
-				// 出力設定からImageFileWriterを生成
-				IImageFileWriter writer = outSetting.getImageFileWriter();
-				writer.setImageFilter(imageFilter);
-				
-				// 出力ファイル(フォルダ)パスを作成
-				File file = new File(outSetting.getOutputPath(), outSetting.getOutputFileName(writer.getSuffix()));
-				
-				// 出力ファイル(フォルダ)オープン
-				if(writer.open(file.getAbsolutePath())){
-					synchronized(mLock){
-						mFileWriter = writer; // ここからCancel可能
+				try {
+					//　ファイルリストを取得
+					IImageFileInfoList list = mTable.getImageFileInfoList();
+					if(list == null || list.size() == 0){
+						return;
 					}
-					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "start");
-					// 出力処理開始
-					writer.write(list, new OnProgressListener(){
-						@Override
-						public void onProgress(int progress, String message) {
-							if(message == null){
-								message = progress + "%";
-							}
-							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
+					
+					mEventObserver.startProgress();
+
+					// 基本変換パラメータ取得
+					ImageFilterParam param = mSettingPanel.getFilterParam();
+					// 出力設定を取得
+					OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
+					
+					param.setPreview(false);
+					
+					// 出力サイズを設定
+					Dimension size = outSetting.getImageSize();
+					if(size == null || (size.width == 0 || size.height == 0)){
+						param.setResize(false);
+					}else{
+						param.setResize(true);
+						param.setResizeDimension(size);
+					}
+					
+					// 基本出力フィルタを生成
+					OutputImageFilter imageFilter = new OutputImageFilter(param);
+					
+					// 出力設定からImageFileWriterを生成
+					IImageFileWriter writer = outSetting.getImageFileWriter();
+					writer.setImageFilter(imageFilter);
+					
+					// 出力ファイル(フォルダ)パスを作成
+					File dir = new File(outSetting.getFinalOutputPath());
+					File file = new File(dir.getAbsolutePath(), outSetting.getOutputFileName(writer.getSuffix()));
+					if(!dir.exists()){
+						if(!dir.mkdirs()){
+							throw new Exception("can't create output folder.");
 						}
-					});
-					// 出力終了
+					}
+					
+					// 出力ファイル(フォルダ)オープン
+					if(writer.open(file.getAbsolutePath())){
+						synchronized(mLock){
+							mFileWriter = writer; // ここからCancel可能
+						}
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "start");
+						// 出力処理開始
+						writer.write(list, new OnProgressListener(){
+							@Override
+							public void onProgress(int progress, String message) {
+								if(message == null){
+									message = progress + "%";
+								}
+								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
+							}
+						});
+						// 出力終了
+						synchronized(mLock){
+							mFileWriter = null;
+						}
+						writer.close();
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
+					}
+					else{
+						throw new Exception("can't open output file.");
+					}
+					
+				} catch(Exception e) {
+					
+					e.printStackTrace();
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "" + e.getMessage());
+					
+				} finally {
 					synchronized(mLock){
 						mFileWriter = null;
 					}
-					writer.close();
-					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
+					mEventObserver.stopProgress();
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FinishConvert, 0);
 				}
-				
-				mEventObserver.stopProgress();
-				
-				mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FinishConvert, 0);
 			}
 		}.start();
 	}
