@@ -67,7 +67,10 @@ public class SettingPanel extends JPanel implements OnEventListener {
 
 		switch(type){
 		case EventObserver.EventType_UpdateFilterParam:
-			mComponent.applyFilterParam((ImageFilterParam)obj);
+			mComponent.applyFilterParam((ImageFilterParam)obj, false);
+			break;
+		case EventObserver.EventType_UpdateFilterParamOnlyEnable:
+			mComponent.applyFilterParam((ImageFilterParam)obj, true);
 			break;
 		case EventObserver.EventType_Progress:
 			if(arg1 != 0){
@@ -84,6 +87,9 @@ public class SettingPanel extends JPanel implements OnEventListener {
 			break;
 		case EventObserver.EventType_FinishConvert:
 			mComponent.onFinishConvert();
+			break;
+		case EventObserver.EventType_FileInfoModified:
+			mComponent.onFileInfoModified();
 			break;
 		default:
 			break;

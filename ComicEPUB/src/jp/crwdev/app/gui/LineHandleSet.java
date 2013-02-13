@@ -52,10 +52,13 @@ public class LineHandleSet implements ILineHandle {
 			float baseHeight = Math.abs(mHandles[UPPER_HORIZONTAL].getBaseLineOffset()) +
 								Math.abs(mHandles[LOWER_HORIZONTAL].getBaseLineOffset());
 			float base = baseHeight * offset / 2.0f;
-			mHandles[LEFT_VERTICAL].setSyncLine(null);
+			mHandles[LEFT_VERTICAL].setSyncLine(null); // 一時的に同期解除
 			mHandles[RIGHT_VERTICAL].setSyncLine(null);
 			mHandles[LEFT_VERTICAL].setBaseLineOffset(-base);
 			mHandles[RIGHT_VERTICAL].setBaseLineOffset(base);
+			if(isSyncLineVertical()){
+				setSyncLineVertical(true); // 同期
+			}
 		}
 		else{
 			float ratio = height / width;
@@ -64,10 +67,13 @@ public class LineHandleSet implements ILineHandle {
 			float baseWidth = Math.abs(mHandles[LEFT_VERTICAL].getBaseLineOffset()) +
 								Math.abs(mHandles[RIGHT_VERTICAL].getBaseLineOffset());
 			float base = baseWidth * offset / 2.0f;
-			mHandles[UPPER_HORIZONTAL].setSyncLine(null);
+			mHandles[UPPER_HORIZONTAL].setSyncLine(null); // 一時的に同期解除
 			mHandles[LOWER_HORIZONTAL].setSyncLine(null);
 			mHandles[UPPER_HORIZONTAL].setBaseLineOffset(-base);
 			mHandles[LOWER_HORIZONTAL].setBaseLineOffset(base);
+			if(isSyncLineHorizontal()){
+				setSyncLineHorizontal(true); // 同期
+			}
 		}
 	}
 	

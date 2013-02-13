@@ -3,8 +3,10 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsListener;
@@ -24,6 +26,7 @@ import javax.swing.SpringLayout;
 
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
+import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
@@ -124,8 +127,12 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				g.drawRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
 			}
 			if(ptRotateA != null && ptRotateB != null){
-				g.setColor(Color.RED);
-				g.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
+				Graphics2D g2 = (Graphics2D)g;
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setColor(Color.RED);
+				g2.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
+				//g.setColor(Color.RED);
+				//g.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
 			
 				double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
 				System.out.println("rad=" + angle);
@@ -179,7 +186,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	public void setImage(BufferedImage image, IImageFileInfo info, int rowIndex){
-		mOriginalImage = image;
+		AddSpaceFilter filter = new AddSpaceFilter();
+//		filter.setTargetSize(ImageFilterParam.getUnificationTextPageSize());
+		mOriginalImage = filter.filter(image, info.getFilterParam());
 		mFileInfo = info;
 		mInfoIndex = rowIndex;
 		ptLeftTop = null;
@@ -198,7 +207,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		
 		
 		if(mImageFilter != null){
-			mImageFilter.setAddSpaceDimension(ImageFilterParam.getUnificationTextPageSize());
+//			mImageFilter.setAddSpaceDimension(ImageFilterParam.getUnificationTextPageSize());
 			BufferedImage filtered = mImageFilter.filter(mOriginalImage, mFileInfo.getFilterParam());
 			mDisplayImage = filtered;
 		}
@@ -626,7 +635,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					ImageFilterParam param = new ImageFilterParam();
 					param.setTextPageCrop(true);
 					param.setTextPageCrop((int)(imageWidth * left), (int)(imageHeight * top), imageWidth - (int)(imageWidth * right), imageHeight - (int)(imageHeight * bottom));
-					mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParam, param);
+					mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamOnlyEnable, param);
 				}
 			}
 		});

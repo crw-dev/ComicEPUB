@@ -1,5 +1,6 @@
 package jp.crwdev.app.container.pdf;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.io.InputStream;
 import com.itextpdf.text.pdf.PRStream;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfImage;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStream;
@@ -26,6 +28,23 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 	/** Name */
 	private int mNumber = 0;
 	
+	public PdfImageFileInfo(ImageRenderInfo info){
+		super();
+		try {
+			PdfImageObject image = info.getImage();
+			mPdfImage = image;
+			String filetype = image.getFileType();
+			mFormat = filetype;
+			mWidth = 0;
+			mHeight = 0;
+			mNumber = info.getRef().getNumber();
+			
+		}catch(Exception e){
+			
+		}
+		
+	}
+	
 	public PdfImageFileInfo(int number, PdfImageObject image, int width, int height, String format){
 		super();
 		mNumber = number;
@@ -33,6 +52,22 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 		mWidth = width;
 		mHeight = height;
 		mFormat = format;
+	}
+	
+	@Override
+	public void update() {
+		if(mWidth != 0 && mHeight != 0){
+			return;
+		}
+		if(mPdfImage != null){
+			try {
+				BufferedImage buffered = mPdfImage.getBufferedImage();
+				mWidth = buffered.getWidth();
+				mHeight = buffered.getHeight();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

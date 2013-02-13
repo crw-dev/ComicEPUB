@@ -139,7 +139,7 @@ public class ImageFilterParam implements Cloneable {
 	protected int mSplitType;
 	protected int mSplitIndex;
 	
-	protected static boolean mIsUnificationTextPage = false;
+	protected boolean mIsUnificationTextPage = false;
 	protected static Dimension mUnificationTextPageSize = new Dimension(0, 0);
 	
 	// Dynamic
@@ -284,7 +284,7 @@ public class ImageFilterParam implements Cloneable {
 		return mSplitIndex;
 	}
 	
-	public static boolean isUnificationTextPage() {
+	public boolean isUnificationTextPage() {
 		return mIsUnificationTextPage;
 	}
 	
@@ -472,7 +472,7 @@ public class ImageFilterParam implements Cloneable {
 		mTranslateY = y;
 	}
 	
-	public static void setUnificationTextPage(boolean enable) {
+	public void setUnificationTextPage(boolean enable) {
 		mIsUnificationTextPage = enable;
 	}
 	
@@ -564,9 +564,9 @@ public class ImageFilterParam implements Cloneable {
 			dest.mSplitType = update.getSplitType();
 			dest.mSplitIndex = update.getSplitIndex();
 		}
-		//if(update.isUnificationTextPage()){
-		//	dest.mIsUnificationTextPage = true;
-		//}
+		if(update.isUnificationTextPage()){
+			dest.mIsUnificationTextPage = true;
+		}
 		
 		dest.mPageType = update.getPageType();
 		

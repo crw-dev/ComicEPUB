@@ -16,8 +16,8 @@ public class PreviewImageFilter extends OutputImageFilter {
 	private Dimension mPreviewSize = new Dimension(600, 800);
 	/** リサイズフィルタ - Preview画面のサイズ変更で使うのでリストとは別に保持しておく */
 	private ResizeFilter mResizeFilter = null;
-	/** 余白追加フィルタ - リストとは別に保持しておく */
-	private AddSpaceFilter mAddSpaceFilter = null;
+//	/** 余白追加フィルタ - リストとは別に保持しておく */
+//	private AddSpaceFilter mAddSpaceFilter = null;
 	
 	
 	/**
@@ -44,13 +44,13 @@ public class PreviewImageFilter extends OutputImageFilter {
 		mPreviewSize.setSize(width-20, height-20);
 	}
 	
-	/**
-	 * 余白追加フィルタへターゲットサイズ指定
-	 * @param size
-	 */
-	public void setAddSpaceDimension(Dimension size){
-		mAddSpaceFilter.setTargetSize(size);
-	}
+//	/**
+//	 * 余白追加フィルタへターゲットサイズ指定
+//	 * @param size
+//	 */
+//	public void setAddSpaceDimension(Dimension size){
+//		mAddSpaceFilter.setTargetSize(size);
+//	}
 
 	/**
 	 * リサイズ時のスケーリング係数W を取得
@@ -72,10 +72,10 @@ public class PreviewImageFilter extends OutputImageFilter {
 	 */
 	private void setFilterVariables(){
 		for(IImageFilter filter : mFilters){
-			if(filter instanceof AddSpaceFilter){
-				mAddSpaceFilter = (AddSpaceFilter)filter;
-			}
-			else if(filter instanceof ResizeFilter){
+//			if(filter instanceof AddSpaceFilter){
+//				mAddSpaceFilter = (AddSpaceFilter)filter;
+//			}
+			if(filter instanceof ResizeFilter){
 				mResizeFilter = (ResizeFilter)filter;
 			}
 		}

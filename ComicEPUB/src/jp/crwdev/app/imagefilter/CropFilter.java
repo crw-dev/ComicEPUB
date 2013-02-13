@@ -86,12 +86,17 @@ public class CropFilter implements IImageFilter {
 			}
 		}
 		else{
-			topLine = param.getFullPageCropTop();
-			leftLine = param.getFullPageCropLeft();
-			subWidth = width - param.getFullPageCropLeft() - param.getFullPageCropRight();
-			subHeight = height - param.getFullPageCropTop() - param.getFullPageCropBottom();
+			if(param.isFullPageCrop()){
+				topLine = param.getFullPageCropTop();
+				leftLine = param.getFullPageCropLeft();
+				subWidth = width - param.getFullPageCropLeft() - param.getFullPageCropRight();
+				subHeight = height - param.getFullPageCropTop() - param.getFullPageCropBottom();
+			}
 		}
 
+		if(topLine < 0 || subHeight < 0 || leftLine < 0 || subWidth < 0){
+			return image;
+		}
 
 		if(param.isPreview()){
 			if(param.isDrawCropAreaInPreview()){

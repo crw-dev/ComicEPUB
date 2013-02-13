@@ -128,6 +128,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			public void onFinish() {
 				mEventSender.stopProgress();
 				mEventSender.setProgressMessage("");
+				// FileInfo更新通知
+				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 			}
 			@Override
 			public void onProcess(int index, int total, IImageFileInfo info) {
@@ -171,6 +173,11 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		
 	}
 	
+	public void selectCurrentItem(){
+		int selected = getSelectedRow();
+		onItemSelected(selected);
+	}
+	
 	private void onTableCellChanged(int row, int col, String value){
 		if(mInfoList != null){
 			IImageFileInfo info = mInfoList.get(row);
@@ -186,6 +193,11 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					if(pageType != param.getPageType()){
 						// PageType変更有り
 						param.setPageType(pageType);
+						
+						//TODO
+						// FileInfo更新通知
+						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
+
 						update = true;
 					}
 				}
@@ -263,6 +275,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			@Override
 			public void onFinish() {
 				mEventSender.stopProgress();
+				// FileInfo更新通知
+				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 			}
 			@Override
 			public void onProcess(int index, int total, IImageFileInfo info) {

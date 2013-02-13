@@ -53,7 +53,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	
 	private ImageFilterParam mBaseFilterParam = new ImageFilterParam();	// global setting
 	
-	private boolean mIsUnificationTextPage = false;
+	//private boolean mIsUnificationTextPage = false;
 	
 	private EventObserver mEventObserver = new EventObserver();
 	private Object mLock = new Object();
@@ -82,7 +82,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     });
 	     
 	     
-	     mIsUnificationTextPage = ImageFilterParam.isUnificationTextPage();
+	     //mIsUnificationTextPage = ImageFilterParam.isUnificationTextPage();
 	     
 	     // Table
 	     ImageFileInfoTable table = new ImageFileInfoTable();
@@ -301,17 +301,15 @@ public class MainFrame extends JFrame implements OnEventListener {
 	}
 
 	public void updateBaseFilterParam(ImageFilterParam param) {
-		if(mIsUnificationTextPage != ImageFilterParam.isUnificationTextPage()){
-			mIsUnificationTextPage = ImageFilterParam.isUnificationTextPage();
-			if(mIsUnificationTextPage){
-				IImageFileInfoList list = mTable.getImageFileInfoList();
-				ImageFilterParam.setUnificationTextPageSize(ImageFileInfoList.getTextPageUnionDimension(list));
-			}
-			else{
-				ImageFilterParam.setUnificationTextPageSize(0, 0);
-			}
+		if(param.isUnificationTextPage()){
+			IImageFileInfoList list = mTable.getImageFileInfoList();
+			ImageFilterParam.setUnificationTextPageSize(ImageFileInfoList.getTextPageUnionDimension(list));
+		}
+		else{
+			ImageFilterParam.setUnificationTextPageSize(0, 0);
 		}
 		setBaseFilterParam(param);
+		mTable.selectCurrentItem(); // Baseフィルタが更新されたのでカレントイメージも更新する
 	}
 
 	private void beginConvert(){
@@ -330,6 +328,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 
 					// 基本変換パラメータ取得
 					ImageFilterParam param = mSettingPanel.getFilterParam();
+					
 					// 出力設定を取得
 					OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
 					

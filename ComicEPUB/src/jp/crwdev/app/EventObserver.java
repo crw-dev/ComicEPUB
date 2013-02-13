@@ -25,6 +25,8 @@ public class EventObserver {
 	public static final int EventType_ProgressMessage = 6;		// obj: String
 	public static final int EventType_FinishConvert = 7;		// no param
 	public static final int EventType_CancelConvert = 8;		// no param
+	public static final int EventType_UpdateFilterParamOnlyEnable = 9;	// no param
+	public static final int EventType_FileInfoModified = 10;	// no param
 	
 
 	/** イベントリスナ 4種類  */

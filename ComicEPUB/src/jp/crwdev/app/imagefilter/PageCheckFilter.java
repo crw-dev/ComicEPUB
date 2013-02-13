@@ -68,12 +68,31 @@ public class PageCheckFilter implements IImageFilter {
 			}
 		}
 		else{
-			topLine = param.getFullPageCropTop();
-			leftLine = param.getFullPageCropLeft();
-			rightLine = width - param.getFullPageCropRight() - 1;
-			bottomLine = height - param.getFullPageCropBottom() - 1;
+			if(param.isFullPageCrop()){
+				topLine = param.getFullPageCropTop();
+				leftLine = param.getFullPageCropLeft();
+				rightLine = width - param.getFullPageCropRight() - 1;
+				bottomLine = height - param.getFullPageCropBottom() - 1;
+			}
 		}
 		
+		// 入力値チェック：不正な値なら外周
+		if(topLine > bottomLine){
+			int tmp = topLine;
+			topLine = bottomLine;
+			bottomLine = tmp;
+		}
+		if(leftLine > rightLine){
+			int tmp = leftLine;
+			leftLine = rightLine;
+			rightLine = tmp;
+		}
+		if(leftLine < 0 || rightLine >= width || topLine < 0 || bottomLine >= height){
+			leftLine = 0;
+			rightLine = width - 1;
+			topLine = 0;
+			bottomLine = height - 1;
+		}
 		
 		int total = 0;
 		int white = 0;

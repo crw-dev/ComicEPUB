@@ -44,7 +44,6 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 			PdfReaderContentParser parser = new PdfReaderContentParser(mPdfReader);
 			int pageCount = mPdfReader.getNumberOfPages();
 			
-			mPdfReader.getPdfObject(1);
 			MyRenderImageListener listener = new MyRenderImageListener();
 			
 			for(int page=1; page<=pageCount; page++){
@@ -68,29 +67,29 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 		
 		@Override
 		public void renderImage(ImageRenderInfo info) {
-			try {
-				PdfImageObject image = info.getImage();
-				String filetype = image.getFileType();
-				PdfName filter = (PdfName)image.get(PdfName.FILTER);
-				int number = info.getRef().getNumber();
-//				if(PdfName.DCTDECODE.equals(filter)){
-//					number = info.getRef().getNumber();
-//				}
-//				else{
-//					number = info.getRef().getNumber();
-//				}
-				BufferedImage buffered = image.getBufferedImage();
-				int width = buffered.getWidth();
-				int height = buffered.getHeight();
+//			try {
+//				PdfImageObject image = info.getImage();
+//				String filetype = image.getFileType();
+//				PdfName filter = (PdfName)image.get(PdfName.FILTER);
+//				int number = info.getRef().getNumber();
+////				if(PdfName.DCTDECODE.equals(filter)){
+////					number = info.getRef().getNumber();
+////				}
+////				else{
+////					number = info.getRef().getNumber();
+////				}
+//				BufferedImage buffered = image.getBufferedImage();
+//				int width = buffered.getWidth();
+//				int height = buffered.getHeight();
 				
-				add(new PdfImageFileInfo(number, image, width, height, filetype));
+				add(new PdfImageFileInfo(info));
 				
-				System.out.println("fileType=" + filetype + " number=" + number + " w=" + width + " h=" + height);
+//				System.out.println("fileType=" + filetype + " number=" + number + " w=" + width + " h=" + height);
 				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			
 			
 		}

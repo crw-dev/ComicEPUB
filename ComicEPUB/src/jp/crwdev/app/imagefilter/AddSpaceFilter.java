@@ -13,7 +13,7 @@ import jp.crwdev.app.interfaces.IImageFilter;
 
 public class AddSpaceFilter implements IImageFilter {
 
-	private Dimension mTargetSize = new Dimension();
+//	private Dimension mTargetSize = new Dimension();
 	
 	
 	/**
@@ -23,31 +23,40 @@ public class AddSpaceFilter implements IImageFilter {
 		
 	}
 	
-	/**
-	 * 余白追加後のサイズ指定
-	 * @param size
-	 */
-	public void setTargetSize(Dimension size){
-		mTargetSize = size;
-	}
+//	/**
+//	 * 余白追加後のサイズ指定
+//	 * @param size
+//	 */
+//	public void setTargetSize(Dimension size){
+//		mTargetSize = size;
+//	}
 	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		if(param.getPageType() == Constant.PAGETYPE_PICT){
 			return image;
 		}
-		if(mTargetSize.width == 0 || mTargetSize.height == 0){
+		
+		Dimension targetSize = ImageFilterParam.getUnificationTextPageSize();
+		if(targetSize.width == 0 || targetSize.height == 0){
 			return image;
 		}
 		
-		BufferedImage dest = new BufferedImage(mTargetSize.width, mTargetSize.height, image.getType());
+		int width = image.getWidth();
+		int height = image.getHeight();
+		if(width == targetSize.width && height == targetSize.height){
+			// 同じサイズなら何もしない
+			return image;
+		}
 		
-		int dx = (mTargetSize.width - image.getWidth()) / 2;
-		int dy = (mTargetSize.height - image.getHeight()) / 2;
+		BufferedImage dest = new BufferedImage(targetSize.width, targetSize.height, image.getType());
+		
+		int dx = (targetSize.width - width) / 2;
+		int dy = (targetSize.height - height) / 2;
 		
 		Graphics2D g = dest.createGraphics();
 		g.setBackground(Color.WHITE);
-		g.clearRect(0, 0, mTargetSize.width, mTargetSize.height);
+		g.clearRect(0, 0, targetSize.width, targetSize.height);
 		g.drawImage(image, dx, dy, image.getWidth(), image.getHeight(), null);
 		g.dispose();
 		

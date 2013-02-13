@@ -650,7 +650,7 @@ public class SettingComponent {
 		param.setContrast(convContrast(contrast));
 		param.setBrightness((float)brightness);
 		
-		ImageFilterParam.setUnificationTextPage(isUnificationTextPage);
+		param.setUnificationTextPage(isUnificationTextPage);
 		
 		return param;
 	}
@@ -738,20 +738,54 @@ public class SettingComponent {
 //		}
 	}
 	
-	public void applyFilterParam(ImageFilterParam param){
+	public void applyFilterParam(ImageFilterParam param, boolean onlyEnable){
 		boolean update = false;
 		
 
-		filterEnable.setSelected(param.isEnable());
-		filterContrast.setSelected(param.isContrast());
-		filterGamma.setSelected(param.isGamma());
-		filterResize.setSelected(param.isResize());
-		filterGrayscale.setSelected(param.isGrayscale());
-		filterPreview.setSelected(param.isPreview());
-		cropFullPage.setSelected(param.isFullPageCrop());
-		cropTextPage.setSelected(param.isTextPageCrop());
-		cropPictPage.setSelected(param.isPictPageCrop());
-		filterUnification.setSelected(param.isUnificationTextPage());
+		if(onlyEnable){
+			if(param.isEnable()){
+				filterEnable.setSelected(param.isEnable());
+			}
+			if(param.isContrast()){
+				filterContrast.setSelected(param.isContrast());
+			}
+			if(param.isGamma()){
+				filterGamma.setSelected(param.isGamma());
+			}
+			if(param.isResize()){
+				filterResize.setSelected(param.isResize());
+			}
+			if(param.isGrayscale()){
+				filterGrayscale.setSelected(param.isGrayscale());
+			}
+			if(param.isPreview()){
+				filterPreview.setSelected(param.isPreview());
+			}
+			if(param.isFullPageCrop()){
+				cropFullPage.setSelected(param.isFullPageCrop());
+			}
+			if(param.isTextPageCrop()){
+				cropTextPage.setSelected(param.isTextPageCrop());
+			}
+			if(param.isPictPageCrop()){
+				cropPictPage.setSelected(param.isPictPageCrop());
+			}
+			if(param.isUnificationTextPage()){
+				filterUnification.setSelected(param.isUnificationTextPage());
+			}
+		}else{
+			filterEnable.setSelected(param.isEnable());
+			filterContrast.setSelected(param.isContrast());
+			filterGamma.setSelected(param.isGamma());
+			filterResize.setSelected(param.isResize());
+			filterGrayscale.setSelected(param.isGrayscale());
+			filterPreview.setSelected(param.isPreview());
+			cropFullPage.setSelected(param.isFullPageCrop());
+			cropTextPage.setSelected(param.isTextPageCrop());
+			cropPictPage.setSelected(param.isPictPageCrop());
+			filterUnification.setSelected(param.isUnificationTextPage());
+		}
+		
 		
 		if(param.isGamma()){
 			gammaValue.setValue((float)param.getGamma());
@@ -840,6 +874,15 @@ public class SettingComponent {
 			outputAuthorKana.setText(param.getAuthorKana());
 		}
 		
+	}
+	
+	/**
+	 * FileInfo更新イベント
+	 */
+	public void onFileInfoModified(){
+		if(filterUnification.isSelected()){
+			updateSettingValues();
+		}
 	}
 	
 	/**
