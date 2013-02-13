@@ -98,6 +98,9 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				int imageWidth = image.getWidth();
 				int imageHeight = image.getHeight();
 				
+				File file = File.createTempFile("temp", "jpg");
+				BufferedImageIO.write(image, "jpeg", 0.8f, new FileOutputStream(file));
+				
 				if(document == null){
 					// Open前にサイズ指定しないと１ページ目に反映されない…
 					document = new Document(PageSize.A4, 0, 0, 0, 0);
@@ -114,8 +117,12 @@ public class PdfImageFileWriter implements IImageFileWriter {
 					document.setPageSize(new Rectangle(0, 0, imageWidth, imageHeight));
 				}
 
-				Image jpeg2pdfImage = Image.getInstance(image, null);
+				Image jpeg2pdfImage = Image.getInstance(file.getAbsolutePath());
 				document.add(jpeg2pdfImage);
+				
+				if(!file.delete()){
+					file.deleteOnExit();
+				}
 				
 				if(listener != null){
 					listener.onProgress((int)((i+1)*progressOffset), null);
