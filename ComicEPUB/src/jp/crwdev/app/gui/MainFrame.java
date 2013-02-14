@@ -29,6 +29,7 @@ import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
+import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
@@ -303,10 +304,10 @@ public class MainFrame extends JFrame implements OnEventListener {
 	public void updateBaseFilterParam(ImageFilterParam param) {
 		if(param.isUnificationTextPage()){
 			IImageFileInfoList list = mTable.getImageFileInfoList();
-			ImageFilterParam.setUnificationTextPageSize(ImageFileInfoList.getTextPageUnionDimension(list));
+			AddSpaceFilter.setUnificationTextPageSize(ImageFileInfoList.getTextPageUnionDimension(list));
 		}
 		else{
-			ImageFilterParam.setUnificationTextPageSize(0, 0);
+			AddSpaceFilter.setUnificationTextPageSize(0, 0);
 		}
 		setBaseFilterParam(param);
 		mTable.selectCurrentItem(); // Baseフィルタが更新されたのでカレントイメージも更新する

@@ -29,6 +29,7 @@ import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
+import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 
 public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
@@ -184,10 +185,23 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		return 1.0f;
 	}
+	private float getScaleX(float ow){
+		if(mDisplayImage != null){
+			float dw = (float)mDisplayImage.getWidth();
+			return dw/ow;
+		}
+		return 1.0f;
+	}
+	private float getScaleY(float oh){
+		if(mDisplayImage != null){
+			float dh = (float)mDisplayImage.getHeight();
+			return dh/oh;
+		}
+		return 1.0f;
+	}
 	
 	public void setImage(BufferedImage image, IImageFileInfo info, int rowIndex){
 		AddSpaceFilter filter = new AddSpaceFilter();
-//		filter.setTargetSize(ImageFilterParam.getUnificationTextPageSize());
 		mOriginalImage = filter.filter(image, info.getFilterParam());
 		mFileInfo = info;
 		mInfoIndex = rowIndex;
@@ -389,7 +403,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private void setCropRect(){
 		Rectangle cropRect = getCropRect();
 		if(cropRect != null && mFileInfo != null){
-			float scale = getScale();
+			//float scale = getScale();
+			Dimension size = SplitFilter.getSplitSize(mOriginalImage, mFileInfo.getFilterParam());
+			float scaleX = getScaleX(size.width);
+			float scaleY = getScaleY(size.height);
 			Rectangle dispImageRect = getDisplayImageRect();
 			
 			int left = cropRect.x - dispImageRect.x;
@@ -398,10 +415,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int right = (dispImageRect.x + dispImageRect.width) - (cropRect.x + cropRect.width);
 			int bottom = (dispImageRect.y + dispImageRect.height) - (cropRect.y + cropRect.height);
 			
-			float orgLeft = (float)left / scale;
-			float orgRight = (float)right / scale;
-			float orgTop = (float)top / scale;
-			float orgBottom = (float)bottom / scale;
+			float orgLeft = (float)left / scaleX;
+			float orgRight = (float)right / scaleX;
+			float orgTop = (float)top / scaleY;
+			float orgBottom = (float)bottom / scaleY;
 			
 			ImageFilterParam param = mFileInfo.getFilterParam();
 			param.setFullPageCrop(true);

@@ -10,6 +10,7 @@ import java.util.List;
 
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
+import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 
@@ -63,24 +64,86 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 					int pageType = param.getSplitType();
 					IImageFileInfo baseInfo = infow.getBaseFileInfo();
 					baseInfo.getFilterParam().setSplitType(pageType);
-					if(pageType == Constant.SPLITTYPE_NONE){
+					if(pageType == SplitFilter.TYPE_NONE){
 						list.add(baseInfo);
 					}
 					else{
-						list.add(new ImageFileInfoSplitWrapper(baseInfo, 0));
-						list.add(new ImageFileInfoSplitWrapper(baseInfo, 1));
+						int splitCount = 1;
+						switch(param.getSplitType()){
+						case SplitFilter.TYPE_L2R_2:
+						case SplitFilter.TYPE_R2L_2:
+							splitCount = 2;
+							break;
+						case SplitFilter.TYPE_L2R_2x2:
+						case SplitFilter.TYPE_R2L_2x2:
+							splitCount = 4;
+							break;
+						case SplitFilter.TYPE_L2R_3x3:
+						case SplitFilter.TYPE_R2L_3x3:
+							splitCount = 9;
+							break;
+						default:
+						}
+						for(int index=0; index<splitCount; index++){
+							list.add(new ImageFileInfoSplitWrapper(baseInfo, index));
+						}
 					}
 				}
 			}else{
-				if(param.getSplitType() != Constant.SPLITTYPE_NONE){
-					list.add(new ImageFileInfoSplitWrapper(info, 0));
-					list.add(new ImageFileInfoSplitWrapper(info, 1));
+				if(param.getSplitType() != SplitFilter.TYPE_NONE){
+					int splitCount = 1;
+					switch(param.getSplitType()){
+					case SplitFilter.TYPE_L2R_2:
+					case SplitFilter.TYPE_R2L_2:
+						splitCount = 2;
+						break;
+					case SplitFilter.TYPE_L2R_2x2:
+					case SplitFilter.TYPE_R2L_2x2:
+						splitCount = 4;
+						break;
+					case SplitFilter.TYPE_L2R_3x3:
+					case SplitFilter.TYPE_R2L_3x3:
+						splitCount = 9;
+						break;
+					default:
+					}
+					for(int index=0; index<splitCount; index++){
+						list.add(new ImageFileInfoSplitWrapper(info, index));
+					}
 				}
 				else{
 					list.add(info);
 				}
 			}
 		}
+//		for(int i=0; i<mList.size(); i++){
+//			IImageFileInfo info = mList.get(i);
+//			ImageFilterParam param = info.getFilterParam();
+//			if(info instanceof ImageFileInfoSplitWrapper){
+//				ImageFileInfoSplitWrapper infow = (ImageFileInfoSplitWrapper)info;
+//				if(param.getSplitIndex() == 0){
+//					int pageType = param.getSplitType();
+//					IImageFileInfo baseInfo = infow.getBaseFileInfo();
+//					baseInfo.getFilterParam().setSplitType(pageType);
+//					if(pageType == Constant.SPLITTYPE_NONE){
+//						list.add(baseInfo);
+//					}
+//					else{
+//						list.add(new ImageFileInfoSplitWrapper(baseInfo, 0));
+//						list.add(new ImageFileInfoSplitWrapper(baseInfo, 1));
+//					}
+//				}
+//			}else{
+//				if(param.getSplitType() != Constant.SPLITTYPE_NONE){
+//					
+//					list.add(new ImageFileInfoSplitWrapper(info, 0));
+//					list.add(new ImageFileInfoSplitWrapper(info, 1));
+//				}
+//				else{
+//					list.add(info);
+//				}
+//			}
+//		}
 		
 		return list;
 	}

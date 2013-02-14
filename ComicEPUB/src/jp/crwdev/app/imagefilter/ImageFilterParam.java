@@ -46,7 +46,7 @@ public class ImageFilterParam implements Cloneable {
 		mTranslateX = 0;
 		mTranslateY = 0;
 		mRotateAngle = 0.0f;
-		mSplitType = Constant.SPLITTYPE_NONE;
+		mSplitType = SplitFilter.TYPE_NONE;
 		mSplitIndex = 0;
 		
 		mPageType = Constant.PAGETYPE_AUTO;
@@ -140,7 +140,7 @@ public class ImageFilterParam implements Cloneable {
 	protected int mSplitIndex;
 	
 	protected boolean mIsUnificationTextPage = false;
-	protected static Dimension mUnificationTextPageSize = new Dimension(0, 0);
+	//protected static Dimension mUnificationTextPageSize = new Dimension(0, 0);
 	
 	// Dynamic
 	protected int mPageType;
@@ -288,9 +288,9 @@ public class ImageFilterParam implements Cloneable {
 		return mIsUnificationTextPage;
 	}
 	
-	public static Dimension getUnificationTextPageSize() {
-		return mUnificationTextPageSize;
-	}
+	//public static Dimension getUnificationTextPageSize() {
+	//	return mUnificationTextPageSize;
+	//}
 
 	
 	// Dynamic
@@ -476,13 +476,13 @@ public class ImageFilterParam implements Cloneable {
 		mIsUnificationTextPage = enable;
 	}
 	
-	public static void setUnificationTextPageSize(Dimension size) {
-		mUnificationTextPageSize.setSize(size);
-	}
+	//public static void setUnificationTextPageSize(Dimension size) {
+	//	mUnificationTextPageSize.setSize(size);
+	//}
 	
-	public static void setUnificationTextPageSize(int width, int height) {
-		mUnificationTextPageSize.setSize(width, height);
-	}
+	//public static void setUnificationTextPageSize(int width, int height) {
+	//	mUnificationTextPageSize.setSize(width, height);
+	//}
 
 	public boolean isEdit() {
 		return (mIsFullPageCrop || mIsTextPageCrop || mIsPictPageCrop || mIsRotate || mIsTranslate);
@@ -560,7 +560,7 @@ public class ImageFilterParam implements Cloneable {
 			dest.mIsRotate = true;
 			dest.mRotateAngle = update.getRotateAngle();
 		}
-		if(update.getSplitType() != Constant.SPLITTYPE_NONE){
+		if(update.getSplitType() != SplitFilter.TYPE_NONE){
 			dest.mSplitType = update.getSplitType();
 			dest.mSplitIndex = update.getSplitIndex();
 		}

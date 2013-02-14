@@ -30,6 +30,7 @@ import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PageCheckFilter;
+import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask;
@@ -428,27 +429,59 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						JMenuItem item0 = new JMenuItem("一括（分割なし）");
 						JMenuItem item1 = new JMenuItem("一括（右→左）");
 						JMenuItem item2 = new JMenuItem("一括（左→右）");
+						JMenuItem item3 = new JMenuItem("一括（順Ｚ 2x2）");
+						JMenuItem item4 = new JMenuItem("一括（逆Ｚ 2x2）");
+						JMenuItem item5 = new JMenuItem("一括（順Ｚ 3x3）");
+						JMenuItem item6 = new JMenuItem("一括（逆Ｚ 3x3）");
 						item0.addActionListener(new ActionListener(){
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
-								updateSplitTypeAll(Constant.SPLITTYPE_NONE);
+								updateSplitTypeAll(SplitFilter.TYPE_NONE);
 							}
 						});
 						item1.addActionListener(new ActionListener(){
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
-								updateSplitTypeAll(Constant.SPLITTYPE_RIGHT_TO_LEFT);
+								updateSplitTypeAll(SplitFilter.TYPE_R2L_2);
 							}
 						});
 						item2.addActionListener(new ActionListener(){
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
-								updateSplitTypeAll(Constant.SPLITTYPE_LEFT_TO_RIGHT);
+								updateSplitTypeAll(SplitFilter.TYPE_L2R_2);
+							}
+						});
+						item3.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								updateSplitTypeAll(SplitFilter.TYPE_R2L_2x2);
+							}
+						});
+						item4.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								updateSplitTypeAll(SplitFilter.TYPE_L2R_2x2);
+							}
+						});
+						item5.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								updateSplitTypeAll(SplitFilter.TYPE_R2L_3x3);
+							}
+						});
+						item6.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								updateSplitTypeAll(SplitFilter.TYPE_L2R_3x3);
 							}
 						});
 						popup.add(item0);
 						popup.add(item1);
 						popup.add(item2);
+						popup.add(item3);
+						popup.add(item4);
+						popup.add(item5);
+						popup.add(item6);
 						popup.show(e.getComponent(), e.getX(), e.getY());
 					}
 				}
@@ -505,8 +538,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		// SplitType Column
 		JComboBox splitBox = new JComboBox(new String[]{
 			Constant.TEXT_SPLITTYPE_NONE,
-			Constant.TEXT_SPLITTYPE_RIGHT_TO_LEFT,
-			Constant.TEXT_SPLITTYPE_LEFT_TO_RIGHT,
+			Constant.TEXT_SPLITTYPE_R2L,
+			Constant.TEXT_SPLITTYPE_L2R,
+			Constant.TEXT_SPLITTYPE_R2L_2x2,
+			Constant.TEXT_SPLITTYPE_L2R_2x2,
+			Constant.TEXT_SPLITTYPE_R2L_3x3,
+			Constant.TEXT_SPLITTYPE_L2R_3x3,
 		});
 		splitBox.setBorder(BorderFactory.createEmptyBorder()); 
 		

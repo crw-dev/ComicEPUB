@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
+import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 
@@ -271,7 +272,7 @@ public class XmlWriter {
 			elem.setAttribute("offset", Float.toString(param.getBrightness()));
 			paramElem.appendChild(elem);
 		}
-		if(param.getSplitType() != Constant.SPLITTYPE_NONE){
+		if(param.getSplitType() != SplitFilter.TYPE_NONE){
 			Element elem = mDocument.createElement("split");
 			elem.appendChild(mDocument.createTextNode("true"));
 			elem.setAttribute("type", Integer.toString(param.getSplitType()));

@@ -5,15 +5,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import jp.crwdev.app.BufferedImageIO;
@@ -107,14 +105,16 @@ public class PdfImageFileWriter implements IImageFileWriter {
 					document.setPageSize(new Rectangle(0, 0, imageWidth, imageHeight));
 					
 					writer = PdfWriter.getInstance(document, new FileOutputStream(mOutputFile.getAbsoluteFile()));
+					writer.addViewerPreference(PdfName.DIRECTION, PdfName.R2L);	// 右綴じ
 					document.open();
 					
 					document.addTitle(mTitle);
-					document.addCreator(mAuthor);
+					document.addAuthor(mAuthor);
 					document.addCreationDate();
 				}
 				else{
 					document.setPageSize(new Rectangle(0, 0, imageWidth, imageHeight));
+					document.newPage();
 				}
 
 				Image jpeg2pdfImage = Image.getInstance(file.getAbsolutePath());

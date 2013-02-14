@@ -13,7 +13,7 @@ import jp.crwdev.app.interfaces.IImageFilter;
 
 public class AddSpaceFilter implements IImageFilter {
 
-//	private Dimension mTargetSize = new Dimension();
+	private static Dimension mUnificationTextPageSize = new Dimension();
 	
 	
 	/**
@@ -22,6 +22,15 @@ public class AddSpaceFilter implements IImageFilter {
 	public AddSpaceFilter(){
 		
 	}
+	
+	public static void setUnificationTextPageSize(Dimension size){
+		AddSpaceFilter.mUnificationTextPageSize = size;
+	}
+	
+	public static void setUnificationTextPageSize(int width, int height){
+		AddSpaceFilter.mUnificationTextPageSize = new Dimension(width, height);
+	}
+	
 	
 //	/**
 //	 * 余白追加後のサイズ指定
@@ -37,14 +46,14 @@ public class AddSpaceFilter implements IImageFilter {
 			return image;
 		}
 		
-		Dimension targetSize = ImageFilterParam.getUnificationTextPageSize();
+		Dimension targetSize = mUnificationTextPageSize;
 		if(targetSize.width == 0 || targetSize.height == 0){
 			return image;
 		}
 		
 		int width = image.getWidth();
 		int height = image.getHeight();
-		if(width == targetSize.width && height == targetSize.height){
+		if(width >= targetSize.width && height >= targetSize.height){
 			// 同じサイズなら何もしない
 			return image;
 		}

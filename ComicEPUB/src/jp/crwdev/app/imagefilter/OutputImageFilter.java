@@ -20,9 +20,9 @@ public class OutputImageFilter implements IImageFilter {
 	 * コンストラクタ
 	 */
 	public OutputImageFilter(){
-		mFilters.add(new SplitFilter());
 		mFilters.add(new AddSpaceFilter());
 		mFilters.add(new TransRotateFilter());
+		mFilters.add(new SplitFilter());
 		mFilters.add(new CropFilter(true));		// 全ページCrop
 		mFilters.add(new PageCheckFilter(true));
 		mFilters.add(new CropFilter(false));	// Text/Pictページ別Crop

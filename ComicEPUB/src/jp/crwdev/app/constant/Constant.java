@@ -3,6 +3,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.crwdev.app.imagefilter.SplitFilter;
+
 public class Constant {
 
 	public static final List<String> SUPPORT_INPUT_PREFIX = new ArrayList<String>();
@@ -20,13 +22,17 @@ public class Constant {
 	public static final String TEXT_PAGETYPE_TEXT = "本文";
 	public static final String TEXT_PAGETYPE_PICT = "挿絵";
 
-	public static final int SPLITTYPE_NONE = 0;
-	public static final int SPLITTYPE_RIGHT_TO_LEFT = 1;
-	public static final int SPLITTYPE_LEFT_TO_RIGHT = 2;
+	//public static final int SPLITTYPE_NONE = 0;
+	//public static final int SPLITTYPE_RIGHT_TO_LEFT = 1;
+	//public static final int SPLITTYPE_LEFT_TO_RIGHT = 2;
 	
 	public static final String TEXT_SPLITTYPE_NONE = "";
-	public static final String TEXT_SPLITTYPE_RIGHT_TO_LEFT = "右→左";
-	public static final String TEXT_SPLITTYPE_LEFT_TO_RIGHT = "左→右";
+	public static final String TEXT_SPLITTYPE_R2L = "右→左";
+	public static final String TEXT_SPLITTYPE_L2R = "左→右";
+	public static final String TEXT_SPLITTYPE_R2L_2x2 = "逆Ｚ 2x2";
+	public static final String TEXT_SPLITTYPE_L2R_2x2 = "順Ｚ 2x2";
+	public static final String TEXT_SPLITTYPE_R2L_3x3 = "逆Ｚ 3x3";
+	public static final String TEXT_SPLITTYPE_L2R_3x3 = "順Ｚ 3x3";
 	
 	
 	public static final String TABLE_HEADER_ENTRYNAME = "ファイル名";
@@ -82,22 +88,42 @@ public class Constant {
 	
 	public static String getSplitTypeText(int splitType){
 		switch(splitType){
-		case SPLITTYPE_RIGHT_TO_LEFT:
-			return TEXT_SPLITTYPE_RIGHT_TO_LEFT;
-		case SPLITTYPE_LEFT_TO_RIGHT:
-			return TEXT_SPLITTYPE_LEFT_TO_RIGHT;
-		case SPLITTYPE_NONE:
+		case SplitFilter.TYPE_R2L_2:
+			return TEXT_SPLITTYPE_R2L;
+		case SplitFilter.TYPE_L2R_2:
+			return TEXT_SPLITTYPE_L2R;
+		case SplitFilter.TYPE_R2L_2x2:
+			return TEXT_SPLITTYPE_R2L_2x2;
+		case SplitFilter.TYPE_L2R_2x2:
+			return TEXT_SPLITTYPE_L2R_2x2;
+		case SplitFilter.TYPE_R2L_3x3:
+			return TEXT_SPLITTYPE_R2L_3x3;
+		case SplitFilter.TYPE_L2R_3x3:
+			return TEXT_SPLITTYPE_L2R_3x3;
+		case SplitFilter.TYPE_NONE:
 		default:
 			return TEXT_SPLITTYPE_NONE;
 		}
 	}
 	public static int getSplitType(String splitType){
-		if(splitType.equals(TEXT_SPLITTYPE_RIGHT_TO_LEFT)){
-			return SPLITTYPE_RIGHT_TO_LEFT;
+		if(splitType.equals(TEXT_SPLITTYPE_R2L)){
+			return SplitFilter.TYPE_R2L_2;
 		}
-		if(splitType.equals(TEXT_SPLITTYPE_LEFT_TO_RIGHT)){
-			return SPLITTYPE_LEFT_TO_RIGHT;
+		if(splitType.equals(TEXT_SPLITTYPE_L2R)){
+			return SplitFilter.TYPE_L2R_2;
 		}
-		return SPLITTYPE_NONE;
+		if(splitType.equals(TEXT_SPLITTYPE_R2L_2x2)){
+			return SplitFilter.TYPE_R2L_2x2;
+		}
+		if(splitType.equals(TEXT_SPLITTYPE_L2R_2x2)){
+			return SplitFilter.TYPE_L2R_2x2;
+		}
+		if(splitType.equals(TEXT_SPLITTYPE_R2L_3x3)){
+			return SplitFilter.TYPE_R2L_3x3;
+		}
+		if(splitType.equals(TEXT_SPLITTYPE_L2R_3x3)){
+			return SplitFilter.TYPE_L2R_3x3;
+		}
+		return SplitFilter.TYPE_NONE;
 	}
 }
