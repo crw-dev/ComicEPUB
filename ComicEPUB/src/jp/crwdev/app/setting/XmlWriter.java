@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.container.ImageFileInfoSplitWrapper;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
@@ -39,6 +42,7 @@ public class XmlWriter {
 	
 	private String mFilePath = null;
 	
+	private HashMap<IImageFileInfo, ImageFileInfoSplitWrapper> mSpInfoMap = new HashMap<IImageFileInfo, ImageFileInfoSplitWrapper>();
 	
 	public XmlWriter(){
 	}
@@ -174,21 +178,58 @@ public class XmlWriter {
 		}
 		
 		ImageFilterParam param = info.getFilterParam();
-		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO){
+		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE){
 		
-			Element infoElem = mDocument.createElement("info");
+			if(param.getSplitType() == SplitFilter.TYPE_NONE || (param.getSplitType() != SplitFilter.TYPE_NONE && param.getSplitIndex() == 0)){
+				
+				//<info>
+				Element infoElem = mDocument.createElement("info");
+		
+				//<filename>
+				Element filenameElem = mDocument.createElement("filename");
+				filenameElem.appendChild(mDocument.createTextNode(info.getFileName()));
+				
+				infoElem.appendChild(filenameElem);
 	
-			Element filenameElem = mDocument.createElement("filename");
-			filenameElem.appendChild(mDocument.createTextNode(info.getFileName()));
-			
-			infoElem.appendChild(filenameElem);
-			
-			writeParam(infoElem, param);
-			
-			parent.appendChild(infoElem);
-		
+				//<split>
+				writeSplit(infoElem, info);
+				//writeParam(infoElem, param);
+				
+				parent.appendChild(infoElem);
+	
+			}
+
 		}
 		
+	}
+	
+	private void writeSplit(Element parent, IImageFileInfo info){
+
+		ImageFilterParam param = info.getFilterParam();
+		int splitType = param.getSplitType();
+		
+
+		//<split>
+		Element splitElem = mDocument.createElement("split");
+
+		
+		splitElem.setAttribute("type", Integer.toString(splitType));
+		
+		//TODO: attribute of vline, hline
+
+		if(info instanceof ImageFileInfoSplitWrapper){
+			ImageFileInfoSplitWrapper wrapInfo = (ImageFileInfoSplitWrapper)info;
+			int size = wrapInfo.getRelativeSplitInfoSize();
+			for(int i=0; i<size; i++){
+				ImageFilterParam sparam = wrapInfo.getRelativeSplitInfoFilterParam(i);
+				writeParam(splitElem, sparam);
+			}
+		}
+		else{
+			writeParam(splitElem, param);
+		}
+		
+		parent.appendChild(splitElem);
 	}
 	
 	private void writeParam(Element parent, ImageFilterParam param){
@@ -198,6 +239,8 @@ public class XmlWriter {
 		}
 
 		Element paramElem = mDocument.createElement("param");
+		
+		paramElem.setAttribute("index", Integer.toString(param.getSplitIndex()));
 		
 		if(param.isPreview()){
 			Element elem = mDocument.createElement("preview");
@@ -272,12 +315,12 @@ public class XmlWriter {
 			elem.setAttribute("offset", Float.toString(param.getBrightness()));
 			paramElem.appendChild(elem);
 		}
-		if(param.getSplitType() != SplitFilter.TYPE_NONE){
-			Element elem = mDocument.createElement("split");
-			elem.appendChild(mDocument.createTextNode("true"));
-			elem.setAttribute("type", Integer.toString(param.getSplitType()));
-			paramElem.appendChild(elem);
-		}
+		//if(param.getSplitType() != SplitFilter.TYPE_NONE){
+		//	Element elem = mDocument.createElement("split");
+		//	elem.appendChild(mDocument.createTextNode("true"));
+		//	elem.setAttribute("type", Integer.toString(param.getSplitType()));
+		//	paramElem.appendChild(elem);
+		//}
 		if(param.getPageType() != Constant.PAGETYPE_AUTO){
 			Element elem = mDocument.createElement("pageType");
 			elem.appendChild(mDocument.createTextNode("true"));
@@ -354,6 +397,30 @@ public class XmlWriter {
 				}
 			}
 		}
+		
+		if(mSpInfoMap.size() > 0){
+			List<IImageFileInfo> tmpList = new ArrayList<IImageFileInfo>();
+			for(int i=0; i<list.size(); i++){
+				tmpList.add(list.get(i));
+			}
+			
+			list.clear();
+		
+			for(int i=0; i<tmpList.size(); i++){
+				IImageFileInfo info = tmpList.get(i);
+				if(mSpInfoMap.containsKey(info)){
+					ImageFileInfoSplitWrapper wrapInfo = mSpInfoMap.get(info);
+					int size = wrapInfo.getRelativeSplitInfoSize();
+					for(int n=0; n<size; n++){
+						ImageFileInfoSplitWrapper winfo = wrapInfo.getRelativeSplitInfo(n);
+						list.add(winfo);
+					}
+				}
+				else{
+					list.add(info);
+				}
+			}
+		}
 	}
 	
 	private void loadOutput(Node outputNode, OutputSettingParam output){
@@ -416,17 +483,60 @@ public class XmlWriter {
 				if(node.getNodeName().equalsIgnoreCase("filename")){
 					filenameNode = node;
 				}
-				else if(node.getNodeName().equalsIgnoreCase("param")){
+				else if(node.getNodeName().equalsIgnoreCase("split")){
 					paramNode = node;
-					//loadParam(node, info.getFilterParam());
 				}
 			}
 			if(filenameNode != null && paramNode != null){
 				String filename = filenameNode.getFirstChild().getNodeValue();
 				IImageFileInfo info = map.get(filename);
 				if(info != null){
-					loadParam(paramNode, info.getFilterParam());
+					loadSplit(paramNode, info);
+					//loadParam(paramNode, info.getFilterParam());
 				}
+			}
+		}
+	}
+	
+	private void loadSplit(Node splitNode, IImageFileInfo info){
+		if(splitNode.getNodeName().equalsIgnoreCase("split")){
+			// type="0" vline="-0.5,0,0.5" hline="-0.5,0,0.5"
+			NamedNodeMap attrs = splitNode.getAttributes();
+			String type = getAttributeValue(attrs, "type");
+			
+			int splitType = Integer.parseInt(type);
+			if(splitType == SplitFilter.TYPE_NONE){
+				// 分割無し
+				NodeList nodes = splitNode.getChildNodes();
+				for(int i=0; i<nodes.getLength(); i++){
+					Node node = nodes.item(i);
+					loadParam(node, info.getFilterParam());
+				}
+			}
+			else{
+				String vline = getAttributeValue(attrs, "vline");
+				String hline = getAttributeValue(attrs, "hline");
+				
+				NodeList nodes = splitNode.getChildNodes();
+				
+				info.getFilterParam().setSplitType(splitType);
+				
+				ImageFileInfoSplitWrapper first = null;// = new ImageFileInfoSplitWrapper(info, 0);
+				
+				//TODO: vline hline
+				
+				for(int i=0; i<nodes.getLength(); i++){
+					Node node = nodes.item(i);
+					ImageFileInfoSplitWrapper relWrapInfo = new ImageFileInfoSplitWrapper(info, i /*dummy*/);
+					loadParam(node, relWrapInfo.getFilterParam());
+
+					if(first == null){
+						first = relWrapInfo;
+					}
+					first.addRelativeSplitInfo(relWrapInfo);
+				}
+				
+				mSpInfoMap.put(info, first);
 			}
 		}
 	}
@@ -509,13 +619,13 @@ public class XmlWriter {
 					param.setContrast(Float.parseFloat(scale));
 					param.setBrightness(Float.parseFloat(offset));
 				}
-				else if(name.equalsIgnoreCase("split")){
-					String type = getAttributeValue(attrs, "type");
-					String enable = node.getFirstChild().getNodeValue();
-					if(Boolean.parseBoolean(enable)){
-						param.setSplitType(Integer.parseInt(type));
-					}
-				}
+				//else if(name.equalsIgnoreCase("split")){
+				//	String type = getAttributeValue(attrs, "type");
+				//	String enable = node.getFirstChild().getNodeValue();
+				//	if(Boolean.parseBoolean(enable)){
+				//		param.setSplitType(Integer.parseInt(type));
+				//	}
+				//}
 				else if(name.equalsIgnoreCase("pageType")){
 					String type = getAttributeValue(attrs, "type");
 					String enable = node.getFirstChild().getNodeValue();
@@ -526,10 +636,15 @@ public class XmlWriter {
 			}
 		}
 	}
+
 	
 	private String getAttributeValue(NamedNodeMap attrs, String name){
 		Node node = attrs.getNamedItem(name);
-		return node.getNodeValue();
+		if(node != null){
+			return node.getNodeValue();
+		} else {
+			return "";
+		}
 	}
 	
 }

@@ -177,7 +177,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	private float getScale(){
 		if(mOriginalImage != null && mDisplayImage != null){
-			//TODO: SplitModeの場合は表示イメージの幅がオリジナルの半分になってしまうため、ここでは高さを元にスケールを計算する
+			//SplitModeの場合は表示イメージの幅がオリジナルの半分になってしまうため、ここでは高さを元にスケールを計算する
 			//      今後SplitModeに縦分割等が入る場合は修正が必要
 			float oh = (float)mOriginalImage.getHeight();
 			float dh = (float)mDisplayImage.getHeight();
@@ -311,7 +311,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			else{
 				// Zoom start
-				//TODO
 				if(mImageArea.contains(x, y)){
 					mIsZoomDrag = true;
 					mZoomPoint.setLocation(x, y);
@@ -392,7 +391,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			else{
 				// Zoom end
-				//TODO
 				mIsZoomDrag = false;
 			}
 
@@ -503,7 +501,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			else{
 				// Zoom
-				//TODO
 				mZoomPoint.setLocation(x, y);
 
 				repaint();
@@ -646,8 +643,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(right < 0){ right = 0; }
 				if(right > 1.0f){ right = 1.0f; }
 				if(mFileInfo != null && mOriginalImage != null){
-					int imageWidth = mOriginalImage.getWidth();
-					int imageHeight = mOriginalImage.getHeight();
+
+					Dimension size = SplitFilter.getSplitSize(mOriginalImage, mFileInfo.getFilterParam());
+					int imageWidth = size.width;
+					int imageHeight = size.height;
 
 					ImageFilterParam param = new ImageFilterParam();
 					param.setTextPageCrop(true);
@@ -674,11 +673,21 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(right > 1.0f){ right = 1.0f; }
 				System.out.println("t=" + top + " l=" + left + " b=" + bottom + " r=" + right);
 				if(mFileInfo != null && mOriginalImage != null){
-					int imageWidth = mOriginalImage.getWidth();
-					int imageHeight = mOriginalImage.getHeight();
+					
+					Dimension size = SplitFilter.getSplitSize(mOriginalImage, mFileInfo.getFilterParam());
+					int imageWidth = size.width;
+					int imageHeight = size.height;
+					//float scaleX = getScaleX(size.width);
+					//float scaleY = getScaleY(size.height);
+
+					int l = (int)(imageWidth * left);
+					int t = (int)(imageHeight * top);
+					int r = (int)(imageWidth - (int)(imageWidth * right));
+					int b = (int)(imageHeight - (int)(imageHeight * bottom));
+					
 					ImageFilterParam param = mFileInfo.getFilterParam();
 					param.setFullPageCrop(true);
-					param.setFullPageCrop((int)(imageWidth * left), (int)(imageHeight * top), imageWidth - (int)(imageWidth * right), imageHeight - (int)(imageHeight * bottom));
+					param.setFullPageCrop(l, t, r, b);
 					updateDisplayImage();
 				}
 			}

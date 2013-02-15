@@ -59,15 +59,19 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 			IImageFileInfo info = mList.get(i);
 			ImageFilterParam param = info.getFilterParam();
 			if(info instanceof ImageFileInfoSplitWrapper){
+				// 分割中
 				ImageFileInfoSplitWrapper infow = (ImageFileInfoSplitWrapper)info;
 				if(param.getSplitIndex() == 0){
+					// １つ目が全ての情報を持っている
 					int pageType = param.getSplitType();
 					IImageFileInfo baseInfo = infow.getBaseFileInfo();
 					baseInfo.getFilterParam().setSplitType(pageType);
 					if(pageType == SplitFilter.TYPE_NONE){
+						// 分割なしに戻す（全ての分割情報は捨てる）
 						list.add(baseInfo);
 					}
 					else{
+						// 分割し直す（全ての分割情報は捨てる）
 						int splitCount = 1;
 						switch(param.getSplitType()){
 						case SplitFilter.TYPE_L2R_2:
@@ -84,13 +88,22 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 							break;
 						default:
 						}
+						
+						ImageFileInfoSplitWrapper first = null;
 						for(int index=0; index<splitCount; index++){
-							list.add(new ImageFileInfoSplitWrapper(baseInfo, index));
+							ImageFileInfoSplitWrapper wrapInfo = new ImageFileInfoSplitWrapper(baseInfo, index);
+							list.add(wrapInfo);
+
+							if(first == null){
+								first = wrapInfo;
+							}
+							first.addRelativeSplitInfo(wrapInfo);
 						}
 					}
 				}
 			}else{
 				if(param.getSplitType() != SplitFilter.TYPE_NONE){
+					// １　→　分割
 					int splitCount = 1;
 					switch(param.getSplitType()){
 					case SplitFilter.TYPE_L2R_2:
@@ -107,11 +120,19 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 						break;
 					default:
 					}
+					ImageFileInfoSplitWrapper first = null;
 					for(int index=0; index<splitCount; index++){
-						list.add(new ImageFileInfoSplitWrapper(info, index));
+						ImageFileInfoSplitWrapper wrapInfo = new ImageFileInfoSplitWrapper(info, index);
+						list.add(wrapInfo);
+
+						if(first == null){
+							first = wrapInfo;
+						}
+						first.addRelativeSplitInfo(wrapInfo);
 					}
 				}
 				else{
+					// 分割なし
 					list.add(info);
 				}
 			}

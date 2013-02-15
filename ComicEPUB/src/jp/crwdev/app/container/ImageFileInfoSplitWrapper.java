@@ -5,6 +5,9 @@ package jp.crwdev.app.container;
 
 import java.io.InputStream;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.interfaces.IImageFileInfo;
@@ -15,6 +18,9 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	private IImageFileInfo mBaseInfo = null;
 	/** 分割後の個別フィルタパラメータ */
 	private ImageFilterParam mParam = null;
+	
+	/** index=0のWrapperは全ての個別パラメータへの参照を持つ */
+	private HashMap<Integer, ImageFileInfoSplitWrapper> mWrapperParams = null;
 	
 	/**
 	 * コンストラクタ
@@ -31,6 +37,30 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 		mParam = info.getFilterParam().clone();
 		//mParam.setSplitType(Constant.SPLITTYPE_NONE);
 		mParam.setSplitIndex(splitIndex);
+	}
+	
+	public void addRelativeSplitInfo(ImageFileInfoSplitWrapper info){
+		if(mWrapperParams == null){
+			mWrapperParams = new HashMap<Integer, ImageFileInfoSplitWrapper>();
+		}
+		ImageFilterParam param = info.getFilterParam();
+		mWrapperParams.put(param.getSplitIndex(), info);
+	}
+	
+	public ImageFileInfoSplitWrapper getRelativeSplitInfo(int index){
+		return mWrapperParams.get(index);
+	}
+
+	public ImageFilterParam getRelativeSplitInfoFilterParam(int index){
+		return mWrapperParams.get(index).getFilterParam();
+	}
+	
+	public int getRelativeSplitInfoSize(){
+		if(mWrapperParams != null){
+			return mWrapperParams.size();
+		}else{
+			return 0;
+		}
 	}
 	
 	/**
@@ -58,11 +88,13 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 
 	@Override
 	public int getWidth() {
-		return mBaseInfo.getWidth() / 2;
+		//TODO split mode
+		return mBaseInfo.getWidth();
 	}
 
 	@Override
 	public int getHeight() {
+		//TODO split mode
 		return mBaseInfo.getHeight();
 	}
 
@@ -83,7 +115,8 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	
 	@Override
 	public void update() {
-		// NOP
+		//TODO split mode
+		mBaseInfo.update();
 	}
 
 	@Override
