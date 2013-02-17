@@ -3,6 +3,7 @@
  */
 package jp.crwdev.app.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -33,12 +34,12 @@ public class LineHandleSet implements ILineHandle {
 	 * コンストラクタ
 	 */
 	public LineHandleSet(){
-		mHandles[CENTER_VERTICAL] = new LineHandle(true, 0.0f);
-		mHandles[CENTER_HORIZONTAL] = new LineHandle(false, 0.0f);
-		mHandles[LEFT_VERTICAL] = new LineHandle(true, -0.45f);
-		mHandles[RIGHT_VERTICAL] = new LineHandle(true, 0.45f);
-		mHandles[UPPER_HORIZONTAL] = new LineHandle(false, -0.45f);
-		mHandles[LOWER_HORIZONTAL] = new LineHandle(false, 0.45f);
+		mHandles[CENTER_VERTICAL] = new LineHandle(true, 0.0f, Color.CYAN, false);
+		mHandles[CENTER_HORIZONTAL] = new LineHandle(false, 0.0f, Color.CYAN, false);
+		mHandles[LEFT_VERTICAL] = new LineHandle(true, -0.45f, Color.CYAN, false);
+		mHandles[RIGHT_VERTICAL] = new LineHandle(true, 0.45f, Color.CYAN, false);
+		mHandles[UPPER_HORIZONTAL] = new LineHandle(false, -0.45f, Color.CYAN, false);
+		mHandles[LOWER_HORIZONTAL] = new LineHandle(false, 0.45f, Color.CYAN, false);
 		
 		setSyncLineVertical(true);
 		setSyncLineHorizontal(true);

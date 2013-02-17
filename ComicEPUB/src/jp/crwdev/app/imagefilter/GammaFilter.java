@@ -55,13 +55,15 @@ public class GammaFilter implements IImageFilter {
 		
 		byte[] gammaTable = getGammaTable(param.getGamma());
 		
-		BufferedImage dest = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
+		//BufferedImage dest = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
 		
 		ByteLookupTable blt = new ByteLookupTable(0,gammaTable);
 		LookupOp lookupOp = new LookupOp(blt, null);
-		lookupOp.filter(image, dest);
+		lookupOp.filter(image, image);
+		return image;
+		//lookupOp.filter(image, dest);
 		
-		return dest;
+		//return dest;
 	}
 
 }

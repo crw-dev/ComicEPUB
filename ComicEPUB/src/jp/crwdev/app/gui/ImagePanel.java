@@ -16,6 +16,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JMenu;
@@ -24,8 +26,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SpringLayout;
 
+import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
+import jp.crwdev.app.container.ImageFileInfoSplitWrapper;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
@@ -54,6 +58,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private boolean mIsZoomDrag = false;
 	private Point mZoomPoint = new Point();
 	private Rectangle mImageArea = new Rectangle();
+	
+	/** カスタム分割モード */
+	private boolean mIsCustomSplitMode = false;
+	private SplitLineSet splitLineHandle = new SplitLineSet();
+	
 	
 	public ImagePanel(){
 		SpringLayout layout = new SpringLayout();
@@ -98,50 +107,61 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int x = (w - imageW)/2;
 			int y = (h - imageH)/2;
 			mImageArea.setBounds(x, y, imageW, imageH);
-			if(!mIsPreviewMode && mIsZoomDrag){
-				//TODO
-				float imageScale = 1.5f;
-				if(imageW > w || imageH > h){
-					imageScale = 1.0f;
-				}
-				int dw = (int)(imageW * imageScale);
-				int dh = (int)(imageH * imageScale);
-				int dx = (w - dw)/2;
-				int dy = (h - dh)/2;
-				float scale = dw / (float)w;
-				int offsetx = mZoomPoint.x - w/2;
-				int offsety = mZoomPoint.y - h/2;
-				dx -= offsetx * scale;
-				dy -= offsety * scale;
-				g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+			
+			if(mIsCustomSplitMode){
+				
+				g.drawImage(mDisplayImage, x, y, this);
+				
+				splitLineHandle.paint(g, w, h, imageW, imageH);
 			}
 			else{
-				g.drawImage(mDisplayImage, x, y, this);
-			}
-			
-			if(guideLineHandle.isDragHandle()){
 				
-			}
-			else if(ptLeftTop != null && ptRightBottom != null){
-				Rectangle cropRect = new Rectangle(ptLeftTop.x, ptLeftTop.y, (ptRightBottom.x-ptLeftTop.x), (ptRightBottom.y-ptLeftTop.y));
-				g.setColor(Color.BLACK);
-				g.drawRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
-			}
-			if(ptRotateA != null && ptRotateB != null){
-				Graphics2D g2 = (Graphics2D)g;
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g2.setColor(Color.RED);
-				g2.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
-				//g.setColor(Color.RED);
-				//g.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
+				if(!mIsPreviewMode && mIsZoomDrag){
+					//TODO
+					float imageScale = 1.5f;
+					if(imageW > w || imageH > h){
+						imageScale = 1.0f;
+					}
+					int dw = (int)(imageW * imageScale);
+					int dh = (int)(imageH * imageScale);
+					int dx = (w - dw)/2;
+					int dy = (h - dh)/2;
+					float scale = dw / (float)w;
+					int offsetx = mZoomPoint.x - w/2;
+					int offsety = mZoomPoint.y - h/2;
+					dx -= offsetx * scale;
+					dy -= offsety * scale;
+					g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+				}
+				else{
+					g.drawImage(mDisplayImage, x, y, this);
+				}
+				
+				if(guideLineHandle.isDragHandle()){
+					
+				}
+				else if(ptLeftTop != null && ptRightBottom != null){
+					Rectangle cropRect = new Rectangle(ptLeftTop.x, ptLeftTop.y, (ptRightBottom.x-ptLeftTop.x), (ptRightBottom.y-ptLeftTop.y));
+					g.setColor(Color.BLACK);
+					g.drawRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+				}
+				if(ptRotateA != null && ptRotateB != null){
+					Graphics2D g2 = (Graphics2D)g;
+					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g2.setColor(Color.RED);
+					g2.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
+					//g.setColor(Color.RED);
+					//g.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
+				
+					double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
+					System.out.println("rad=" + angle);
+				}
+	
+				if(mIsPreviewMode){
+					//guideLineHandle.setScale((float)mImageFilter.getResizedScaleW(), (float)mImageFilter.getResizedScaleH());
+					guideLineHandle.paint(g, w, h, imageW, imageH);
+				}
 			
-				double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
-				System.out.println("rad=" + angle);
-			}
-
-			if(mIsPreviewMode){
-				//guideLineHandle.setScale((float)mImageFilter.getResizedScaleW(), (float)mImageFilter.getResizedScaleH());
-				guideLineHandle.paint(g, w, h, imageW, imageH);
 			}
 		}
 		else{
@@ -222,7 +242,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		
 		if(mImageFilter != null){
 //			mImageFilter.setAddSpaceDimension(ImageFilterParam.getUnificationTextPageSize());
-			BufferedImage filtered = mImageFilter.filter(mOriginalImage, mFileInfo.getFilterParam());
+			BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
 			mDisplayImage = filtered;
 		}
 		//BufferedImage conv = ResizeImageFile.getFinalConvertedImage(mOriginalImage, mFileInfo, true);
@@ -242,8 +262,16 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		int x = e.getX();
 		int y = e.getY();
+		
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseClicked(e);
+		}
+
 		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
 			if(mImageArea.contains(x, y)){
+				if(mIsCustomSplitMode){
+					return;
+				}
 				mFileInfo.getFilterParam().setRotate(false);
 				mFileInfo.getFilterParam().setRotateAngle(0.0f);
 				updateDisplayImage();
@@ -254,6 +282,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 		}
 		else{
+			if(mIsCustomSplitMode){
+				return;
+			}
 			if(mImageArea.contains(x, y)){
 				clearCropRect();
 			}
@@ -261,19 +292,30 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_MoveInfo, 1);
 			}
 		}
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		if(mIsPreviewMode){
-			guideLineHandle.mouseEntered(e);
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseEntered(e);
+		}
+		else{
+			if(mIsPreviewMode){
+				guideLineHandle.mouseEntered(e);
+			}
 		}
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		if(mIsPreviewMode){
-			guideLineHandle.mouseExited(e);
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseExited(e);
+		}
+		else{
+			if(mIsPreviewMode){
+				guideLineHandle.mouseExited(e);
+			}
 		}
 	}
 
@@ -281,40 +323,45 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
-		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-			if(mIsPreviewMode){
-				guideLineHandle.mousePressed(e);
-				if(guideLineHandle.isDragHandle()){
-					return;
-				}
-			}
-			if(ptRotateA == null){
-				ptRotateA = new Point(x, y);
-				ptRotateB = new Point(x, y);
-			}
+		if(mIsCustomSplitMode){
+			splitLineHandle.mousePressed(e);
 		}
 		else{
-			if(mIsPreviewMode){
-				guideLineHandle.mousePressed(e);
-				if(guideLineHandle.isDragHandle()){
-					
+			int x = e.getX();
+			int y = e.getY();
+			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
+				if(mIsPreviewMode){
+					guideLineHandle.mousePressed(e);
+					if(guideLineHandle.isDragHandle()){
+						return;
+					}
 				}
-				else{
-					ptLeftTop = new Point();
-					ptRightBottom = new Point();
-					mBasePoint.setLocation(x, y);
-					ptLeftTop.setLocation(x, y);
-					ptRightBottom.setLocation(x, y);
+				if(ptRotateA == null){
+					ptRotateA = new Point(x, y);
+					ptRotateB = new Point(x, y);
 				}
 			}
 			else{
-				// Zoom start
-				if(mImageArea.contains(x, y)){
-					mIsZoomDrag = true;
-					mZoomPoint.setLocation(x, y);
-					repaint();
+				if(mIsPreviewMode){
+					guideLineHandle.mousePressed(e);
+					if(guideLineHandle.isDragHandle()){
+						
+					}
+					else{
+						ptLeftTop = new Point();
+						ptRightBottom = new Point();
+						mBasePoint.setLocation(x, y);
+						ptLeftTop.setLocation(x, y);
+						ptRightBottom.setLocation(x, y);
+					}
+				}
+				else{
+					// Zoom start
+					if(mImageArea.contains(x, y)){
+						mIsZoomDrag = true;
+						mZoomPoint.setLocation(x, y);
+						repaint();
+					}
 				}
 			}
 		}
@@ -344,56 +391,88 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			return;
 		}
 		
-		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-			if(mIsPreviewMode){
-				boolean handle = guideLineHandle.isDragHandle();
-				guideLineHandle.mouseReleased(e);
-				if(handle){
-					return;
-				}
-			}
-			if(ptRotateA != null && ptRotateB != null){
-				if(!ptRotateA.equals(ptRotateB)){
-					ImageFilterParam param = mFileInfo.getFilterParam();
-					param.setRotate(true);
-					double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
-					param.setRotateAngle(angle + param.getRotateAngle());
-					updateDisplayImage();
-					updateTableInfo();
-				}
-				ptRotateA = null;
-				ptRotateB = null;
-			}
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseReleased(e);
 		}
-		else {
-			if(mIsPreviewMode){
-				boolean isDragged = guideLineHandle.isDragHandle();
-				if(!isDragged){
-					setCropRect();
-				}
-				guideLineHandle.mouseReleased(e);
-				if(isDragged){
-					Dimension offset = new Dimension(0, 0);
-					guideLineHandle.getHandleOffset(offset);
-					System.out.println("offset=" + offset.toString());
-					if(!(offset.width == 0 && offset.height == 0)){
-						ImageFilterParam param = mFileInfo.getFilterParam();
-						param.setTranslate(true);
-						double scaleW = mImageFilter.getResizedScaleW(); // 最後のResize時のScale値
-						double scaleH = mImageFilter.getResizedScaleH();
-						param.setTranslateX(param.getTranslateX() - (int)(offset.width / scaleW));
-						param.setTranslateY(param.getTranslateY() - (int)(offset.height / scaleH));
-						updateDisplayImage();
-						updateTableInfo();
+		else{
+			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
+				if(mIsPreviewMode){
+					boolean handle = guideLineHandle.isDragHandle();
+					guideLineHandle.mouseReleased(e);
+					if(handle){
 						return;
 					}
 				}
+				if(ptRotateA != null && ptRotateB != null){
+					if(!ptRotateA.equals(ptRotateB)){
+						ImageFilterParam param = mFileInfo.getFilterParam();
+						param.setRotate(true);
+						double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
+						param.setRotateAngle(angle + param.getRotateAngle());
+						updateDisplayImage();
+						updateTableInfo();
+					}
+					ptRotateA = null;
+					ptRotateB = null;
+				}
 			}
-			else{
-				// Zoom end
-				mIsZoomDrag = false;
-			}
+			else {
+				if(mIsPreviewMode){
+					boolean isDragged = guideLineHandle.isDragHandle();
+					if(!isDragged){
+						setCropRect();
+					}
+					guideLineHandle.mouseReleased(e);
+					if(isDragged){
+						Dimension offset = new Dimension(0, 0);
+						guideLineHandle.getHandleOffset(offset);
+						System.out.println("offset=" + offset.toString());
+						if(!(offset.width == 0 && offset.height == 0)){
+							/* 回転→移動の場合 */
+							ImageFilterParam param = mFileInfo.getFilterParam();
+							param.setTranslate(true);
+							double scaleW = mImageFilter.getResizedScaleW(); // 最後のResize時のScale値
+							double scaleH = mImageFilter.getResizedScaleH();
+							double angle = param.isRotate() ? param.getRotateAngle() : 0.0f;
+							double radian = Math.toRadians(angle);
+							
+							AffineTransform af = new AffineTransform();
+							af.setToRotation(-radian);
+							double[] srcPoints = new double[]{ (double)offset.width, (double)offset.height };
+							double[] dstPoints = new double[2];
+							af.transform(srcPoints, 0, dstPoints, 0, 1);
 
+							System.out.println("src=" + srcPoints[0] + "," + srcPoints[1] + " dst=" +dstPoints[0] + "," + dstPoints[1]);
+
+
+							param.setTranslateX(param.getTranslateX() - (int)(dstPoints[0] / scaleW));
+							param.setTranslateY(param.getTranslateY() - (int)(dstPoints[1] / scaleH));
+							//param.setTranslateX(param.getTranslateX() - (int)(offset.width / scaleW));
+							//param.setTranslateY(param.getTranslateY() - (int)(offset.height / scaleH));
+							updateDisplayImage();
+							updateTableInfo();
+							return;
+							
+							/* 移動→回転の場合
+							ImageFilterParam param = mFileInfo.getFilterParam();
+							param.setTranslate(true);
+							double scaleW = mImageFilter.getResizedScaleW(); // 最後のResize時のScale値
+							double scaleH = mImageFilter.getResizedScaleH();
+							param.setTranslateX(param.getTranslateX() - (int)(offset.width / scaleW));
+							param.setTranslateY(param.getTranslateY() - (int)(offset.height / scaleH));
+							updateDisplayImage();
+							updateTableInfo();
+							return;
+							 */
+						}
+					}
+				}
+				else{
+					// Zoom end
+					mIsZoomDrag = false;
+				}
+	
+			}
 		}
 		repaint();
 	}
@@ -458,61 +537,71 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
-		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-			if(mIsPreviewMode){
-				guideLineHandle.mouseDragged(e);
-				if(guideLineHandle.isDragHandle()){
-					repaint();
-					return;
-				}
-			}
-			if(ptRotateA != null && ptRotateB != null){
-				ptRotateB.setLocation(x, y);
-				repaint();
-			}
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseDragged(e);
+			repaint();
 		}
 		else{
-			if(mIsPreviewMode){
-				guideLineHandle.mouseDragged(e);
-				if(guideLineHandle.isDragHandle()){
-					
-				}
-				else{
-					if(x < mBasePoint.x){
-						ptLeftTop.x = x;
-						ptRightBottom.x = mBasePoint.x;
-					}
-					if(mBasePoint.x < x){
-						ptRightBottom.x = x;
-						ptLeftTop.x = mBasePoint.x;
-					}
-					if(y < mBasePoint.y){
-						ptLeftTop.y = y;
-						ptRightBottom.y = mBasePoint.y;
-					}
-					if(mBasePoint.y < y){
-						ptRightBottom.y = y;
-						ptLeftTop.y = mBasePoint.y;
+			int x = e.getX();
+			int y = e.getY();
+			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
+				if(mIsPreviewMode){
+					guideLineHandle.mouseDragged(e);
+					if(guideLineHandle.isDragHandle()){
+						repaint();
+						return;
 					}
 				}
-				repaint();
+				if(ptRotateA != null && ptRotateB != null){
+					ptRotateB.setLocation(x, y);
+					repaint();
+				}
 			}
 			else{
-				// Zoom
-				mZoomPoint.setLocation(x, y);
-
-				repaint();
+				if(mIsPreviewMode){
+					guideLineHandle.mouseDragged(e);
+					if(guideLineHandle.isDragHandle()){
+						
+					}
+					else{
+						if(x < mBasePoint.x){
+							ptLeftTop.x = x;
+							ptRightBottom.x = mBasePoint.x;
+						}
+						if(mBasePoint.x < x){
+							ptRightBottom.x = x;
+							ptLeftTop.x = mBasePoint.x;
+						}
+						if(y < mBasePoint.y){
+							ptLeftTop.y = y;
+							ptRightBottom.y = mBasePoint.y;
+						}
+						if(mBasePoint.y < y){
+							ptRightBottom.y = y;
+							ptLeftTop.y = mBasePoint.y;
+						}
+					}
+					repaint();
+				}
+				else{
+					// Zoom
+					mZoomPoint.setLocation(x, y);
+	
+					repaint();
+				}
 			}
 		}
-		
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if(mIsPreviewMode){
-			guideLineHandle.mouseMoved(e);
+		if(mIsCustomSplitMode){
+			splitLineHandle.mouseMoved(e);
+		}
+		else{
+			if(mIsPreviewMode){
+				guideLineHandle.mouseMoved(e);
+			}
 		}
 	}
 
@@ -522,18 +611,21 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			return;
 		}
 		
-		int rotation = e.getWheelRotation();		
-		long when = e.getWhen();
-		System.out.println("rotation=" + rotation + " when=" + when);
-		
-		ImageFilterParam param = mFileInfo.getFilterParam();
-		param.setRotate(true);
-		double angle = 0.1 * rotation;
-		param.setRotateAngle(angle + param.getRotateAngle());
-		updateDisplayImage();
-		updateTableInfo();
-
-		
+		if(mIsCustomSplitMode){
+			
+		}
+		else{
+			int rotation = e.getWheelRotation();		
+			long when = e.getWhen();
+			System.out.println("rotation=" + rotation + " when=" + when);
+			
+			ImageFilterParam param = mFileInfo.getFilterParam();
+			param.setRotate(true);
+			double angle = 0.1 * rotation;
+			param.setRotateAngle(angle + param.getRotateAngle());
+			updateDisplayImage();
+			updateTableInfo();
+		}
 	}
 	
 	private void showSettingPopupMenu(int x, int y){
@@ -708,6 +800,57 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		popup.add(areaMenu);
 		
 
+		boolean isSplited = false;
+		if(mFileInfo instanceof ImageFileInfoSplitWrapper){
+			JMenuItem splitMenu = new JMenuItem("分割解除");
+			splitMenu.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					ImageFileInfoSplitWrapper wrapInfo = (ImageFileInfoSplitWrapper)mFileInfo;
+					wrapInfo = wrapInfo.getFirstSplitInfo();
+					wrapInfo.getFilterParam().setSplitType(SplitFilter.TYPE_NONE);
+					mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
+					//updateDisplayImage();
+				}
+			});
+			
+			popup.add(splitMenu);
+		}
+		else{
+			JMenuItem splitMenu1 = new JMenuItem("カスタム分割モード(3x3)");
+			splitMenu1.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					if(mIsCustomSplitMode){
+						float[] v = splitLineHandle.getV();
+						float[] h = splitLineHandle.getH();
+						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
+						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
+					}
+					mIsCustomSplitMode = !mIsCustomSplitMode;
+					splitLineHandle.setSplitColRow(3, 3);
+					repaint();
+				}
+			});
+			JMenuItem splitMenu2 = new JMenuItem("カスタム分割モード(3x4)");
+			splitMenu2.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					if(mIsCustomSplitMode){
+						float[] v = splitLineHandle.getV();
+						float[] h = splitLineHandle.getH();
+						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
+						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
+					}
+					mIsCustomSplitMode = !mIsCustomSplitMode;
+					splitLineHandle.setSplitColRow(3, 4);
+					repaint();
+				}
+			});
+			
+			popup.add(splitMenu1);
+			popup.add(splitMenu2);
+		}
 
 		
 		popup.show(this, x, y);

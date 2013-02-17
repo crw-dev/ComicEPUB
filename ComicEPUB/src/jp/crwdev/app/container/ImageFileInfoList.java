@@ -65,7 +65,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 					// １つ目が全ての情報を持っている
 					int pageType = param.getSplitType();
 					IImageFileInfo baseInfo = infow.getBaseFileInfo();
-					baseInfo.getFilterParam().setSplitType(pageType);
+					baseInfo.getFilterParam().setSplitType(pageType, param.getSplitOffsetV(), param.getSplitOffsetV());
 					if(pageType == SplitFilter.TYPE_NONE){
 						// 分割なしに戻す（全ての分割情報は捨てる）
 						list.add(baseInfo);
@@ -86,6 +86,9 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 						case SplitFilter.TYPE_R2L_3x3:
 							splitCount = 9;
 							break;
+						case SplitFilter.TYPE_CUSTOM:
+							splitCount = (param.getSplitOffsetV().length-1) * (param.getSplitOffsetH().length-1);
+							break;
 						default:
 						}
 						
@@ -98,6 +101,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 								first = wrapInfo;
 							}
 							first.addRelativeSplitInfo(wrapInfo);
+							wrapInfo.setFirstSplitInfo(first);
 						}
 					}
 				}
@@ -118,6 +122,9 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 					case SplitFilter.TYPE_R2L_3x3:
 						splitCount = 9;
 						break;
+					case SplitFilter.TYPE_CUSTOM:
+						splitCount = (param.getSplitOffsetV().length-1) * (param.getSplitOffsetH().length-1);
+						break;
 					default:
 					}
 					ImageFileInfoSplitWrapper first = null;
@@ -129,6 +136,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 							first = wrapInfo;
 						}
 						first.addRelativeSplitInfo(wrapInfo);
+						wrapInfo.setFirstSplitInfo(first);
 					}
 				}
 				else{

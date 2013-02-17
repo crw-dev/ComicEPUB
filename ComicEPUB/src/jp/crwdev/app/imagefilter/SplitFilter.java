@@ -19,6 +19,7 @@ public class SplitFilter implements IImageFilter {
 	public static final int TYPE_L2R_2 = 4;
 	public static final int TYPE_L2R_2x2 = 5;
 	public static final int TYPE_L2R_3x3 = 6;
+	public static final int TYPE_CUSTOM = 10;
 	
 	public static final float duplicateMargin = 0.02f;	// 重複領域
 	
@@ -38,42 +39,61 @@ public class SplitFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int widthMargin = (int)(width * duplicateMargin);
-		int heightMargin = (int)(height * duplicateMargin);
-		
-		if(splitType == SplitFilter.TYPE_R2L_2){
-			width /= 2;
-			width += widthMargin;
+		if(splitType == SplitFilter.TYPE_CUSTOM){
+			//TODO
+			float[] v = param.getSplitOffsetV();
+			float[] h = param.getSplitOffsetH();
+			
+			int size = (v.length-1)*(h.length-1);
+			int splitIndex = param.getSplitIndex();
+			
+			int xIndex = (v.length-1) - splitIndex % (v.length-1);
+			int yIndex = splitIndex / (v.length-1);
+			
+			int x = (int)(width * (v[xIndex] + 0.5f));
+			int y = (int)(height * (h[yIndex] + 0.5f));
+			
+			width = (int)((v[xIndex+1] - v[xIndex]) * width);
+			height = (int)((h[yIndex+1] - h[yIndex]) * height);
+			
 		}
-		else if(splitType == SplitFilter.TYPE_R2L_2x2){
-			width /= 2;
-			height /= 2;
-			width += widthMargin;
-			height += heightMargin;
+		else{
+			int widthMargin = (int)(width * duplicateMargin);
+			int heightMargin = (int)(height * duplicateMargin);
+			
+			if(splitType == SplitFilter.TYPE_R2L_2){
+				width /= 2;
+				width += widthMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_R2L_2x2){
+				width /= 2;
+				height /= 2;
+				width += widthMargin;
+				height += heightMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_R2L_3x3){
+				width /= 3;
+				height /= 3;
+				width += widthMargin;
+				height += heightMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_L2R_2){
+				width /= 2;
+				width += widthMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_L2R_2x2){
+				width /= 2;
+				height /= 2;
+				width += widthMargin;
+				height += heightMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_L2R_3x3){
+				width /= 3;
+				height /= 3;
+				width += widthMargin;
+				height += heightMargin;
+			}
 		}
-		else if(splitType == SplitFilter.TYPE_R2L_3x3){
-			width /= 3;
-			height /= 3;
-			width += widthMargin;
-			height += heightMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_L2R_2){
-			width /= 2;
-			width += widthMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_L2R_2x2){
-			width /= 2;
-			height /= 2;
-			width += widthMargin;
-			height += heightMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_L2R_3x3){
-			width /= 3;
-			height /= 3;
-			width += widthMargin;
-			height += heightMargin;
-		}
-		
 		
 		return new Dimension(width, height);
 	}
@@ -92,90 +112,109 @@ public class SplitFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int widthMargin = (int)(width * duplicateMargin);
-		int heightMargin = (int)(height * duplicateMargin);
-
-		if(splitType == SplitFilter.TYPE_L2R_2){
-			width /= 2;
-			x = width * splitIndex;
-			if(splitIndex % 2 == 1){
-				x -= widthMargin;
-			}
-			width += widthMargin;
+		if(splitType == SplitFilter.TYPE_CUSTOM){
+			//TODO
+			float[] v = param.getSplitOffsetV();
+			float[] h = param.getSplitOffsetH();
+			
+			int size = (v.length-1)*(h.length-1);
+			//int splitIndex = param.getSplitIndex();
+			
+			int xIndex = (v.length-2) - splitIndex % (v.length-1);
+			int yIndex = splitIndex / (v.length-1);
+			
+			x = (int)(width * (v[xIndex] + 0.5f));
+			y = (int)(height * (h[yIndex] + 0.5f));
+			
+			width = (int)((v[xIndex+1] - v[xIndex]) * width);
+			height = (int)((h[yIndex+1] - h[yIndex]) * height);
 		}
-		else if(splitType == SplitFilter.TYPE_L2R_2x2){
-			width /= 2;
-			height /= 2;
-			x = width * (splitIndex % 2);
-			y = height * (splitIndex / 2);
-			if(splitIndex % 2 == 1){
-				x -= widthMargin;
+		else{
+			int widthMargin = (int)(width * duplicateMargin);
+			int heightMargin = (int)(height * duplicateMargin);
+	
+			if(splitType == SplitFilter.TYPE_L2R_2){
+				width /= 2;
+				x = width * splitIndex;
+				if(splitIndex % 2 == 1){
+					x -= widthMargin;
+				}
+				width += widthMargin;
 			}
-			if(splitIndex / 2 == 1){
-				y -= heightMargin;
+			else if(splitType == SplitFilter.TYPE_L2R_2x2){
+				width /= 2;
+				height /= 2;
+				x = width * (splitIndex % 2);
+				y = height * (splitIndex / 2);
+				if(splitIndex % 2 == 1){
+					x -= widthMargin;
+				}
+				if(splitIndex / 2 == 1){
+					y -= heightMargin;
+				}
+				width += widthMargin;
+				height += heightMargin;
 			}
-			width += widthMargin;
-			height += heightMargin;
+			else if(splitType == SplitFilter.TYPE_L2R_3x3){
+				width /= 3;
+				height /= 3;
+				x = width * (splitIndex % 3);
+				y = height * (splitIndex / 3);
+				if(splitIndex % 3 == 1){
+					x -= widthMargin / 2;
+				}else if(splitIndex % 3 == 2){
+					x -= widthMargin;
+				}
+				if(splitIndex / 3 == 1){
+					y -= heightMargin / 2;
+				}else if(splitIndex / 3 == 2){
+					y -= heightMargin;
+				}
+				width += widthMargin;
+				height += heightMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_R2L_2){
+				width /= 2;
+				x = width * (1-splitIndex);
+				if(splitIndex % 2 == 0){
+					x -= widthMargin;
+				}
+				width += widthMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_R2L_2x2){
+				width /= 2;
+				height /= 2;
+				x = width * (1-(splitIndex % 2));
+				y = height * (splitIndex / 2);
+				if(splitIndex % 2 == 0){
+					x -= widthMargin;
+				}
+				if(splitIndex / 2 == 1){
+					y -= heightMargin;
+				}
+				width += widthMargin;
+				height += heightMargin;
+			}
+			else if(splitType == SplitFilter.TYPE_R2L_3x3){
+				width /= 3;
+				height /= 3;
+				x = width * (2-(splitIndex % 3));
+				y = height * (splitIndex / 3);
+				if(splitIndex % 3 == 1){
+					x -= widthMargin / 2;
+				}else if(splitIndex % 3 == 0){
+					x -= widthMargin;
+				}
+				if(splitIndex / 3 == 1){
+					y -= heightMargin / 2;
+				}else if(splitIndex / 3 == 2){
+					y -= heightMargin;
+				}
+				width += widthMargin;
+				height += heightMargin;
+			}
+			
 		}
-		else if(splitType == SplitFilter.TYPE_L2R_3x3){
-			width /= 3;
-			height /= 3;
-			x = width * (splitIndex % 3);
-			y = height * (splitIndex / 3);
-			if(splitIndex % 3 == 1){
-				x -= widthMargin / 2;
-			}else if(splitIndex % 3 == 2){
-				x -= widthMargin;
-			}
-			if(splitIndex / 3 == 1){
-				y -= heightMargin / 2;
-			}else if(splitIndex / 3 == 2){
-				y -= heightMargin;
-			}
-			width += widthMargin;
-			height += heightMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_R2L_2){
-			width /= 2;
-			x = width * (1-splitIndex);
-			if(splitIndex % 2 == 0){
-				x -= widthMargin;
-			}
-			width += widthMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_R2L_2x2){
-			width /= 2;
-			height /= 2;
-			x = width * (1-(splitIndex % 2));
-			y = height * (splitIndex / 2);
-			if(splitIndex % 2 == 0){
-				x -= widthMargin;
-			}
-			if(splitIndex / 2 == 1){
-				y -= heightMargin;
-			}
-			width += widthMargin;
-			height += heightMargin;
-		}
-		else if(splitType == SplitFilter.TYPE_R2L_3x3){
-			width /= 3;
-			height /= 3;
-			x = width * (2-(splitIndex % 3));
-			y = height * (splitIndex / 3);
-			if(splitIndex % 3 == 1){
-				x -= widthMargin / 2;
-			}else if(splitIndex % 3 == 0){
-				x -= widthMargin;
-			}
-			if(splitIndex / 3 == 1){
-				y -= heightMargin / 2;
-			}else if(splitIndex / 3 == 2){
-				y -= heightMargin;
-			}
-			width += widthMargin;
-			height += heightMargin;
-		}
-		
 
 		BufferedImage dest = new BufferedImage(width, height, image.getType());
 		Graphics2D g = dest.createGraphics();

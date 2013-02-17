@@ -21,6 +21,8 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	
 	/** index=0のWrapperは全ての個別パラメータへの参照を持つ */
 	private HashMap<Integer, ImageFileInfoSplitWrapper> mWrapperParams = null;
+	/** index=0以外のWrapperはindex=0への参照を持つ */
+	private ImageFileInfoSplitWrapper mFirstWrapper = null;
 	
 	/**
 	 * コンストラクタ
@@ -37,6 +39,13 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 		mParam = info.getFilterParam().clone();
 		//mParam.setSplitType(Constant.SPLITTYPE_NONE);
 		mParam.setSplitIndex(splitIndex);
+	}
+	
+	public void setFirstSplitInfo(ImageFileInfoSplitWrapper first){
+		mFirstWrapper = first;
+	}
+	public ImageFileInfoSplitWrapper getFirstSplitInfo(){
+		return mFirstWrapper;
 	}
 	
 	public void addRelativeSplitInfo(ImageFileInfoSplitWrapper info){

@@ -33,6 +33,7 @@ public class Constant {
 	public static final String TEXT_SPLITTYPE_L2R_2x2 = "順Ｚ 2x2";
 	public static final String TEXT_SPLITTYPE_R2L_3x3 = "逆Ｚ 3x3";
 	public static final String TEXT_SPLITTYPE_L2R_3x3 = "順Ｚ 3x3";
+	public static final String TEXT_SPLITTYPE_CUSTOM = "カスタム";
 	
 	
 	public static final String TABLE_HEADER_ENTRYNAME = "ファイル名";
@@ -100,6 +101,8 @@ public class Constant {
 			return TEXT_SPLITTYPE_R2L_3x3;
 		case SplitFilter.TYPE_L2R_3x3:
 			return TEXT_SPLITTYPE_L2R_3x3;
+		case SplitFilter.TYPE_CUSTOM:
+			return TEXT_SPLITTYPE_CUSTOM;
 		case SplitFilter.TYPE_NONE:
 		default:
 			return TEXT_SPLITTYPE_NONE;
@@ -123,6 +126,9 @@ public class Constant {
 		}
 		if(splitType.equals(TEXT_SPLITTYPE_L2R_3x3)){
 			return SplitFilter.TYPE_L2R_3x3;
+		}
+		if(splitType.equals(TEXT_SPLITTYPE_CUSTOM)){
+			return SplitFilter.TYPE_CUSTOM;
 		}
 		return SplitFilter.TYPE_NONE;
 	}

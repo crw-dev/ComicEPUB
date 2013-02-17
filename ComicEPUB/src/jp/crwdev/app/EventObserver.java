@@ -27,6 +27,7 @@ public class EventObserver {
 	public static final int EventType_CancelConvert = 8;		// no param
 	public static final int EventType_UpdateFilterParamOnlyEnable = 9;	// no param
 	public static final int EventType_FileInfoModified = 10;	// no param
+	public static final int EventType_RenewalList = 11;			// no param
 	
 
 	/** イベントリスナ 4種類  */

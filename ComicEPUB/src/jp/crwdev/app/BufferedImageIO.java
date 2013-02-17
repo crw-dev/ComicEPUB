@@ -35,8 +35,7 @@ public class BufferedImageIO {
 		if(isJpeg){
 			JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(stream);
 			try {
-				BufferedImage image = decoder.decodeAsBufferedImage();
-				return prepareBufferedImage(image);
+				return prepareBufferedImage(decoder.decodeAsBufferedImage());
 			} catch (ImageFormatException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -60,10 +59,20 @@ public class BufferedImageIO {
 			Graphics2D g = dest.createGraphics();
 			g.drawImage(image, 0, 0, null);
 			g.dispose();
+			image = null;
 			return dest;
 		}
 		return image;
 	}
+	
+	public static BufferedImage copyBufferedImage(BufferedImage image){
+		BufferedImage dest = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Graphics2D g = dest.createGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return dest;
+	}
+	
 	
 	public static boolean write(BufferedImage image, String format, float quality, OutputStream out){
 		Iterator writers = ImageIO.getImageWritersByFormatName(format);

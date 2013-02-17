@@ -41,12 +41,24 @@ public class TransRotateFilter implements IImageFilter {
 		AffineTransform beforeAffin = g2.getTransform(); 
 		AffineTransform affin = new AffineTransform(); 
 		
-		if(param.isTranslate() && !(tx == 0 && ty == 0)){
-			affin.translate(tx, ty);
-		}
+		// 回転
 		if(param.isRotate() && !(angle == 0.0f)){
 			affin.rotate(Math.toRadians( angle ), cx, cy);
 		}
+		// 移動
+		if(param.isTranslate() && !(tx == 0 && ty == 0)){
+			affin.translate(tx, ty);
+		}
+//		if(!param.isRotate()){
+//			angle = 0.0f;
+//		}
+//		if(!param.isTranslate()){
+//			tx = 0;
+//			ty = 0;
+//		}
+//		affin.setToTranslation(tx, ty);
+//		affin.rotate(Math.toRadians(angle), cx-tx, cy-ty);
+		
 
 		g2.setTransform(affin);
 		
@@ -65,6 +77,7 @@ public class TransRotateFilter implements IImageFilter {
 
 		g2.drawImage(image, 0, 0, null); 
 		g2.setTransform(beforeAffin);
+		image = null;
 
 		return bimg;
 	}

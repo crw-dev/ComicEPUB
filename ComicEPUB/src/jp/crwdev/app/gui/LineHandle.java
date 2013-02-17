@@ -11,6 +11,12 @@ import java.awt.event.MouseEvent;
 import jp.crwdev.app.interfaces.ILineHandle;
 
 public class LineHandle implements ILineHandle {
+	
+	/** 描画色 */
+	private Color mBaseLineColor = Color.CYAN;
+	private Color mHandleLineColor = Color.RED;
+	
+	private boolean mIsEnableLeftDrag = false;
 
 	/** 縦線フラグ */
 	private boolean mIsVertical = true;
@@ -52,10 +58,12 @@ public class LineHandle implements ILineHandle {
 	 * @param isVertical　true=縦線, false=横線
 	 * @param offset 画像中央からの基準点初期値
 	 */
-	public LineHandle(boolean isVertical, float offset){
+	public LineHandle(boolean isVertical, float offset, Color baseColor, boolean leftDrag){
 		mIsVertical = isVertical;
 		mBaseLineOffset = offset;
 		mInitBaseLineOffset = offset;
+		mBaseLineColor = baseColor;
+		mIsEnableLeftDrag = leftDrag;
 	}
 	
 	/**
@@ -74,6 +82,13 @@ public class LineHandle implements ILineHandle {
 		return mBaseLineOffset;
 	}
 	
+	/**
+	 * 描画色設定
+	 * @param color
+	 */
+	public void setBaseLineColor(Color color){
+		mBaseLineColor = color;
+	}
 
 	@Override
 	public void resetPosition(){
@@ -117,18 +132,18 @@ public class LineHandle implements ILineHandle {
 	public void paint(Graphics g, int width, int height, int imageWidth, int imageHeight){
 		setViewSize(width, height, imageWidth, imageHeight);
 		if(mIsVertical){
-			g.setColor(Color.CYAN);
+			g.setColor(mBaseLineColor);
 			g.drawLine(mBaseLine, 0, mBaseLine, height-1);
 			if(mIsDragHandle){
-				g.setColor(Color.RED);
+				g.setColor(mHandleLineColor);
 				g.drawLine(mHandleLine, 0, mHandleLine, height-1);
 			}
 		}
 		else{
-			g.setColor(Color.CYAN);
+			g.setColor(mBaseLineColor);
 			g.drawLine(0, mBaseLine, width-1, mBaseLine);
 			if(mIsDragHandle){
-				g.setColor(Color.RED);
+				g.setColor(mHandleLineColor);
 				g.drawLine(0, mHandleLine, width-1, mHandleLine);
 			}
 		}
@@ -162,7 +177,7 @@ public class LineHandle implements ILineHandle {
 		if(mIsVertical){
 			int x = e.getX();
 			if(mBaseLine - HandleSize <= x && x <= mBaseLine + HandleSize){
-				if(javax.swing.SwingUtilities.isRightMouseButton(e)){
+				if(mIsEnableLeftDrag || javax.swing.SwingUtilities.isRightMouseButton(e)){
 					if(!mIsFixed){
 						mIsDragBaseLine = true;
 					}
@@ -176,7 +191,7 @@ public class LineHandle implements ILineHandle {
 		else{
 			int y = e.getY();
 			if(mBaseLine - HandleSize <= y && y <= mBaseLine + HandleSize){
-				if(javax.swing.SwingUtilities.isRightMouseButton(e)){
+				if(mIsEnableLeftDrag || javax.swing.SwingUtilities.isRightMouseButton(e)){
 					if(!mIsFixed){
 						mIsDragBaseLine = true;
 					}

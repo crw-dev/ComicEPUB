@@ -24,7 +24,9 @@ public class ContrastFilter implements IImageFilter {
 		
 		RescaleOp rop = new RescaleOp(contrast, brightness,
 			new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY));
-		return rop.filter(image, null);
+		//return rop.filter(image, null);
+		rop.filter(image, image);
+		return image;
 	}
 
 }

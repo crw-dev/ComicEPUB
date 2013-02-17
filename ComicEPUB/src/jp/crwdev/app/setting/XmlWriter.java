@@ -216,6 +216,15 @@ public class XmlWriter {
 		splitElem.setAttribute("type", Integer.toString(splitType));
 		
 		//TODO: attribute of vline, hline
+		float[] v = param.getSplitOffsetV();
+		float[] h = param.getSplitOffsetH();
+		if(v != null && h != null && v.length >= 2 && h.length >= 2){
+			String vline = createFloatArrayString(v);
+			String hline = createFloatArrayString(h);
+			
+			splitElem.setAttribute("vline", vline);
+			splitElem.setAttribute("hline", hline);
+		}
 
 		if(info instanceof ImageFileInfoSplitWrapper){
 			ImageFileInfoSplitWrapper wrapInfo = (ImageFileInfoSplitWrapper)info;
@@ -230,6 +239,15 @@ public class XmlWriter {
 		}
 		
 		parent.appendChild(splitElem);
+	}
+	
+	private String createFloatArrayString(float[] v){
+		StringBuilder sb = new StringBuilder();
+		sb.append(Float.toString(v[0]));
+		for(int i=1; i<v.length; i++){
+			sb.append("," + Float.toString(v[i]));
+		}
+		return new String(sb);
 	}
 	
 	private void writeParam(Element parent, ImageFilterParam param){
@@ -519,11 +537,18 @@ public class XmlWriter {
 				
 				NodeList nodes = splitNode.getChildNodes();
 				
-				info.getFilterParam().setSplitType(splitType);
+				//TODO: vline hline
+				float[] v = null;
+				float[] h = null;
+				if(!vline.isEmpty() && !hline.isEmpty()){
+					v = parseFloatArray(vline);
+					h = parseFloatArray(hline);
+				}
+				
+				info.getFilterParam().setSplitType(splitType, v, h);
 				
 				ImageFileInfoSplitWrapper first = null;// = new ImageFileInfoSplitWrapper(info, 0);
 				
-				//TODO: vline hline
 				
 				for(int i=0; i<nodes.getLength(); i++){
 					Node node = nodes.item(i);
@@ -534,11 +559,21 @@ public class XmlWriter {
 						first = relWrapInfo;
 					}
 					first.addRelativeSplitInfo(relWrapInfo);
+					relWrapInfo.setFirstSplitInfo(first);
 				}
 				
 				mSpInfoMap.put(info, first);
 			}
 		}
+	}
+	
+	private float[] parseFloatArray(String v){
+		String[] va = v.split(",");
+		float[] ar = new float[va.length];
+		for(int i=0; i<va.length; i++){
+			ar[i] = Float.parseFloat(va[i]);
+		}
+		return ar;
 	}
 	
 	private void loadParam(Node paramNode, ImageFilterParam param){

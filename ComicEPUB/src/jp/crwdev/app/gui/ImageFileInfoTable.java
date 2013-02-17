@@ -60,7 +60,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		setModel(mTableModel);
 			
 			
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		for(int i=0; i<Constant.TABLE_HEADER_COLUMNS.length; i++){
@@ -89,8 +89,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	@Override
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
-		if(row == getSelectedRow()){
-			c.setBackground(Color.MAGENTA);
+		if(isRowSelected(row)){// == getSelectedRow()){
+			//c.setBackground(Color.MAGENTA);
 		}
 		else{
 			ImageFilterParam param = mInfoList.get(row).getFilterParam();
@@ -500,11 +500,42 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					item0.addActionListener(new ActionListener(){
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							int selected = table.getSelectedRow();
-							deleteItem(selected);
+							int rowCount = table.getRowCount();
+							int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(table.isRowSelected(i)){
+									mInfoList.remove(listIndex);
+									continue;
+								}
+								listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
+						}
+					});
+					JMenuItem item1 = new JMenuItem("選択アイテム以外削除");
+					item1.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int rowCount = table.getRowCount();
+							int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(!table.isRowSelected(i)){
+									mInfoList.remove(listIndex);
+									continue;
+								}
+								listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
 						}
 					});
 					popup.add(item0);
+					popup.add(item1);
 
 					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -580,6 +611,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			if(nextIndex >= 0 && getRowCount() > nextIndex){
 				setRowSelectionInterval(nextIndex, nextIndex);
 			}
+			break;
+		case EventObserver.EventType_RenewalList:
+			renewalList();
 			break;
 		default:
 			break;
