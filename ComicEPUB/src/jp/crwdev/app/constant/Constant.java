@@ -17,10 +17,12 @@ public class Constant {
 	public static final int PAGETYPE_AUTO = 0;
 	public static final int PAGETYPE_TEXT = 1;
 	public static final int PAGETYPE_PICT = 2;
+	public static final int PAGETYPE_COLOR = 3;
 	
 	public static final String TEXT_PAGETYPE_AUTO = "";
 	public static final String TEXT_PAGETYPE_TEXT = "本文";
 	public static final String TEXT_PAGETYPE_PICT = "挿絵";
+	public static final String TEXT_PAGETYPE_COLOR = "カラー";
 
 	//public static final int SPLITTYPE_NONE = 0;
 	//public static final int SPLITTYPE_RIGHT_TO_LEFT = 1;
@@ -72,6 +74,8 @@ public class Constant {
 			return TEXT_PAGETYPE_TEXT;
 		case PAGETYPE_PICT:
 			return TEXT_PAGETYPE_PICT;
+		case PAGETYPE_COLOR:
+			return TEXT_PAGETYPE_COLOR;
 		case PAGETYPE_AUTO:
 		default:
 			return TEXT_PAGETYPE_AUTO;
@@ -83,6 +87,9 @@ public class Constant {
 		}
 		if(pageType.equals(TEXT_PAGETYPE_PICT)){
 			return PAGETYPE_PICT;
+		}
+		if(pageType.equals(TEXT_PAGETYPE_COLOR)){
+			return PAGETYPE_COLOR;
 		}
 		return PAGETYPE_AUTO;
 	}

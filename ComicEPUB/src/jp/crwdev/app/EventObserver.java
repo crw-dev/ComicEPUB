@@ -17,7 +17,7 @@ public class EventObserver {
 	
 	// Event Type
 	public static final int EventType_UpdateFileInfo = 0;	// arg1: rowIndex
-	public static final int EventType_UpdateFilterParam = 1;	// obj: ImageFilterParam
+	public static final int EventType_UpdateFilterParamSet = 1;	// obj: ImageFilterParamSet
 	public static final int EventType_MoveInfo = 2;		// arg1: offset
 	public static final int EventType_BeginConvert = 3;	// no param
 	public static final int EventType_Progress = 4;		// arg1: 0=stop other=start
@@ -25,9 +25,11 @@ public class EventObserver {
 	public static final int EventType_ProgressMessage = 6;		// obj: String
 	public static final int EventType_FinishConvert = 7;		// no param
 	public static final int EventType_CancelConvert = 8;		// no param
-	public static final int EventType_UpdateFilterParamOnlyEnable = 9;	// no param
-	public static final int EventType_FileInfoModified = 10;	// no param
-	public static final int EventType_RenewalList = 11;			// no param
+	public static final int EventType_UpdateFilterParam = 9;	// arg1: filterIndex, obj: ImageFilterParam
+	public static final int EventType_UpdateFilterParamOnlyEnable = 10;	// arg1: filterIndex, obj: ImageFilterParam
+	public static final int EventType_FileInfoModified = 11;	// no param
+	public static final int EventType_RenewalList = 12;			// no param
+	public static final int EventType_SelectTab = 13;			// arg1: tab index
 	
 
 	/** イベントリスナ 4種類  */
@@ -94,6 +96,19 @@ public class EventObserver {
 	 */
 	public void sendEvent(int target, int type, Object obj){
 		sendEvent(target, type, 0, 0, obj);
+	}
+	
+	/**
+	 * イベント通知
+	 * @param target 通知先
+	 * @param type イベント種別
+	 * @param arg1 引数１
+	 * @param obj オブジェクト型引数
+	 */
+	public void sendEvent(int target, int type, int arg1, Object obj){
+		if(0 <= target && target < mListeners.length){
+			mListeners[target].onEventReceived(type, arg1, 0, obj);
+		}
 	}
 	
 	/**

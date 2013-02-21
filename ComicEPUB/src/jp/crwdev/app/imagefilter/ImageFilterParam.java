@@ -17,6 +17,11 @@ public class ImageFilterParam implements Cloneable {
 		mIsEnable = false;
 		mIsPreview = false;
 		mIsDrawCropAreaInPreview = true;
+		mIsColorPageCrop = false;
+		mColorPageCropLeft = 0;
+		mColorPageCropTop = 0;
+		mColorPageCropRight = 0;
+		mColorPageCropBottom = 0;
 		mIsTextPageCrop = false;
 		mTextPageCropLeft = 0;
 		mTextPageCropTop = 0;
@@ -71,6 +76,11 @@ public class ImageFilterParam implements Cloneable {
 		dest.mIsEnable = src.isEnable();
 		dest.mIsPreview = src.isPreview();
 		dest.mIsDrawCropAreaInPreview = src.isDrawCropAreaInPreview();
+		dest.mIsColorPageCrop = src.isColorPageCrop();
+		dest.mColorPageCropLeft = src.getColorPageCropLeft();
+		dest.mColorPageCropTop = src.getColorPageCropTop();
+		dest.mColorPageCropRight = src.getColorPageCropRight();
+		dest.mColorPageCropBottom = src.getColorPageCropBottom();
 		dest.mIsTextPageCrop = src.isTextPageCrop();
 		dest.mTextPageCropLeft = src.getTextPageCropLeft();
 		dest.mTextPageCropTop = src.getTextPageCropTop();
@@ -107,6 +117,11 @@ public class ImageFilterParam implements Cloneable {
 	protected boolean mIsEnable;
 	protected boolean mIsPreview;
 	protected boolean mIsDrawCropAreaInPreview;
+	protected boolean mIsColorPageCrop;
+	protected int mColorPageCropLeft;
+	protected int mColorPageCropTop;
+	protected int mColorPageCropRight;
+	protected int mColorPageCropBottom;
 	protected boolean mIsTextPageCrop;
 	protected int mTextPageCropLeft;
 	protected int mTextPageCropTop;
@@ -162,6 +177,26 @@ public class ImageFilterParam implements Cloneable {
 		return mIsDrawCropAreaInPreview;
 	}
 	
+	public boolean isColorPageCrop() {
+		return mIsColorPageCrop;
+	}
+
+	public int getColorPageCropLeft() {
+		return mColorPageCropLeft;
+	}
+
+	public int getColorPageCropTop() {
+		return mColorPageCropTop;
+	}
+
+	public int getColorPageCropRight() {
+		return mColorPageCropRight;
+	}
+
+	public int getColorPageCropBottom() {
+		return mColorPageCropBottom;
+	}
+
 	public boolean isTextPageCrop() {
 		return mIsTextPageCrop;
 	}
@@ -480,6 +515,33 @@ public class ImageFilterParam implements Cloneable {
 		mTextPageCropBottom = bottom;
 	}	
 
+	public void setColorPageCrop(boolean enable) {
+		mIsColorPageCrop = enable;
+	}
+
+	public void setColorPageCropBottom(int bottom) {
+		mColorPageCropBottom = bottom;
+	}
+
+	public void setColorPageCropLeft(int left) {
+		mColorPageCropLeft = left;
+	}
+
+	public void setColorPageCropRight(int right) {
+		mColorPageCropRight = right;
+	}
+
+	public void setColorPageCropTop(int top) {
+		mColorPageCropTop = top;
+	}
+
+	public void setColorPageCrop(int left, int top, int right, int bottom) {
+		mColorPageCropLeft = left;
+		mColorPageCropTop = top;
+		mColorPageCropRight = right;
+		mColorPageCropBottom = bottom;
+	}	
+
 	public void setTranslate(boolean enable) {
 		mIsTranslate = enable;
 	}
@@ -531,6 +593,13 @@ public class ImageFilterParam implements Cloneable {
 		//if(update.isDrawCropAreaInPreview()){
 		//	dest.mIsDrawCropAreaInPreview = true;
 		//}
+		if(update.isColorPageCrop()){
+			dest.mIsColorPageCrop = true;
+			dest.mColorPageCropLeft = update.getColorPageCropLeft();
+			dest.mColorPageCropTop = update.getColorPageCropTop();
+			dest.mColorPageCropRight = update.getColorPageCropRight();
+			dest.mColorPageCropBottom = update.getColorPageCropBottom();
+		}
 		if(update.isTextPageCrop()){
 			dest.mIsTextPageCrop = true;
 			dest.mTextPageCropLeft = update.getTextPageCropLeft();

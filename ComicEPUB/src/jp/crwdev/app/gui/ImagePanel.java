@@ -35,6 +35,7 @@ import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
+import jp.crwdev.app.setting.ImageFilterParamSet;
 
 public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
 	
@@ -88,9 +89,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		mEventSender = observer;
 	}
 	
-	public void setImageFilterParam(ImageFilterParam param){
-		mImageFilter.setImageFilterParam(param);
-		mIsPreviewMode = param.isPreview();
+	public void setImageFilterParam(ImageFilterParamSet params){
+		mImageFilter.setImageFilterParam(params);
+		mIsPreviewMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
 		updateDisplayImage();
 	}
 	
@@ -241,9 +242,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		
 		
 		if(mImageFilter != null){
-//			mImageFilter.setAddSpaceDimension(ImageFilterParam.getUnificationTextPageSize());
-			BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
-			mDisplayImage = filtered;
+			try {
+				BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+				mDisplayImage = filtered;
+			}catch(OutOfMemoryError e){
+				mEventSender.setProgressMessage(e.getMessage());
+				e.printStackTrace();
+			}
 		}
 		//BufferedImage conv = ResizeImageFile.getFinalConvertedImage(mOriginalImage, mFileInfo, true);
 		//Rectangle rect = ResizeImageFile.getResizedRect(conv.getWidth(), conv.getHeight(), 600, 800);
@@ -743,7 +748,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					ImageFilterParam param = new ImageFilterParam();
 					param.setTextPageCrop(true);
 					param.setTextPageCrop((int)(imageWidth * left), (int)(imageHeight * top), imageWidth - (int)(imageWidth * right), imageHeight - (int)(imageHeight * bottom));
-					mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamOnlyEnable, param);
+					mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamOnlyEnable, ImageFilterParamSet.FILTER_INDEX_TEXT, param);
 				}
 			}
 		});

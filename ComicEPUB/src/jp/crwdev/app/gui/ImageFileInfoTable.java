@@ -16,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -33,6 +34,7 @@ import jp.crwdev.app.imagefilter.PageCheckFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
+import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask.OnTaskObserver;
 
@@ -43,7 +45,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	private ImagePanel mImagePanel = null;
 	
 	private IImageFileInfoList mInfoList = null;
-	private ImageFilterParam mBaseFilterParam = null;
+	private ImageFilterParamSet mBaseFilterParams = null;
 	
 	public ImageFileInfoTable(){
 		initialize();
@@ -82,8 +84,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		mImagePanel = panel;
 	}
 	
-	public void setImageFilterParam(ImageFilterParam baseParam){
-		mBaseFilterParam = baseParam;
+	public void setImageFilterParam(ImageFilterParamSet baseParams){
+		mBaseFilterParams = baseParams;
 	}
 	
 	@Override
@@ -150,6 +152,20 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		return mInfoList;
 	}
 	
+	private int getPageTypeToFilterIndex(int pageType){
+		switch(pageType){
+		case Constant.PAGETYPE_COLOR:
+			return ImageFilterParamSet.FILTER_INDEX_COLOR;
+		case Constant.PAGETYPE_PICT:
+			return ImageFilterParamSet.FILTER_INDEX_PICT;
+		case Constant.PAGETYPE_TEXT:
+			return ImageFilterParamSet.FILTER_INDEX_TEXT;
+		case Constant.PAGETYPE_AUTO:
+		default:
+			return ImageFilterParamSet.FILTER_INDEX_BASIC;
+		}
+	}
+
 	// Table Event
 	private void onItemSelected(int index){
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
@@ -157,18 +173,19 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			IImageFileInfo info = mInfoList.get(index);
 			if(info != null){
 				InputStream stream = info.getInputStream();
-				BufferedImage image = BufferedImageIO.read(stream, info.isJpeg());
-				if(mImagePanel != null){
-					mImagePanel.setImage(image, info, index);
+				try {
+					BufferedImage image = BufferedImageIO.read(stream, info.isJpeg());
+					if(mImagePanel != null){
+						mImagePanel.setImage(image, info, index);
+					}
+				}catch(OutOfMemoryError e){
+					mEventSender.setProgressMessage(e.getMessage());
+					e.printStackTrace();
+					return;
 				}
-//				{
-//					XmlWriter writer = new XmlWriter();
-//					writer.openSettingFile();
-//					writer.loadSetting();
-////					writer.openDocument();
-////					writer.writeInfo(null, info);
-////					writer.closeDocument();
-//				}
+				
+				int pageType = info.getFilterParam().getPageType();
+				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));
 			}
 		}
 		
@@ -178,7 +195,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		int selected = getSelectedRow();
 		onItemSelected(selected);
 	}
-	
+
 	private void onTableCellChanged(int row, int col, String value){
 		if(mInfoList != null){
 			IImageFileInfo info = mInfoList.get(row);
@@ -291,8 +308,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					BufferedImage image = BufferedImageIO.read(stream, info.isJpeg());
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();
-					if(mBaseFilterParam != null){
-						filterParam = mBaseFilterParam.createMergedFilterParam(filterParam);
+					if(mBaseFilterParams != null){
+						filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
 					}
 					boolean whitePage = checker.isWhiteImage(image, filterParam, true);
 					if(!whitePage){
@@ -559,6 +576,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				Constant.TEXT_PAGETYPE_AUTO,
 				Constant.TEXT_PAGETYPE_TEXT,
 				Constant.TEXT_PAGETYPE_PICT,
+				Constant.TEXT_PAGETYPE_COLOR,
 		});
 		pageBox.setBorder(BorderFactory.createEmptyBorder()); 
 

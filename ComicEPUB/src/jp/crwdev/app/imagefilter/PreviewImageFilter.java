@@ -85,7 +85,7 @@ public class PreviewImageFilter extends OutputImageFilter {
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		
-		ImageFilterParam newParam = mBaseFilterParam.createMergedFilterParam(param);
+		ImageFilterParam newParam = mBaseFilterParams.createMergedFilterParam(param);
 		//newParam.setPreview(mIsPreview);
 		//newParam.setResize(true);
 		newParam.setResizeDimension(mPreviewSize);

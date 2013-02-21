@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.crwdev.app.interfaces.IImageFilter;
+import jp.crwdev.app.setting.ImageFilterParamSet;
 
 public class OutputImageFilter implements IImageFilter {
 
 	/** フィルタリスト */
 	protected List<IImageFilter> mFilters = new ArrayList<IImageFilter>();
 	/** フィルタパラメータ */
-	protected ImageFilterParam mBaseFilterParam = new ImageFilterParam();
+	protected ImageFilterParamSet mBaseFilterParams = new ImageFilterParamSet();
 
 	/**
 	 * コンストラクタ
@@ -36,25 +37,25 @@ public class OutputImageFilter implements IImageFilter {
 	 * コンストラクタ
 	 * @param param
 	 */
-	public OutputImageFilter(ImageFilterParam param){
+	public OutputImageFilter(ImageFilterParamSet params){
 		this();
-		mBaseFilterParam = param.clone();
+		mBaseFilterParams = params.clone();
 	}
 
 	/**
 	 * フィルタパラメータを設定する
 	 * @param param
 	 */
-	public void setImageFilterParam(ImageFilterParam param){
-		mBaseFilterParam = param.clone();
+	public void setImageFilterParam(ImageFilterParamSet params){
+		mBaseFilterParams = params.clone();
 	}
 	
 	/**
 	 * フィルタパラメータを取得する
 	 * @return
 	 */
-	public ImageFilterParam getImageFilterParam(){
-		return mBaseFilterParam;
+	public ImageFilterParamSet getImageFilterParam(){
+		return mBaseFilterParams;
 	}
 	
 	/**
@@ -68,7 +69,7 @@ public class OutputImageFilter implements IImageFilter {
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		
-		ImageFilterParam newParam = mBaseFilterParam.createMergedFilterParam(param);
+		ImageFilterParam newParam = mBaseFilterParams.createMergedFilterParam(param);
 		
 		for(IImageFilter filter : mFilters){
 			image = filter.filter(image, newParam);

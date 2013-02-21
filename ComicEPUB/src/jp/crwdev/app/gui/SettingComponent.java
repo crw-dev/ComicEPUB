@@ -35,6 +35,7 @@ import javax.swing.event.ChangeListener;
 
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
+import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.InifileProperty;
 
 public class SettingComponent {
@@ -134,7 +135,7 @@ public class SettingComponent {
 	
 	public SettingComponent(SettingPanel parent){
 		mParent = parent;
-		addToComponent(parent);
+		//addToComponent(parent);
 	}
 	
 	private void addToComponent(JComponent parent){
@@ -595,7 +596,7 @@ public class SettingComponent {
 		return checkBoxes[checkboxId].isSelected();
 	}
 	
-	public ImageFilterParam getCurrentFilterParam(){
+	public ImageFilterParamSet getCurrentFilterParam(){
 		boolean isEnable = filterEnable.isSelected();
 		boolean isContrast = filterContrast.isSelected();
 		boolean isGamma = filterGamma.isSelected();
@@ -652,7 +653,13 @@ public class SettingComponent {
 		
 		param.setUnificationTextPage(isUnificationTextPage);
 		
-		return param;
+		ImageFilterParamSet paramSet = new ImageFilterParamSet();
+		paramSet.set(0, param);
+		paramSet.set(1, param);
+		paramSet.set(2, param);
+		paramSet.set(3, param);
+		
+		return paramSet;
 	}
 	
 	public OutputSettingParam getOutputSettingParam(){

@@ -8,6 +8,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Hashtable;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -37,6 +38,7 @@ import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
 import jp.crwdev.app.interfaces.IImageFileWriter;
 import jp.crwdev.app.interfaces.IImageFileWriter.OnProgressListener;
+import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.setting.XmlWriter;
 import jp.crwdev.app.util.FileDropTargetAdapter;
 import jp.crwdev.app.util.InifileProperty;
@@ -52,7 +54,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private ImagePanel mImagePanel;
 	private SettingPanel mSettingPanel;
 	
-	private ImageFilterParam mBaseFilterParam = new ImageFilterParam();	// global setting
+	//private ImageFilterParam mBaseFilterParam = new ImageFilterParam();	// global setting
+	private ImageFilterParamSet mBaseFilterParams = new ImageFilterParamSet();
 	
 	//private boolean mIsUnificationTextPage = false;
 	
@@ -110,7 +113,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     //settingPanel.setMinimumSize(new Dimension(300, 800));
 	     mSettingPanel = settingPanel;
 	     
-	     ImageFilterParam defaultParam = settingPanel.getFilterParam();
+	     ImageFilterParamSet defaultParam = settingPanel.getImageFilterParamSet();
 	     setBaseFilterParam(defaultParam);
 
 	     
@@ -185,17 +188,18 @@ public class MainFrame extends JFrame implements OnEventListener {
 							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
 							
 							
-							ImageFilterParam param = null;
+							//ImageFilterParam param = null;
+							ImageFilterParamSet params = new ImageFilterParamSet();
 							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
 								//TODO: implement setting file reader/writer
 								XmlWriter loader = new XmlWriter();
 								loader.openLoadSettingFile(mSettingFilePath);
-								param = new ImageFilterParam();
+								//param = new ImageFilterParam();
 								
 								// listに変更を反映する
-								loader.loadSetting(outputParam, param, list);
+								loader.loadSetting(outputParam, params, list);
 								
 							}
 							// 出力設定を設定画面に反映
@@ -203,9 +207,11 @@ public class MainFrame extends JFrame implements OnEventListener {
 		
 							mTable.setImageFileInfoList(list);
 							
-							if(param != null){
+							if(params != null){
 								// 全体設定を反映
-								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParam, param);
+								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
+								
+								updateBaseFilterParam(params);
 							}
 
 					
@@ -267,7 +273,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private void saveSettingFile(String filepath){
 		 XmlWriter writer = new XmlWriter();
 		 writer.openSaveSettingFile(filepath);
-		 writer.writeSetting(null, mSettingPanel.getOutputSettingParam(), mBaseFilterParam, mTable.getImageFileInfoList());
+		 writer.writeSetting(null, mSettingPanel.getOutputSettingParam(), mBaseFilterParams, mTable.getImageFileInfoList());
 	}
 	
 	private int showSettingSaveConfirmDialog(){
@@ -295,21 +301,28 @@ public class MainFrame extends JFrame implements OnEventListener {
 		}
 	}
 
-	public void setBaseFilterParam(ImageFilterParam param){
-		mBaseFilterParam = param.clone();
-		mImagePanel.setImageFilterParam(mBaseFilterParam);
-		mTable.setImageFilterParam(mBaseFilterParam);
+	public void setBaseFilterParam(ImageFilterParamSet params){
+		mBaseFilterParams = new ImageFilterParamSet();
+		for(int i=0; i<params.size(); i++){
+			ImageFilterParam param = params.get(i);
+			mBaseFilterParams.set(i, param != null ? param.clone() : null);
+		}
+		mImagePanel.setImageFilterParam(mBaseFilterParams);
+		mTable.setImageFilterParam(mBaseFilterParams);
+		//mBaseFilterParam = param.clone();
+		//mImagePanel.setImageFilterParam(mBaseFilterParam);
+		//mTable.setImageFilterParam(mBaseFilterParam);
 	}
 
-	public void updateBaseFilterParam(ImageFilterParam param) {
-		if(param.isUnificationTextPage()){
+	public void updateBaseFilterParam(ImageFilterParamSet params) {
+		if(params.get(ImageFilterParamSet.FILTER_INDEX_TEXT) != null && params.get(ImageFilterParamSet.FILTER_INDEX_TEXT).isUnificationTextPage()){
 			IImageFileInfoList list = mTable.getImageFileInfoList();
 			AddSpaceFilter.setUnificationTextPageSize(ImageFileInfoList.getTextPageUnionDimension(list));
 		}
 		else{
 			AddSpaceFilter.setUnificationTextPageSize(0, 0);
 		}
-		setBaseFilterParam(param);
+		setBaseFilterParam(params);
 		mTable.selectCurrentItem(); // Baseフィルタが更新されたのでカレントイメージも更新する
 	}
 
@@ -328,24 +341,24 @@ public class MainFrame extends JFrame implements OnEventListener {
 					mEventObserver.startProgress();
 
 					// 基本変換パラメータ取得
-					ImageFilterParam param = mSettingPanel.getFilterParam();
+					ImageFilterParamSet params = mSettingPanel.getImageFilterParamSet();
 					
 					// 出力設定を取得
 					OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
 					
-					param.setPreview(false);
+					params.setPreview(false);
 					
 					// 出力サイズを設定
 					Dimension size = outSetting.getImageSize();
 					if(size == null || (size.width == 0 || size.height == 0)){
-						param.setResize(false);
+						params.setResize(false);
 					}else{
-						param.setResize(true);
-						param.setResizeDimension(size);
+						params.setResize(true);
+						params.setResizeDimension(size);
 					}
 					
 					// 基本出力フィルタを生成
-					OutputImageFilter imageFilter = new OutputImageFilter(param);
+					OutputImageFilter imageFilter = new OutputImageFilter(params);
 					
 					// 出力設定からImageFileWriterを生成
 					IImageFileWriter writer = outSetting.getImageFileWriter();
@@ -406,8 +419,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 	@Override
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
-		case EventObserver.EventType_UpdateFilterParam:
-			updateBaseFilterParam((ImageFilterParam)obj);
+		case EventObserver.EventType_UpdateFilterParamSet:
+			updateBaseFilterParam((ImageFilterParamSet)obj);
 			break;
 		case EventObserver.EventType_BeginConvert:
 			beginConvert();

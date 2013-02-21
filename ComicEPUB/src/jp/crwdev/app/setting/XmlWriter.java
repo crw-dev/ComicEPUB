@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -86,8 +87,8 @@ public class XmlWriter {
 			e.printStackTrace();
 		}
 	}
-	public void writeSetting(Element parent, OutputSettingParam output, ImageFilterParam base, IImageFileInfoList list){
-		if(output == null || base == null || list == null){
+	public void writeSetting(Element parent, OutputSettingParam output, ImageFilterParamSet bases, IImageFileInfoList list){
+		if(output == null || bases == null || list == null){
 			return;
 		}
 		if(parent == null){
@@ -101,7 +102,11 @@ public class XmlWriter {
 		
 		// <base>
 		Element baseElem = mDocument.createElement("base");
-		writeParam(baseElem, base);
+		//writeParam(baseElem, base);
+		writeFilterBase(baseElem, bases.get(0), "basic");
+		writeFilterBase(baseElem, bases.get(1), "color");
+		writeFilterBase(baseElem, bases.get(2), "pict");
+		writeFilterBase(baseElem, bases.get(3), "text");
 		parent.appendChild(baseElem);
 
 		// <infos>
@@ -112,6 +117,16 @@ public class XmlWriter {
 		parent.appendChild(infosElem);
 		
 		closeDocument();
+	}
+	
+	private void writeFilterBase(Element parent, ImageFilterParam param, String pageType){
+		if(param == null){
+			return;
+		}
+		Element filterElem = mDocument.createElement("filter");
+		filterElem.setAttribute("pageType", pageType);
+		writeParam(filterElem, param);
+		parent.appendChild(filterElem);
 	}
 	
 	private void writeOutput(Element parent, OutputSettingParam output){
@@ -297,6 +312,15 @@ public class XmlWriter {
 			elem.setAttribute("b", Integer.toString(param.getFullPageCropBottom()));
 			paramElem.appendChild(elem);
 		}
+		if(param.isColorPageCrop()){
+			Element elem = mDocument.createElement("colorCrop");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("l", Integer.toString(param.getColorPageCropLeft()));
+			elem.setAttribute("t", Integer.toString(param.getColorPageCropTop()));
+			elem.setAttribute("r", Integer.toString(param.getColorPageCropRight()));
+			elem.setAttribute("b", Integer.toString(param.getColorPageCropBottom()));
+			paramElem.appendChild(elem);
+		}
 		if(param.isTextPageCrop()){
 			Element elem = mDocument.createElement("textCrop");
 			elem.appendChild(mDocument.createTextNode("true"));
@@ -377,7 +401,8 @@ public class XmlWriter {
 		}
 	}
 	
-	public void loadSetting(OutputSettingParam output, ImageFilterParam baseParam, IImageFileInfoList list){
+	
+	public void loadSetting(OutputSettingParam output, ImageFilterParamSet baseParams, IImageFileInfoList list){
 		if(mDocument == null){
 			return;
 		}
@@ -392,6 +417,7 @@ public class XmlWriter {
 		if(topNodes.getLength() != 1){
 			return;
 		}
+		
 		Node settingNode = topNodes.item(0);
 		if(settingNode.getNodeName().equalsIgnoreCase("setting")){
 			NodeList settingNodes = settingNode.getChildNodes();
@@ -403,8 +429,9 @@ public class XmlWriter {
 				}
 				else if(name.equalsIgnoreCase("base")){
 					NodeList baseNodes = node.getChildNodes();
-					if(baseNodes.getLength() == 1){
-						loadParam(baseNodes.item(0), baseParam);
+					for(int n=0; n<baseNodes.getLength(); n++){
+						loadFilterBase(baseNodes.item(n), baseParams);
+						//loadParam(baseNodes.item(n), baseParam);
 					}
 				}
 				else if(name.equalsIgnoreCase("infos")){
@@ -436,6 +463,36 @@ public class XmlWriter {
 				}
 				else{
 					list.add(info);
+				}
+			}
+		}
+	}
+	
+	private void loadFilterBase(Node filterNode, ImageFilterParamSet params){
+		if(filterNode.getNodeName().equalsIgnoreCase("filter")){
+			NamedNodeMap attrs = filterNode.getAttributes();
+			String pageType = getAttributeValue(attrs, "pageType");
+			if(!pageType.isEmpty()){
+				int index = 0;
+				if(pageType.equals("basic")){
+					index = 0;
+				}
+				else if(pageType.equals("color")){
+					index = 1;
+				}
+				else if(pageType.equals("pict")){
+					index = 2;
+				}
+				else if(pageType.equals("text")){
+					index = 3;
+				}
+				ImageFilterParam param = params.get(index);
+				if(param == null){
+					params.set(index, new ImageFilterParam());
+				}
+				NodeList nodes = filterNode.getChildNodes();
+				if(nodes.getLength() > 0){
+					loadParam(nodes.item(0), params.get(index));
 				}
 			}
 		}
@@ -617,6 +674,15 @@ public class XmlWriter {
 					String enable = node.getFirstChild().getNodeValue();
 					param.setFullPageCrop(Boolean.parseBoolean(enable));
 					param.setFullPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
+				}
+				else if(name.equalsIgnoreCase("colorCrop")){
+					String l = getAttributeValue(attrs, "l");
+					String r = getAttributeValue(attrs, "r");
+					String t = getAttributeValue(attrs, "t");
+					String b = getAttributeValue(attrs, "b");
+					String enable = node.getFirstChild().getNodeValue();
+					param.setColorPageCrop(Boolean.parseBoolean(enable));
+					param.setColorPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("textCrop")){
 					String l = getAttributeValue(attrs, "l");
