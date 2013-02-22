@@ -189,7 +189,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 							
 							
 							//ImageFilterParam param = null;
-							ImageFilterParamSet params = new ImageFilterParamSet();
+							ImageFilterParamSet params = null;
 							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
@@ -197,7 +197,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 								XmlWriter loader = new XmlWriter();
 								loader.openLoadSettingFile(mSettingFilePath);
 								//param = new ImageFilterParam();
-								
+								params = new ImageFilterParamSet();
 								// listに変更を反映する
 								loader.loadSetting(outputParam, params, list);
 								

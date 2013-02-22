@@ -624,12 +624,39 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			long when = e.getWhen();
 			System.out.println("rotation=" + rotation + " when=" + when);
 			
+			//TODO
 			ImageFilterParam param = mFileInfo.getFilterParam();
 			param.setRotate(true);
 			double angle = 0.1 * rotation;
 			param.setRotateAngle(angle + param.getRotateAngle());
 			updateDisplayImage();
 			updateTableInfo();
+
+			
+//			ImageFilterParam param = mFileInfo.getFilterParam();
+//			double angle = 0.5 * rotation;
+//			
+//			int x = e.getX();
+//			int y = e.getY();
+//			int w = getWidth();
+//			int h = getHeight();
+//			AffineTransform af = new AffineTransform();
+//			af.rotate(-Math.toRadians(angle), w/2, h/2);
+//			
+//			double[] srcPoints = new double[]{ (double)x, (double)y };
+//			double[] dstPoints = new double[2];
+//			af.transform(srcPoints, 0, dstPoints, 0, 1);
+//
+//			double offsetx = dstPoints[0] - srcPoints[0];
+//			double offsety = dstPoints[1] - srcPoints[1];
+//			
+//			param.setRotate(true);
+//			param.setRotateAngle(angle + param.getRotateAngle());
+//			param.setTranslate(true);
+//			param.setTranslateX(param.getTranslateX() + (int)offsetx);
+//			param.setTranslateY(param.getTranslateY() + (int)offsety);
+//			updateDisplayImage();
+//			updateTableInfo();
 		}
 	}
 	

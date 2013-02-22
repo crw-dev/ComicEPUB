@@ -41,6 +41,7 @@ public class OutputSettingPanel extends JPanel {
 	// Button
 	public JButton chooseFolderButton;
 	public JButton convertButton;
+	public JButton cancelButton;
 	
 	private SettingPanel mParent = null;
 	
@@ -53,7 +54,7 @@ public class OutputSettingPanel extends JPanel {
 	
 	public void setComponents(SettingPanel parent, JComboBox imageSize, JComboBox fileType, JComboBox bookType,
 			JTextField title, JTextField titleKana, JTextField author, JTextField authorKana,
-			JTextField folder, JButton folderBtn, JButton convertBtn){
+			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn){
 		mParent = parent;
 		outputImageSize = imageSize;
 		outputFileType = fileType;
@@ -65,6 +66,7 @@ public class OutputSettingPanel extends JPanel {
 		outputFolder = folder;
 		chooseFolderButton = folderBtn;
 		convertButton = convertBtn;
+		cancelButton = cancelBtn;
 		initialize();
 	}
 	
@@ -118,8 +120,9 @@ public class OutputSettingPanel extends JPanel {
 						}
 					}					
 					if(ok){
-						convertButton.setEnabled(false);
 						if(mParent != null){
+							convertButton.setEnabled(false);
+							cancelButton.setEnabled(true);
 							mParent.startConvert();
 						}
 					}

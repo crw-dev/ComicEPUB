@@ -32,6 +32,9 @@ public class PreviewSettingPanel extends JPanel {
 	
 	private void initialize(){
 	
+		checkPreview.setSelected(true);
+		checkResize.setSelected(true);
+		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 
 				updateSettingValues(); 
@@ -40,6 +43,14 @@ public class PreviewSettingPanel extends JPanel {
 		
 		checkPreview.addMouseListener(mouseClickAdapter);
 		checkResize.addMouseListener(mouseClickAdapter);
+	}
+	
+	public void setPreview(boolean enable){
+		checkPreview.setSelected(enable);
+	}
+	
+	public void setResize(boolean enable){
+		checkResize.setSelected(enable);
 	}
 	
 	public boolean isPreview(){

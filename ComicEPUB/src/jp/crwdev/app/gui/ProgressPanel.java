@@ -2,6 +2,8 @@ package jp.crwdev.app.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -37,6 +39,15 @@ public class ProgressPanel extends JPanel {
 	
 	private void initialize(){
 
+		cancelButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(mParent != null){
+					mParent.cancelConvert();
+				}
+			}
+		});
+		cancelButton.setEnabled(false);
 	}
 	
 	

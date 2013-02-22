@@ -130,7 +130,7 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, progressBar, -6, SpringLayout.WEST, cancelButton);
 		add(progressBar);
 		
-		labelMessage = new JLabel("New label");
+		labelMessage = new JLabel("");
 		springLayout.putConstraint(SpringLayout.WEST, labelMessage, 0, SpringLayout.WEST, checkPreview);
 		springLayout.putConstraint(SpringLayout.SOUTH, labelMessage, -6, SpringLayout.NORTH, progressBar);
 		springLayout.putConstraint(SpringLayout.EAST, labelMessage, 0, SpringLayout.EAST, tabbedPane);
