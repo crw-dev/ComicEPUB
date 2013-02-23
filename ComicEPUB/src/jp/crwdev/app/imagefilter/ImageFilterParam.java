@@ -40,6 +40,8 @@ public class ImageFilterParam implements Cloneable {
 		mIsContrast = false;
 		mContrast = 1.0f;
 		mBrightness = 0;
+		mIsBlur = false;
+		mBlurPixels = 3;
 		mIsEqualize = false;
 		mIsFullPageCrop = false;
 		mFullPageCropLeft = 0;
@@ -96,6 +98,8 @@ public class ImageFilterParam implements Cloneable {
 		dest.mIsGrayscale = src.isGrayscale();
 		dest.mIsGamma = src.isGamma();
 		dest.mGamma = src.getGamma();
+		dest.mIsBlur = src.isBlur();
+		dest.mBlurPixels = src.getBlurPixels();
 		dest.mIsContrast = src.isContrast();
 		dest.mContrast = src.getContrast();
 		dest.mBrightness = src.getBrightness();
@@ -137,6 +141,8 @@ public class ImageFilterParam implements Cloneable {
 	protected boolean mIsGrayscale;
 	protected boolean mIsGamma;
 	protected double mGamma;
+	protected boolean mIsBlur;
+	protected float mBlurPixels;
 	protected boolean mIsContrast;
 	protected float mContrast;
 	protected float mBrightness;
@@ -256,6 +262,14 @@ public class ImageFilterParam implements Cloneable {
 	public double getGamma() {
 		return mGamma;
 	}
+	
+	public boolean isBlur() {
+		return mIsBlur;
+	}
+	
+	public float getBlurPixels() {
+		return mBlurPixels;
+	}
 
 	public boolean isContrast() {
 		return mIsContrast;
@@ -366,6 +380,14 @@ public class ImageFilterParam implements Cloneable {
 
 	public void setContrast(float scale) {
 		mContrast = scale;
+	}
+	
+	public void setBlur(boolean enable) {
+		mIsBlur = enable;
+	}
+	
+	public void setBlurPixels(float pixels){
+		mBlurPixels = pixels;
 	}
 
 	public void setDrawCropAreaInPreview(boolean enable) {
@@ -629,6 +651,10 @@ public class ImageFilterParam implements Cloneable {
 			dest.mIsContrast = true;
 			dest.mContrast = update.getContrast();
 			dest.mBrightness = update.getBrightness();
+		}
+		if(update.isBlur()){
+			dest.mIsBlur = true;
+			dest.mBlurPixels = update.getBlurPixels();
 		}
 		if(update.isEqualize()){
 			dest.mIsEqualize = true;

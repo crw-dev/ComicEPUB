@@ -54,7 +54,7 @@ public class SettingPanelLayout extends JPanel {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		springLayout.putConstraint(SpringLayout.NORTH, tabbedPane, 6, SpringLayout.SOUTH, checkPreview);
 		springLayout.putConstraint(SpringLayout.WEST, tabbedPane, 3, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, tabbedPane, 300, SpringLayout.SOUTH, checkPreview);
+		springLayout.putConstraint(SpringLayout.SOUTH, tabbedPane, 328, SpringLayout.SOUTH, checkPreview);
 		springLayout.putConstraint(SpringLayout.EAST, tabbedPane, -3, SpringLayout.EAST, this);
 		add(tabbedPane);
 		

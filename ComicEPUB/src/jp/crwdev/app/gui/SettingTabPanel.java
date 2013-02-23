@@ -32,6 +32,7 @@ public class SettingTabPanel extends JPanel {
 
 	// CheckBox
 	public JCheckBox checkEnable = new JCheckBox("無変換");
+	public JCheckBox checkBlur = new JCheckBox("ぼかし");
 	public JCheckBox checkContrast = new JCheckBox("コントラスト");
 	public JCheckBox checkGamma = new JCheckBox("ガンマ補正");
 	public JCheckBox checkGrayscale = new JCheckBox("グレースケール");
@@ -87,11 +88,18 @@ public class SettingTabPanel extends JPanel {
 		layout1.putConstraint(SpringLayout.WEST, checkEnable, 0, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, checkEnable, 0, SpringLayout.NORTH, checkPanel);
 		
+		// ぼかし
+		checkPanel.add(checkBlur);
+
+		layout1.putConstraint(SpringLayout.WEST, checkBlur, 0, SpringLayout.WEST, checkPanel);
+		layout1.putConstraint(SpringLayout.NORTH, checkBlur, 0, SpringLayout.SOUTH, checkEnable);
+
+		
 		// グレースケール
 		checkPanel.add(checkGrayscale);
 
 		layout1.putConstraint(SpringLayout.WEST, checkGrayscale, 0, SpringLayout.WEST, checkPanel);
-		layout1.putConstraint(SpringLayout.NORTH, checkGrayscale, 0, SpringLayout.SOUTH, checkEnable);
+		layout1.putConstraint(SpringLayout.NORTH, checkGrayscale, 0, SpringLayout.SOUTH, checkBlur);
 
 		//
 		Component current = checkGrayscale;
@@ -189,6 +197,7 @@ public class SettingTabPanel extends JPanel {
 		};
 		
 		checkEnable.addMouseListener(mouseClickAdapter);
+		checkBlur.addMouseListener(mouseClickAdapter);
 		checkUnification.addMouseListener(mouseClickAdapter);
 		checkGrayscale.addMouseListener(mouseClickAdapter);
 		checkGamma.addMouseListener(mouseClickAdapter);
@@ -271,6 +280,10 @@ public class SettingTabPanel extends JPanel {
 			if(param.isGamma()){
 				checkGamma.setSelected(param.isGamma());
 			}
+			if(param.isBlur()){
+				checkBlur.setSelected(param.isBlur());
+				//TODO: value
+			}
 			if(param.isGrayscale()){
 				checkGrayscale.setSelected(param.isGrayscale());
 			}
@@ -291,6 +304,7 @@ public class SettingTabPanel extends JPanel {
 			}
 		}else{
 			checkEnable.setSelected(param.isEnable());
+			checkBlur.setSelected(param.isBlur());
 			checkContrast.setSelected(param.isContrast());
 			checkGamma.setSelected(param.isGamma());
 			checkGrayscale.setSelected(param.isGrayscale());
@@ -369,6 +383,7 @@ public class SettingTabPanel extends JPanel {
 	
 	public ImageFilterParam getImageFilterParam(){
 		boolean isEnable = checkEnable.isSelected();
+		boolean isBlur = checkBlur.isSelected();
 		boolean isContrast = checkContrast.isSelected();
 		boolean isGamma = checkGamma.isSelected();
 		boolean isGrayscale = checkGrayscale.isSelected();
@@ -395,6 +410,8 @@ public class SettingTabPanel extends JPanel {
 		ImageFilterParam param = new ImageFilterParam();
 		
 		param.setEnable(isEnable);
+		param.setBlur(isBlur);
+		//TODO: blur value
 		param.setContrast(isContrast);
 		param.setGamma(isGamma);
 		param.setGrayscale(isGrayscale);

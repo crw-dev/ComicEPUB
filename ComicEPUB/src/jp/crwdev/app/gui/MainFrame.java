@@ -46,6 +46,8 @@ import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
 
 public class MainFrame extends JFrame implements OnEventListener {
 
+	private boolean mIsSettingChanged = false;
+	
 	private IImageFileScanner mCurrentFile = null;
 	private IImageFileWriter mFileWriter = null;
 	private String mSettingFilePath = null;
@@ -72,9 +74,11 @@ public class MainFrame extends JFrame implements OnEventListener {
 	    		 System.out.println("windowClosing");
 	    		 //dispose();
 	    		 if(mSettingFilePath != null){
-	    			 int ret = showSettingSaveConfirmDialog();
-	    			 if(ret == JOptionPane.YES_OPTION){
-	    				 saveSettingFile(mSettingFilePath);
+	    			 if(mIsSettingChanged){
+		    			 int ret = showSettingSaveConfirmDialog();
+		    			 if(ret == JOptionPane.YES_OPTION){
+		    				 saveSettingFile(mSettingFilePath);
+		    			 }
 	    			 }
 	    		 }
 	    		 InifileProperty.getInstance().save();
@@ -125,7 +129,6 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     layout.putConstraint(SpringLayout.NORTH, scrollTable, 3, SpringLayout.NORTH, p);
 	     layout.putConstraint(SpringLayout.SOUTH, scrollTable, 3, SpringLayout.SOUTH, p);
 	     layout.putConstraint(SpringLayout.WEST, scrollTable, 3, SpringLayout.WEST, p);
-//	     layout.putConstraint(SpringLayout.EAST, scrollTable, 0, SpringLayout.WEST, imagePanel);
 	     
 	     layout.putConstraint(SpringLayout.NORTH, imagePanel, 3, SpringLayout.NORTH, p);
 	     layout.putConstraint(SpringLayout.SOUTH, imagePanel, 3, SpringLayout.SOUTH, p);
@@ -134,7 +137,6 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     
 	     layout.putConstraint(SpringLayout.NORTH, settingPanel, 3, SpringLayout.NORTH, p);
 	     layout.putConstraint(SpringLayout.SOUTH, settingPanel, -3, SpringLayout.SOUTH, p);
-//	     layout.putConstraint(SpringLayout.WEST, settingPanel, 5, SpringLayout.WEST, imagePanel);
 	     layout.putConstraint(SpringLayout.EAST, settingPanel, -5, SpringLayout.EAST, p);
 	     
 	     table.setEventObserver(mEventObserver);
@@ -146,8 +148,17 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     mEventObserver.setEventListener(EventObserver.EventTarget_Main, this);
 	     
 	     
-	     add(scrollTable);
-	     add(imagePanel);
+	     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, imagePanel);
+	     splitPane.setDividerSize(5);
+	     add(splitPane);
+	     
+	     layout.putConstraint(SpringLayout.NORTH, splitPane, 3, SpringLayout.NORTH, p);
+	     layout.putConstraint(SpringLayout.SOUTH, splitPane, 3, SpringLayout.SOUTH, p);
+	     layout.putConstraint(SpringLayout.WEST, splitPane, 3, SpringLayout.WEST, p);
+	     layout.putConstraint(SpringLayout.EAST, splitPane, 0, SpringLayout.WEST, settingPanel);
+
+//	     add(scrollTable);
+//	     add(imagePanel);
 	     add(settingPanel);
 		    //add(settingPanel,BorderLayout.CENTER);
 		    
@@ -170,11 +181,15 @@ public class MainFrame extends JFrame implements OnEventListener {
 							if(mCurrentFile != null){
 								mCurrentFile.close();
 								mCurrentFile = null;
-								int ret = showSettingSaveConfirmDialog();
-								if(ret == JOptionPane.YES_OPTION){
-									saveSettingFile(mSettingFilePath);
+								if(mIsSettingChanged){
+									int ret = showSettingSaveConfirmDialog();
+									if(ret == JOptionPane.YES_OPTION){
+										saveSettingFile(mSettingFilePath);
+									}
 								}
 							}
+							
+							mIsSettingChanged = false;
 							
 							IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
 							mCurrentFile = scanner;
@@ -420,6 +435,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
 		case EventObserver.EventType_UpdateFilterParamSet:
+			mIsSettingChanged = true;
 			updateBaseFilterParam((ImageFilterParamSet)obj);
 			break;
 		case EventObserver.EventType_BeginConvert:
