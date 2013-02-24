@@ -470,7 +470,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 
 		sb.append("<!-- xhtml -->\n");
 		for(int i=0; i<list.size(); i++){
-			if(list.get(i).isEnable()){
+			if(!list.get(i).isEnable()){
 				continue;
 			}
 			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(i)+ "\" href=\"xhtml/" + getXhtmlFileName(i) + "\" properties=\"svg\" fallback=\"" + getImageId(i) + "\"/>\n");
@@ -481,7 +481,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		sb.append("<!-- itemref -->\n");
 		for(int i=0; i<size; i++){
-			if(list.get(i).isEnable()){
+			if(!list.get(i).isEnable()){
 				continue;
 			}
 			String properties = "";
