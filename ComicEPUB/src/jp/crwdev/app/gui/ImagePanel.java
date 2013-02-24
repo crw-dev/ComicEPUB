@@ -258,6 +258,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	public void updateTableInfo(){
 		mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_UpdateFileInfo, mInfoIndex);
+		mEventSender.setModified();
 	}
 
 	@Override

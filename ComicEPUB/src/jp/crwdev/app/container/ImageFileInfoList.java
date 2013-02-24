@@ -5,6 +5,8 @@ package jp.crwdev.app.container;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -92,9 +94,14 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 						default:
 						}
 						
+						boolean sameCount = splitCount == infow.getRelativeSplitInfoSize();
+						
 						ImageFileInfoSplitWrapper first = null;
 						for(int index=0; index<splitCount; index++){
 							ImageFileInfoSplitWrapper wrapInfo = new ImageFileInfoSplitWrapper(baseInfo, index);
+							if(sameCount){
+								wrapInfo.setEnable(infow.getRelativeSplitInfo(index).isEnable());
+							}
 							list.add(wrapInfo);
 
 							if(first == null){
@@ -144,7 +151,11 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 					list.add(info);
 				}
 			}
+			
 		}
+		
+		list.sort();
+		
 //		for(int i=0; i<mList.size(); i++){
 //			IImageFileInfo info = mList.get(i);
 //			ImageFilterParam param = info.getFilterParam();
@@ -177,6 +188,23 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		return list;
 	}
 
+	@Override
+	public void sort() {
+		Collections.sort(mList, new Comparator(){
+			@Override
+			public int compare(Object o1, Object o2) {
+				IImageFileInfo a = (IImageFileInfo)o1;
+				IImageFileInfo b = (IImageFileInfo)o2;
+				
+				int comp = a.getFileName().compareToIgnoreCase(b.getFileName());
+				if(comp == 0){
+					comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
+				}
+				return comp;
+			}
+		});
+	}
+	
 	protected String getSuffix(String fileName) {
 	    if (fileName == null)
 	        return null;

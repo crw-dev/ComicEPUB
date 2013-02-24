@@ -30,7 +30,7 @@ public class EventObserver {
 	public static final int EventType_FileInfoModified = 11;	// no param
 	public static final int EventType_RenewalList = 12;			// no param
 	public static final int EventType_SelectTab = 13;			// arg1: tab index
-	
+	public static final int EventType_ModifiedSetting = 14;		// no param
 
 	/** イベントリスナ 4種類  */
 	private OnEventListener[] mListeners = new OnEventListener[4];
@@ -54,6 +54,11 @@ public class EventObserver {
 	/** プログレスメッセージ */
 	public void setProgressMessage(String message){
 		sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
+	}
+	
+	/** 編集フラグON */
+	public void setModified(){
+		sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_ModifiedSetting, 0);
 	}
 
 	/**

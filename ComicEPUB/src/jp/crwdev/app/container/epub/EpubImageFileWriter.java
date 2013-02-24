@@ -258,12 +258,15 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		for(int i=0; i<size; i++){
 			IImageFileInfo info = list.get(i);
-			
+			if(!info.isEnable()){
+				continue;
+			}
+
 			if(mIsCancel){
 				throw new Exception("user cancel");
 			}
 			
-			String filename = getImageFileName(i, ".jpg");
+			String filename = getImageFileName(sizeList.size(), ".jpg");
 			
 			zipOut.putNextEntry(new ZipEntry(imageDir + filename));
 			
@@ -286,7 +289,6 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			}
 			
 			zipOut.closeEntry();
-			
 			
 			if(listener != null){
 				listener.onProgress((int)((i*1)*progressOffset)+5, null);
@@ -456,6 +458,9 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("<!-- image -->\n");
 		int size = list.size();
 		for(int i=0; i<size; i++){
+			if(list.get(i).isEnable()){
+				continue;
+			}
 			String properties = "";
 			if(!getImageProperties(i).equals("")){
 				properties = " properties=\"" + getImageProperties(i) + "\"";
@@ -465,6 +470,9 @@ public class EpubImageFileWriter implements IImageFileWriter {
 
 		sb.append("<!-- xhtml -->\n");
 		for(int i=0; i<list.size(); i++){
+			if(list.get(i).isEnable()){
+				continue;
+			}
 			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(i)+ "\" href=\"xhtml/" + getXhtmlFileName(i) + "\" properties=\"svg\" fallback=\"" + getImageId(i) + "\"/>\n");
 		}
 
@@ -473,6 +481,9 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		sb.append("<!-- itemref -->\n");
 		for(int i=0; i<size; i++){
+			if(list.get(i).isEnable()){
+				continue;
+			}
 			String properties = "";
 			if(!getItemRefProperties(i).equals("")){
 				properties = " properties=\"" + getItemRefProperties(i) + "\"";

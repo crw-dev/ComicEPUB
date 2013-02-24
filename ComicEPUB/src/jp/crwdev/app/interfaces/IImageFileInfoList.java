@@ -42,4 +42,11 @@ public interface IImageFileInfoList {
 	 * @return
 	 */
 	public IImageFileInfoList renew();
+	
+	
+	/**
+	 * ソート
+	 */
+	public void sort();
+	
 }

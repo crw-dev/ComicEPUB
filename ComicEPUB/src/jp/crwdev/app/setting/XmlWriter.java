@@ -192,8 +192,19 @@ public class XmlWriter {
 			parent = mRootElement;
 		}
 		
+		boolean isEnable = info.isEnable();
+		if(isEnable && info instanceof ImageFileInfoSplitWrapper){
+			ImageFileInfoSplitWrapper wrap = (ImageFileInfoSplitWrapper)info;
+			for(int i=0; i<wrap.getRelativeSplitInfoSize(); i++){
+				if(!wrap.getRelativeSplitInfo(i).isEnable()){
+					isEnable = false;
+					break;
+				}
+			}
+		}
+		
 		ImageFilterParam param = info.getFilterParam();
-		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE){
+		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE || !isEnable){
 		
 			if(param.getSplitType() == SplitFilter.TYPE_NONE || (param.getSplitType() != SplitFilter.TYPE_NONE && param.getSplitIndex() == 0)){
 				
@@ -226,6 +237,9 @@ public class XmlWriter {
 
 		//<split>
 		Element splitElem = mDocument.createElement("split");
+		//if(!info.isEnable()){
+		//	splitElem.setAttribute("enable", Boolean.toString(info.isEnable()));
+		//}
 
 		
 		splitElem.setAttribute("type", Integer.toString(splitType));
@@ -244,12 +258,23 @@ public class XmlWriter {
 		if(info instanceof ImageFileInfoSplitWrapper){
 			ImageFileInfoSplitWrapper wrapInfo = (ImageFileInfoSplitWrapper)info;
 			int size = wrapInfo.getRelativeSplitInfoSize();
+			String disable = "";
 			for(int i=0; i<size; i++){
+				IImageFileInfo winfo = wrapInfo.getRelativeSplitInfo(i);
+				if(!winfo.isEnable()){
+					disable += "," + i;
+				}
 				ImageFilterParam sparam = wrapInfo.getRelativeSplitInfoFilterParam(i);
 				writeParam(splitElem, sparam);
 			}
+			if(!disable.isEmpty()){
+				splitElem.setAttribute("disable", disable.substring(1));
+			}
 		}
 		else{
+			if(!info.isEnable()){
+				splitElem.setAttribute("disable", "0");
+			}
 			writeParam(splitElem, param);
 		}
 		
@@ -587,6 +612,17 @@ public class XmlWriter {
 			
 			int splitType = Integer.parseInt(type);
 			if(splitType == SplitFilter.TYPE_NONE){
+				//String enable = getAttributeValue(attrs, "enable");
+				//boolean value = true;
+				//if(!enable.isEmpty()){
+				//	value = Boolean.parseBoolean(enable);
+				//}
+				//info.setEnable(value);
+				String disable = getAttributeValue(attrs, "disable");
+				if(!disable.isEmpty()){
+					info.setEnable(false);
+				}
+				
 				// 分割無し
 				NodeList nodes = splitNode.getChildNodes();
 				for(int i=0; i<nodes.getLength(); i++){
@@ -613,6 +649,23 @@ public class XmlWriter {
 				ImageFileInfoSplitWrapper first = null;// = new ImageFileInfoSplitWrapper(info, 0);
 				
 				
+				String disable = getAttributeValue(attrs, "disable");
+				String[] svals = disable.split(",");
+				boolean[] vals = null;
+				if(!disable.isEmpty() && svals.length > 0){
+					vals = new boolean[nodes.getLength()];
+					for(int i=0; i<vals.length; i++){
+						vals[i] = true;
+					}
+					for(int i=0; i<svals.length; i++){
+						try {
+							int index = Integer.parseInt(svals[i]);
+							vals[index] = false;
+						}catch(NumberFormatException e){
+						}
+					}
+				}
+
 				for(int i=0; i<nodes.getLength(); i++){
 					Node node = nodes.item(i);
 					ImageFileInfoSplitWrapper relWrapInfo = new ImageFileInfoSplitWrapper(info, i /*dummy*/);
@@ -623,6 +676,9 @@ public class XmlWriter {
 					}
 					first.addRelativeSplitInfo(relWrapInfo);
 					relWrapInfo.setFirstSplitInfo(first);
+					if(vals != null){
+						relWrapInfo.setEnable(vals[i]);
+					}
 				}
 				
 				mSpInfoMap.put(info, first);

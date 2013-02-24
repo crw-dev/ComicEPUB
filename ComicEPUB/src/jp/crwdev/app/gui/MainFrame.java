@@ -220,6 +220,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 							// 出力設定を設定画面に反映
 							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
 		
+							list.sort();
 							mTable.setImageFileInfoList(list);
 							
 							if(params != null){
@@ -437,6 +438,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 		case EventObserver.EventType_UpdateFilterParamSet:
 			mIsSettingChanged = true;
 			updateBaseFilterParam((ImageFilterParamSet)obj);
+			break;
+		case EventObserver.EventType_ModifiedSetting:
+			mIsSettingChanged = true;
 			break;
 		case EventObserver.EventType_BeginConvert:
 			beginConvert();

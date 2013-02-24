@@ -73,7 +73,19 @@ public interface IImageFileInfo {
 	 * @param param
 	 */
 	void setFilterParam(ImageFilterParam param);
-
+	
+	/**
+	 * 有効フラグ設定
+	 * @param enable
+	 */
+	void setEnable(boolean enable);
+	
+	/**
+	 * 有効フラグ
+	 * @return
+	 */
+	boolean isEnable();
+	
 	/**
 	 * リソース解放
 	 */

@@ -21,7 +21,7 @@ public class SplitFilter implements IImageFilter {
 	public static final int TYPE_L2R_3x3 = 6;
 	public static final int TYPE_CUSTOM = 10;
 	
-	public static final float duplicateMargin = 0.02f;	// 重複領域
+	public static final float duplicateMargin = 0.00f;	// 重複領域
 	
 	
 	/**

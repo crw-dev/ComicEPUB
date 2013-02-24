@@ -89,6 +89,9 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				}
 				
 				IImageFileInfo info = list.get(i);
+				if(!info.isEnable()){
+					continue;
+				}
 			
 				BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
 				if(mBaseFilter != null){

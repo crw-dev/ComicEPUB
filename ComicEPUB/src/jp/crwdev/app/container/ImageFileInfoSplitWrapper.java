@@ -24,6 +24,9 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	/** index=0以外のWrapperはindex=0への参照を持つ */
 	private ImageFileInfoSplitWrapper mFirstWrapper = null;
 	
+	/** 有効フラグ */
+	boolean mIsEnable = true;
+	
 	/**
 	 * コンストラクタ
 	 * @param info 画像ファイル情報元データ
@@ -72,6 +75,17 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 		}
 	}
 	
+	@Override
+	public void setEnable(boolean enable){
+		mIsEnable = enable;
+	}
+	
+	@Override
+	public boolean isEnable(){
+		return mIsEnable;
+	}
+
+
 	/**
 	 * 元ファイル情報取得
 	 * @return

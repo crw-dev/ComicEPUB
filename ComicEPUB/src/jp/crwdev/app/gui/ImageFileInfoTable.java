@@ -68,7 +68,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		for(int i=0; i<Constant.TABLE_HEADER_COLUMNS.length; i++){
 	        TableColumn col = getColumnModel().getColumn( i );
 	        col.setMinWidth(50);
-	        col.setMaxWidth(200);
+//	        col.setMaxWidth(200);
 		}
 
 		setEventListener();
@@ -95,13 +95,19 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			//c.setBackground(Color.MAGENTA);
 		}
 		else{
-			ImageFilterParam param = mInfoList.get(row).getFilterParam();
-			if(param.isEdit()){
-				c.setBackground(Color.YELLOW);
+			IImageFileInfo info = mInfoList.get(row);
+			if(!info.isEnable()){
+				c.setBackground(Color.GRAY);
 			}
 			else{
-				boolean pict = (param.getPageType() == Constant.PAGETYPE_PICT);
-				c.setBackground(pict ? Color.ORANGE: getBackground());
+				ImageFilterParam param = mInfoList.get(row).getFilterParam();
+				if(param.isEdit()){
+					c.setBackground(Color.YELLOW);
+				}
+				else{
+					boolean pict = (param.getPageType() == Constant.PAGETYPE_PICT);
+					c.setBackground(pict ? Color.ORANGE: getBackground());
+				}
 			}
 		}
 		return c;
@@ -215,6 +221,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						//TODO
 						// FileInfo更新通知
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
+						mEventSender.setModified();
 
 						update = true;
 					}
@@ -518,13 +525,14 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							int rowCount = table.getRowCount();
-							int listIndex = 0;
+							//int listIndex = 0;
 							for(int i=0; i<rowCount; i++){
 								if(table.isRowSelected(i)){
-									mInfoList.remove(listIndex);
-									continue;
+									mInfoList.get(i).setEnable(false);
+									//mInfoList.remove(listIndex);
+									//continue;
 								}
-								listIndex++;
+								//listIndex++;
 							}
 							
 							renewalList();
@@ -532,18 +540,19 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							//deleteItem(selected);
 						}
 					});
-					JMenuItem item1 = new JMenuItem("選択アイテム以外削除");
+					JMenuItem item1 = new JMenuItem("選択アイテム削除取り消し");
 					item1.addActionListener(new ActionListener(){
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							int rowCount = table.getRowCount();
-							int listIndex = 0;
+							//int listIndex = 0;
 							for(int i=0; i<rowCount; i++){
-								if(!table.isRowSelected(i)){
-									mInfoList.remove(listIndex);
-									continue;
+								if(table.isRowSelected(i)){
+									mInfoList.get(i).setEnable(true);
+									//mInfoList.remove(listIndex);
+									//continue;
 								}
-								listIndex++;
+								//listIndex++;
 							}
 							
 							renewalList();
@@ -614,6 +623,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	public void renewalList(){
 		if(mInfoList != null){
 			setImageFileInfoList(mInfoList.renew());
+			mEventSender.setModified();
 		}
 	}
 

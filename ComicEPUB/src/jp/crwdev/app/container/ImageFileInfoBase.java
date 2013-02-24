@@ -26,6 +26,8 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	protected int mHeight;
 	/** 画像サイズ */
 	protected long mSize;
+	/** 有効フラグ */
+	protected boolean mIsEnable = true;
 	
 	/**
 	 * 基本データの読み込み
@@ -124,6 +126,16 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 				reader.dispose();
 			}
 		}
+	}
+	
+	@Override
+	public void setEnable(boolean enable){
+		mIsEnable = enable;
+	}
+	
+	@Override
+	public boolean isEnable(){
+		return mIsEnable;
 	}
 
 	/**

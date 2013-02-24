@@ -96,6 +96,10 @@ public class ZipImageFileWriter implements IImageFileWriter {
 			
 			for(int i=0; i<size; i++){
 				IImageFileInfo info = list.get(i);
+				if(!info.isEnable()){
+					continue;
+				}
+				
 				BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
 				if(mBaseFilter != null){
 					image = mBaseFilter.filter(image, info.getFilterParam());
