@@ -458,7 +458,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("<!-- image -->\n");
 		int size = list.size();
 		for(int i=0; i<size; i++){
-			if(list.get(i).isEnable()){
+			if(!list.get(i).isEnable()){
 				continue;
 			}
 			String properties = "";
