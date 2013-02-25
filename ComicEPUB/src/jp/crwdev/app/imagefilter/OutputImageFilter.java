@@ -71,9 +71,6 @@ public class OutputImageFilter implements IImageFilter {
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		ImageFilterParam newParam = mBaseFilterParams.createMergedFilterParam(param);
-		if(!param.isEnable()){
-			return image;
-		}
 
 		for(IImageFilter filter : mFilters){
 			image = filter.filter(image, newParam);
