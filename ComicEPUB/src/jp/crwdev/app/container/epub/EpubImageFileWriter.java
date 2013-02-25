@@ -457,38 +457,44 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		sb.append("<!-- image -->\n");
 		int size = list.size();
+		int index = 0;
 		for(int i=0; i<size; i++){
 			if(!list.get(i).isEnable()){
 				continue;
 			}
 			String properties = "";
-			if(!getImageProperties(i).equals("")){
-				properties = " properties=\"" + getImageProperties(i) + "\"";
+			if(!getImageProperties(index).equals("")){
+				properties = " properties=\"" + getImageProperties(index) + "\"";
 			}
-			sb.append("<item media-type=\"" + getMimeType("jpg") + "\" id=\"" + getImageId(i) + "\" href=\"image/" + getImageFileName(i, ".jpg") + "\"" + properties + "/>\n");
+			sb.append("<item media-type=\"" + getMimeType("jpg") + "\" id=\"" + getImageId(index) + "\" href=\"image/" + getImageFileName(index, ".jpg") + "\"" + properties + "/>\n");
+			index++;
 		}
 
 		sb.append("<!-- xhtml -->\n");
+		index = 0;
 		for(int i=0; i<list.size(); i++){
 			if(!list.get(i).isEnable()){
 				continue;
 			}
-			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(i)+ "\" href=\"xhtml/" + getXhtmlFileName(i) + "\" properties=\"svg\" fallback=\"" + getImageId(i) + "\"/>\n");
+			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(index)+ "\" href=\"xhtml/" + getXhtmlFileName(index) + "\" properties=\"svg\" fallback=\"" + getImageId(index) + "\"/>\n");
+			index++;
 		}
 
 		sb.append("</manifest>\n");
 		sb.append("<spine page-progression-direction=\"rtl\">\n");
 		
 		sb.append("<!-- itemref -->\n");
+		index = 0;
 		for(int i=0; i<size; i++){
 			if(!list.get(i).isEnable()){
 				continue;
 			}
 			String properties = "";
-			if(!getItemRefProperties(i).equals("")){
-				properties = " properties=\"" + getItemRefProperties(i) + "\"";
+			if(!getItemRefProperties(index).equals("")){
+				properties = " properties=\"" + getItemRefProperties(index) + "\"";
 			}
-			sb.append("<itemref linear=\"yes\" idref=\"" + getXhtmlId(i) + "\"" + properties + "/>\n");
+			sb.append("<itemref linear=\"yes\" idref=\"" + getXhtmlId(index) + "\"" + properties + "/>\n");
+			index++;
 		}
 		
 		sb.append("</spine>\n");

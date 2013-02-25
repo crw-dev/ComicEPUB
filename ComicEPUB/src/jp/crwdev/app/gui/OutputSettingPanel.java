@@ -92,6 +92,24 @@ public class OutputSettingPanel extends JPanel {
 		outputFileType.addItem("folder");
 		outputFileType.addItem("epub");
 		outputFileType.addItem("pdf");
+		
+		outputFileType.setSelectedIndex(0);
+		outputBookType.setEnabled(false);
+
+		outputFileType.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("comboBoxChanged")){
+					String selected = (String)outputFileType.getSelectedItem();
+					if(selected.equalsIgnoreCase("epub")){
+						outputBookType.setEnabled(true);
+					}
+					else{
+						outputBookType.setEnabled(false);
+					}
+				}
+			}
+		});
 
 		chooseFolderButton.addActionListener(new ActionListener(){
 			@Override
