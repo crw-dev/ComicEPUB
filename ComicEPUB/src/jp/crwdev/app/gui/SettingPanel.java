@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
@@ -25,8 +26,8 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	private OutputSettingPanel mOutputSetting = new OutputSettingPanel();
 	private ProgressPanel mProgressPanel = new ProgressPanel();
 
-	public SettingPanel(){
-		super();
+	public SettingPanel(JFrame parent){
+		super(parent);
 		
 		mPreviewSetting.setComponents(this, checkPreview, checkResize);
 		

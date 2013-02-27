@@ -1,5 +1,6 @@
 ﻿package jp.crwdev.app.constant;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,5 +139,62 @@ public class Constant {
 			return SplitFilter.TYPE_CUSTOM;
 		}
 		return SplitFilter.TYPE_NONE;
+	}
+	
+	public static File getContentFile(File contentPath){
+		if(contentPath.isDirectory()){
+			return contentPath;
+		}
+		else{
+			String fileName = contentPath.getAbsolutePath();
+			int dotIndex = fileName.lastIndexOf(".");
+			String suffix = "";
+			if(dotIndex >= 0){
+				suffix = fileName.substring(dotIndex + 1);
+			}
+			if(Constant.SUPPORT_INPUT_PREFIX.contains(suffix.toLowerCase())){
+				return contentPath;
+			}
+			else{
+				return contentPath.getParentFile();
+			}
+		}
+	}
+	public static File getSettingFile(File contentPath){
+		if(contentPath.isDirectory()){
+			String settingFileName = contentPath.getName() + "_setting.xml";
+			File settingFile = new File(contentPath, settingFileName);
+			if(settingFile.exists() && !settingFile.isDirectory()){
+				return settingFile;
+			}
+		}
+		else{
+			String fileName = contentPath.getAbsolutePath();
+			int dotIndex = fileName.lastIndexOf(".");
+			String suffix = "";
+			if(dotIndex >= 0){
+				suffix = fileName.substring(dotIndex + 1);
+			}
+			if(Constant.SUPPORT_INPUT_PREFIX.contains(suffix.toLowerCase())){
+				String filenameNoSuffix = fileName;
+				if(dotIndex >= 0){
+					filenameNoSuffix = fileName.substring(0, dotIndex);
+				}
+				String settingFileName = filenameNoSuffix + "_setting.xml";
+				File settingFile = new File(settingFileName);
+				if(settingFile.exists() && !settingFile.isDirectory()){
+					return settingFile;
+				}
+			}else{
+				String parent = contentPath.getParent();
+				File parentFolder = new File(parent);
+				String settingFileName = parentFolder.getName() + "_setting.xml";
+				File settingFile = new File(parentFolder, settingFileName);
+				if(settingFile.exists() && !settingFile.isDirectory()){
+					return settingFile;
+				}
+			}
+		}
+		return null;
 	}
 }

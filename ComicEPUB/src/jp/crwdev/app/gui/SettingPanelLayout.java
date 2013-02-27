@@ -1,9 +1,12 @@
 package jp.crwdev.app.gui;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JCheckBox;
@@ -31,13 +34,18 @@ public class SettingPanelLayout extends JPanel {
 	protected JButton outpuFolderButton;
 	protected JButton convertButton;
 	protected JButton cancelButton;
+	protected JButton packageConvertButton;
 	protected JLabel labelMessage;
 	protected JProgressBar progressBar;
+	
+	protected JFrame mParentFrame;
 	
 	/**
 	 * Create the panel.
 	 */
-	public SettingPanelLayout() {
+	public SettingPanelLayout(JFrame parent) {
+		mParentFrame = parent;
+		
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		
@@ -119,6 +127,11 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, convertButton, 0, SpringLayout.EAST, tabbedPane);
 		add(convertButton);
 		
+		packageConvertButton = new JButton("一括変換");
+		springLayout.putConstraint(SpringLayout.NORTH, packageConvertButton, 6, SpringLayout.SOUTH, outpuFolderButton);
+		springLayout.putConstraint(SpringLayout.WEST, packageConvertButton, 0, SpringLayout.WEST, checkPreview);
+		add(packageConvertButton);
+		
 		cancelButton = new JButton("キャンセル");
 		springLayout.putConstraint(SpringLayout.SOUTH, cancelButton, -3, SpringLayout.SOUTH, this);
 		springLayout.putConstraint(SpringLayout.EAST, cancelButton, 0, SpringLayout.EAST, tabbedPane);
@@ -136,6 +149,13 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, labelMessage, 0, SpringLayout.EAST, tabbedPane);
 		add(labelMessage);
 
+		
+		packageConvertButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new BatWorkDialog(mParentFrame);
+			}
+		});
 	}
 	
 	

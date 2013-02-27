@@ -45,7 +45,23 @@ public class BlurFilter implements IImageFilter {
 			blurOp.filter(image, dest); // ぼかし 
 		}
 		else{
-			float[] sharp = {0.0f,-1.0f,0.0f,-1.0f,5.0f,-1.0f,0.f,-1.0f,0.0f}; 
+//		      float f0 = - 0.1f;
+//		      float f1 = -0.3f;
+//		      float f2 = 3.0f;
+//		      float[] matrix = {
+//		          f0,f0,f0,f0,f0,
+//		          f0,f1,f1,f1,f0,
+//		          f0,f1,f2,f1,f0,
+//		          f0,f1,f1,f1,f0,
+//		          f0,f0,f0,f0,f0};
+//		     Kernel sharpCarnel2 = new Kernel(5,5,matrix);
+//				ConvolveOp sharpOp = new ConvolveOp(sharpCarnel2, ConvolveOp.EDGE_NO_OP, null); 
+//				sharpOp.filter(image, dest); // シャープ 
+		      
+			float[] sharp =	{-0.06f, -0.11f, -0.06f,  //operator[1] 鮮鋭化
+				       -0.11f,  1.68f, -0.11f,
+				       -0.06f, -0.11f, -0.06f};
+//			float[] sharp = {0.0f,-1.0f,0.0f,-1.0f,5.0f,-1.0f,0.f,-1.0f,0.0f}; 
 			Kernel sharpKernel = new Kernel(3, 3, sharp); 
 			ConvolveOp sharpOp = new ConvolveOp(sharpKernel, ConvolveOp.EDGE_NO_OP, null); 
 			sharpOp.filter(image, dest); // シャープ 

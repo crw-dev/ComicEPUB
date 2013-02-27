@@ -111,7 +111,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     mImagePanel = imagePanel;
 
 	     // SettingPanel
-	     SettingPanel settingPanel = new SettingPanel();
+	     SettingPanel settingPanel = new SettingPanel(this);
 	     settingPanel.setPreferredSize(new Dimension(250, 800));
 	     //settingPanel.setSize(300,800);
 	     //settingPanel.setMinimumSize(new Dimension(300, 800));

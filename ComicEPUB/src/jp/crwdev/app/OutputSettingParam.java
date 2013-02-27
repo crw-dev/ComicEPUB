@@ -150,12 +150,28 @@ public class OutputSettingParam {
 	}
 	
 	/**
+	 * EPUBのBook typeを設定
+	 * @param bookType
+	 */
+	public void setEpubType(String bookType){
+		mOutputEpubType = bookType;
+	}
+	
+	/**
 	 * FileType取得
 	 */
 	public String getFileType(){
 		return mOutputFileType;
 	}
 	
+	/**
+	 * FileTypeを設定
+	 * @param fileType
+	 */
+	public void setFileType(String fileType){
+		mOutputFileType = fileType;
+	}
+
 	/**
 	 * 出力画像サイズを設定
 	 * @param width

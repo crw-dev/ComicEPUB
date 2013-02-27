@@ -135,6 +135,10 @@ public class XmlWriter {
 		}
 
 		//TODO:
+		
+		parent.setAttribute("fileType", output.getFileType());
+		parent.setAttribute("bookType", output.getEpubType());
+		
 		// <folder>
 		String outputFolder = output.getOutputPath();
 		if(!outputFolder.isEmpty()){
@@ -406,11 +410,11 @@ public class XmlWriter {
 	}
 	
 	
-	public void openLoadSettingFile(String filepath){
+	public boolean openLoadSettingFile(String filepath){
 		try {
 			File file = new File(filepath);
 			if(!file.exists()){
-				return;
+				return false;
 			}
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
@@ -420,16 +424,15 @@ public class XmlWriter {
 			factory.setValidating(false);
 			Document document = builder.parse("file:///" + filepath);
 			mDocument = document;
+			return true;
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
 	
@@ -438,10 +441,13 @@ public class XmlWriter {
 			return;
 		}
 		
-		HashMap<String, IImageFileInfo> map = new HashMap<String, IImageFileInfo>();
-		for(int i=0; i<list.size(); i++){
-			IImageFileInfo info = list.get(i);
-			map.put(info.getFileName(), info);
+		HashMap<String, IImageFileInfo> map = null;
+		if(list != null){
+			map = new HashMap<String, IImageFileInfo>();
+			for(int i=0; i<list.size(); i++){
+				IImageFileInfo info = list.get(i);
+				map.put(info.getFileName(), info);
+			}
 		}
 		
 		NodeList topNodes = mDocument.getChildNodes();
@@ -456,19 +462,25 @@ public class XmlWriter {
 				Node node = settingNodes.item(i);
 				String name = node.getNodeName();
 				if(name.equalsIgnoreCase("output")){
-					loadOutput(node, output);
+					if(output != null){
+						loadOutput(node, output);
+					}
 				}
 				else if(name.equalsIgnoreCase("base")){
-					NodeList baseNodes = node.getChildNodes();
-					for(int n=0; n<baseNodes.getLength(); n++){
-						loadFilterBase(baseNodes.item(n), baseParams);
-						//loadParam(baseNodes.item(n), baseParam);
+					if(baseParams != null){
+						NodeList baseNodes = node.getChildNodes();
+						for(int n=0; n<baseNodes.getLength(); n++){
+							loadFilterBase(baseNodes.item(n), baseParams);
+							//loadParam(baseNodes.item(n), baseParam);
+						}
 					}
 				}
 				else if(name.equalsIgnoreCase("infos")){
-					NodeList infosNodes = node.getChildNodes();
-					for(int n=0; n<infosNodes.getLength(); n++){
-						loadInfo(infosNodes.item(n), map);
+					if(list != null){
+						NodeList infosNodes = node.getChildNodes();
+						for(int n=0; n<infosNodes.getLength(); n++){
+							loadInfo(infosNodes.item(n), map);
+						}
 					}
 				}
 			}
@@ -532,6 +544,18 @@ public class XmlWriter {
 	private void loadOutput(Node outputNode, OutputSettingParam output){
 		if(outputNode.getNodeName().equalsIgnoreCase("output")){
 			//TODO:
+			NamedNodeMap outputAttrs = outputNode.getAttributes();
+			String fileType = getAttributeValue(outputAttrs, "fileType");
+			if(fileType.isEmpty()){
+				fileType = "zip";
+			}
+			String bookType = getAttributeValue(outputAttrs, "bookType");
+			if(bookType.isEmpty()){
+				bookType = "book";
+			}
+			
+			output.setFileType(fileType);
+			output.setEpubType(bookType);
 
 			NodeList nodes = outputNode.getChildNodes();
 			for(int i=0; i<nodes.getLength(); i++){

@@ -32,7 +32,7 @@ public class OutputImageFilter implements IImageFilter {
 		mFilters.add(new GrayscaleFilter());
 		mFilters.add(new BlurFilter(true));
 		mFilters.add(new ResizeFilter());
-		//mFilters.add(new BlurFilter(false));
+//		mFilters.add(new BlurFilter(false));
 	}
 	
 	/**

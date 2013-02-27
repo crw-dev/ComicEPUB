@@ -16,7 +16,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -60,8 +59,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		};
 
 		setModel(mTableModel);
-			
-			
+		
 		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
@@ -145,7 +143,13 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				
 				mEventSender.setProgressMessage(String.format("%d / %d", (index+1), total));
 				
-				info.update();
+				try {
+					info.update();
+				}catch(Exception e){
+					e.printStackTrace();
+				}catch(OutOfMemoryError e){
+					e.printStackTrace();
+				}
 				
 				mTableModel.setValueAt(Integer.toString(info.getWidth()), index, Constant.TABLE_COLUMN_WIDTH);
 				mTableModel.setValueAt(Integer.toString(info.getHeight()), index, Constant.TABLE_COLUMN_HEIGHT);
