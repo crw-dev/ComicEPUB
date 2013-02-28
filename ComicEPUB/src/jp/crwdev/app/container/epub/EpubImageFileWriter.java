@@ -30,6 +30,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	private final static String STYLE_FILENAME = "fixed-layout-jp.css";
 	private final static String OPF_FILENAME = "standard.opf";
 	private final static String NCX_FILENAME = "toc.ncx";
+	private final static String NAVIGATION_FILENAME = "navigation-documents.xhtml";
 	private final static String ITEM_DIR = "OEBPS";
 	private final static String STYLE_DIR = ITEM_DIR + "/" + "style";
 	private final static String IMAGE_DIR = ITEM_DIR + "/" + "image";
@@ -132,6 +133,8 @@ public class EpubImageFileWriter implements IImageFileWriter {
 
 		    mkdir(ITEM_DIR, zipOut);
 		    writeStandardOpf(zipOut, list, uuid, mBookType, mTitle, mTitleKana, "", 0, mAuthor, mAuthorKana, -1, -1);
+		    
+		    writeNavigationFile(zipOut);
 
 		}catch(Exception e){
 			if(!e.getMessage().equals("user cancel")){
@@ -225,7 +228,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		out.println("html {");
 		out.println("  writing-mode: tb-rl;");
-		out.println("  direction: rtl;");
+		//out.println("  direction: rtl;");
 		out.println("}");
 		out.println("body {");
 		out.println("  top: 0px;");
@@ -334,7 +337,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-		sb.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\" \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n");
+		//sb.append("<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\" \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n");
 		sb.append("<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\">\n");
 		sb.append("<head>\n");
 		sb.append("  <meta name=\"dtb:uid\" content=\"" + uuid + "\" />\n");
@@ -360,6 +363,41 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		out.flush();
 		
 		zipOut.closeEntry();
+	}
+	
+	private void writeNavigationFile(ZipOutputStream zipOut) throws IOException{
+		zipOut.putNextEntry(new ZipEntry(ITEM_DIR + "/" + NAVIGATION_FILENAME));
+
+		String filename = getXhtmlFileName(0);
+
+		PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
+
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		sb.append("<!DOCTYPE html>\n");
+		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:epub=\"http://www.idpf.org/2007/ops\" xml:lang=\"ja\">\n");
+		sb.append("<head>\n");
+		sb.append("<meta charset=\"UTF-8\"/>\n");
+		sb.append("<title>Navigation</title>\n");
+		sb.append("</head>\n");
+		sb.append("<body>\n");
+		sb.append("<nav epub:type=\"toc\" id=\"toc\">\n");
+		sb.append("<h1>Navigation</h1>\n");
+		sb.append("<ol>\n");
+		sb.append("<li><a href=\"xhtml/" + filename + "\">表紙</a></li>\n");
+		sb.append("</ol>\n");
+		sb.append("</nav>\n");
+		sb.append("</body>\n");
+		sb.append("</html>\n");
+
+
+		out.write(new String(sb));
+		
+		out.flush();
+		
+		zipOut.closeEntry();
+
 	}
 	
 	private void writeStandardOpf(ZipOutputStream zipOut, IImageFileInfoList list, String uuid, String booktype, String title, String title_kana, String seriesTitle, int serieseNum, String creator, String creator_kana, int baseWidth, int baseHeight) throws IOException {
@@ -392,7 +430,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		String datatype = booktype; //"comic";// "magazine", "book"
 		String date = String.format("%04d-%02d-%02dT00:00:00Z", modifiedDate.getYear()+1900, modifiedDate.getMonth()+1, modifiedDate.getDate());
 		String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-				+ "<package xmlns=\"http://www.idpf.org/2007/opf\" version=\"3.0\" xml:lang=\"ja\" unique-identifier=\"" + uuid + "\"\n"
+				+ "<package xmlns=\"http://www.idpf.org/2007/opf\" version=\"3.0\" xml:lang=\"ja\" unique-identifier=\"BookID\"\n" //=\"" + uuid + "\"\n"
 				+ "prefix=\"rendition: http://www.idpf.org/vocab/rendition/#\n"
 				+ "         ebpaj: http://www.ebpaj.jp/\n"
 				+ "         fixed-layout-jp: http://www.digital-comic.jp/\">\n"
@@ -400,22 +438,20 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				+ "<!--  作品名 -->\n";
 			head += titleTag(title, title_kana, serieseTitle, serieseNum);
 			head += "<!--  著者名 -->\n"
-				+ "<dc:creator id=\"creator01\">" + creator + "</dc:creator>\n"
-				+ "<meta refines=\"#creator01\" property=\"role\" scheme=\"marc:relators\">aut</meta>\n"
-				+ "<meta refines=\"#creator01\" property=\"file-as\">" + creator_kana + "</meta>\n"
+				+ authorTag(creator, creator_kana)
 				+ "<!--  出版社名 -->\n"
-				+ "<dc:publisher id=\"publisher\">" + publisher + "</dc:publisher>\n"
-				+ "<meta refines=\"#publisher\" property=\"file-as\">" + publisher_kana + "</meta>\n"
+				+ publisherTag(publisher, publisher_kana)
 				+ "<!--  言語 -->\n"
 				+ "<dc:language>ja</dc:language>\n"
 				+ "<!--  ファイルid -->\n"
-				+ "<dc:identifier id=\"unique-id\">urn:uuid:" + uuid + "</dc:identifier>\n"
+				+ "<dc:identifier id=\"BookID\">urn:uuid:" + uuid + "</dc:identifier>\n"
 				+ "<!--  更新日 -->\n"
 				+ "<meta property=\"dcterms:modified\">" + date + "</meta>\n"
 				+ "<meta property=\"prs:datatype\">" + datatype + "</meta>\n"
 				+ "<!-- Fixed-Layout Documents指定 -->\n"
 				+ "<meta property=\"rendition:layout\">pre-paginated</meta>\n"
 				+ "<meta property=\"rendition:spread\">landscape</meta>\n";
+			
 			if(baseWidth > 0 && baseHeight > 0){
 				head += "<!--  基準サイズ -->\n"
 				+ "<meta property=\"fixed-layout-jp:viewport\">width=" + baseWidth + ", height=" + baseHeight + "</meta>\n";
@@ -426,6 +462,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				+ "</metadata>\n"
 				+ "<manifest>\n"
 				+ "<!-- navigation -->\n"
+				+ "<item media-type=\"application/xhtml+xml\" id=\"toc\" href=\"navigation-documents.xhtml\" properties=\"nav\" />\n"
 				+ "<item href=\"toc.ncx\" id=\"ncx\" media-type=\"application/x-dtbncx+xml\" />\n"
 				+ "<!-- style -->\n"
 				+ "<item media-type=\"text/css\" id=\"fixed-layout-jp\" href=\"style/fixed-layout-jp.css\"/>\n";
@@ -435,22 +472,50 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	private String getStandardOpfFoot(){
 		return "</package>";
 	}
+	
 	private String titleTag(String displayTitle, String displayTitleKana, String seriesTitle, int seriesPosition){
 		StringBuilder sb = new StringBuilder();
 		
 		if(seriesTitle == null || seriesTitle.length() == 0){
 			sb.append("<dc:title id=\"title\">" + displayTitle + "</dc:title>\n");
-			sb.append("<meta refines=\"#title\" property=\"file-as\">" + displayTitleKana + "</meta>\n");
+			if(displayTitleKana != null && !displayTitleKana.isEmpty()){
+				sb.append("<meta refines=\"#title\" property=\"file-as\">" + displayTitleKana + "</meta>\n");
+			}
 		}
 		else{
 			sb.append("<dc:title id=\"t1\">" + displayTitle + "</dc:title>\n");
-			sb.append("<meta refines=\"#t1\" property=\"title-type\">main</meta>\n");
-			sb.append("<meta refines=\"#t1\" property=\"file-as\">" + displayTitleKana + "</meta>\n");
+			if(displayTitleKana != null && !displayTitleKana.isEmpty()){
+				sb.append("<meta refines=\"#t1\" property=\"title-type\">main</meta>\n");
+				sb.append("<meta refines=\"#t1\" property=\"file-as\">" + displayTitleKana + "</meta>\n");
+			}
 		}
 	    
 		return new String(sb);
 	}
-
+	private String authorTag(String creator, String creator_kana){
+		
+		if(creator == null || creator.isEmpty()){
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("<dc:creator id=\"creator01\">" + creator + "</dc:creator>\n");
+		sb.append("<meta refines=\"#creator01\" property=\"role\" scheme=\"marc:relators\">aut</meta>\n");
+		if(creator_kana != null && !creator_kana.isEmpty()){
+			sb.append("<meta refines=\"#creator01\" property=\"file-as\">" + creator_kana + "</meta>\n");
+		}
+		return new String(sb);
+	}
+	private String publisherTag(String publisher, String publisher_kana){
+		if(publisher == null || publisher.isEmpty()){
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("<dc:creator id=\"publisher\">" + publisher + "</dc:creator>\n");
+		if(publisher_kana != null && !publisher_kana.isEmpty()){
+			sb.append("<meta refines=\"#publisher\" property=\"file-as\">" + publisher_kana + "</meta>\n");
+		}
+		return new String(sb);
+	}
 	
 	public String getStandardOpfBody(IImageFileInfoList list){
 		StringBuilder sb = new StringBuilder();
@@ -481,7 +546,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		}
 
 		sb.append("</manifest>\n");
-		sb.append("<spine page-progression-direction=\"rtl\">\n");
+		sb.append("<spine page-progression-direction=\"rtl\" toc=\"ncx\">\n");
 		
 		sb.append("<!-- itemref -->\n");
 		index = 0;

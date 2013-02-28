@@ -374,6 +374,12 @@ public class XmlWriter {
 			elem.setAttribute("value", Float.toString(param.getBlurPixels()));
 			paramElem.appendChild(elem);
 		}
+		if(param.isSharpness()){
+			Element elem = mDocument.createElement("sharpness");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("value", Float.toString(param.getSharpnessPixels()));
+			paramElem.appendChild(elem);
+		}
 		if(param.isGrayscale()){
 			Element elem = mDocument.createElement("grayscale");
 			elem.appendChild(mDocument.createTextNode("true"));
@@ -793,6 +799,12 @@ public class XmlWriter {
 					String value = getAttributeValue(attrs, "value");
 					param.setBlur(Boolean.parseBoolean(enable));
 					param.setBlurPixels(Float.parseFloat(value));
+				}
+				else if(name.equalsIgnoreCase("sharpness")){
+					String enable = node.getFirstChild().getNodeValue();
+					String value = getAttributeValue(attrs, "value");
+					param.setSharpness(Boolean.parseBoolean(enable));
+					param.setSharpnessPixels(Float.parseFloat(value));
 				}
 				else if(name.equalsIgnoreCase("grayscale")){
 					String enable = node.getFirstChild().getNodeValue();

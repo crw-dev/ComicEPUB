@@ -483,7 +483,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			}
 			// 出力処理開始
 			final int rowIndex = index;
-			writer.write(list, new OnProgressListener(){
+			boolean result = writer.write(list, new OnProgressListener(){
 				private int preProgress = 0;
 				@Override
 				public void onProgress(int progress, String message) {
@@ -506,7 +506,11 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			if(mIsCancel){
 				updateStatus(index, "キャンセル");
 			}else{
-				updateStatus(index, "変換済み");
+				if(result){
+					updateStatus(index, "変換済み");
+				}else{
+					updateStatus(index, "変換失敗");
+				}
 			}
 		}
 		else{

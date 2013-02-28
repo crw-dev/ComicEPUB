@@ -33,6 +33,7 @@ public class SettingTabPanel extends JPanel {
 	// CheckBox
 	public JCheckBox checkEnable = new JCheckBox("無変換");
 	public JCheckBox checkBlur = new JCheckBox("ぼかし");
+	public JCheckBox checkSharpness = new JCheckBox("シャープネス");
 	public JCheckBox checkContrast = new JCheckBox("コントラスト");
 	public JCheckBox checkGamma = new JCheckBox("ガンマ補正");
 	public JCheckBox checkGrayscale = new JCheckBox("グレースケール");
@@ -40,6 +41,7 @@ public class SettingTabPanel extends JPanel {
 	public JCheckBox checkUnification = new JCheckBox("本文ページサイズ統一");
 	
 	// Spinner
+	public JSpinner spinSharpness = new JSpinner();
 	public JSpinner spinGamma = new JSpinner();
 	public JSpinner spinCropLeft = new JSpinner();
 	public JSpinner spinCropRight = new JSpinner();
@@ -94,7 +96,16 @@ public class SettingTabPanel extends JPanel {
 		layout1.putConstraint(SpringLayout.WEST, checkBlur, 0, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, checkBlur, 0, SpringLayout.SOUTH, checkEnable);
 
+		// シャープネス
+		checkPanel.add(checkSharpness);
 		
+		layout1.putConstraint(SpringLayout.WEST, checkSharpness, 0, SpringLayout.EAST, checkBlur);
+		layout1.putConstraint(SpringLayout.NORTH, checkSharpness, 0, SpringLayout.NORTH, checkBlur);
+		
+		checkPanel.add(spinSharpness);
+		layout1.putConstraint(SpringLayout.WEST, spinSharpness, 0, SpringLayout.EAST, checkSharpness);
+		layout1.putConstraint(SpringLayout.BASELINE, spinSharpness, 0, SpringLayout.BASELINE, checkSharpness);
+
 		// グレースケール
 		checkPanel.add(checkGrayscale);
 
@@ -189,6 +200,9 @@ public class SettingTabPanel extends JPanel {
 		spinGamma.setPreferredSize(new Dimension(40, 20));
 		spinGamma.setModel(new SpinnerNumberModel(1.6f, 0.0f, 3.0f, 0.1f));
 		
+		mOldSharpLevel = 1;
+		spinSharpness.setPreferredSize(new Dimension(40, 20));
+		spinSharpness.setModel(new SpinnerNumberModel(1, 1, 10, 1));
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 
@@ -198,6 +212,7 @@ public class SettingTabPanel extends JPanel {
 		
 		checkEnable.addMouseListener(mouseClickAdapter);
 		checkBlur.addMouseListener(mouseClickAdapter);
+		checkSharpness.addMouseListener(mouseClickAdapter);
 		checkUnification.addMouseListener(mouseClickAdapter);
 		checkGrayscale.addMouseListener(mouseClickAdapter);
 		checkGamma.addMouseListener(mouseClickAdapter);
@@ -217,6 +232,19 @@ public class SettingTabPanel extends JPanel {
 			}
 		});
 		
+		spinSharpness.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				if(checkSharpness.isSelected()){
+					int sharpLevel = (Integer)spinSharpness.getValue();
+					if(mOldSharpLevel != sharpLevel){
+						mOldSharpLevel = sharpLevel;
+						updateSettingValues();
+					}
+				}
+			}
+		});
+
 		
 		sliderContrast.setMinimum(-255);
 		sliderContrast.setMaximum(255);
@@ -282,7 +310,9 @@ public class SettingTabPanel extends JPanel {
 			}
 			if(param.isBlur()){
 				checkBlur.setSelected(param.isBlur());
-				//TODO: value
+			}
+			if(param.isSharpness()){
+				checkSharpness.setSelected(param.isSharpness());
 			}
 			if(param.isGrayscale()){
 				checkGrayscale.setSelected(param.isGrayscale());
@@ -305,6 +335,7 @@ public class SettingTabPanel extends JPanel {
 		}else{
 			checkEnable.setSelected(param.isEnable());
 			checkBlur.setSelected(param.isBlur());
+			checkSharpness.setSelected(param.isSharpness());
 			checkContrast.setSelected(param.isContrast());
 			checkGamma.setSelected(param.isGamma());
 			checkGrayscale.setSelected(param.isGrayscale());
@@ -328,6 +359,12 @@ public class SettingTabPanel extends JPanel {
 			}
 		}
 		
+		if(param.isBlur()){
+			
+		}
+		if(param.isSharpness()){
+			spinSharpness.setValue((int)param.getSharpnessPixels());
+		}
 		
 		if(param.isGamma()){
 			spinGamma.setValue((float)param.getGamma());
@@ -384,6 +421,7 @@ public class SettingTabPanel extends JPanel {
 	public ImageFilterParam getImageFilterParam(){
 		boolean isEnable = checkEnable.isSelected();
 		boolean isBlur = checkBlur.isSelected();
+		boolean isSharpness = checkSharpness.isSelected();
 		boolean isContrast = checkContrast.isSelected();
 		boolean isGamma = checkGamma.isSelected();
 		boolean isGrayscale = checkGrayscale.isSelected();
@@ -411,7 +449,9 @@ public class SettingTabPanel extends JPanel {
 		
 		param.setEnable(isEnable);
 		param.setBlur(isBlur);
-		//TODO: blur value
+		param.setSharpness(isSharpness);
+		//TODO: blur/shapness value
+		param.setSharpnessPixels((Integer)spinSharpness.getValue());
 		param.setContrast(isContrast);
 		param.setGamma(isGamma);
 		param.setGrayscale(isGrayscale);
@@ -450,6 +490,8 @@ public class SettingTabPanel extends JPanel {
 			return false;
 		}
 	}
+	
+	private int mOldSharpLevel = 1;
 	
 	private double mOldGamma = 1.0f;
 	private double getGammaValue(){

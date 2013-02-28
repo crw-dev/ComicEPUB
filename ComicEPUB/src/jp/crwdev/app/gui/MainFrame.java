@@ -396,7 +396,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 						}
 						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "start");
 						// 出力処理開始
-						writer.write(list, new OnProgressListener(){
+						boolean result = writer.write(list, new OnProgressListener(){
 							@Override
 							public void onProgress(int progress, String message) {
 								if(message == null){
@@ -410,7 +410,12 @@ public class MainFrame extends JFrame implements OnEventListener {
 							mFileWriter = null;
 						}
 						writer.close();
-						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
+						
+						if(result){
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
+						}else{
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "convert failed.");
+						}
 					}
 					else{
 						throw new Exception("can't open output file.");
