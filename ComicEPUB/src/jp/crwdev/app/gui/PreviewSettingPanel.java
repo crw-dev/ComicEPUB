@@ -12,6 +12,7 @@ public class PreviewSettingPanel extends JPanel {
 
 	private JCheckBox checkPreview = new JCheckBox("編集モード");
 	private JCheckBox checkResize = new JCheckBox("リサイズ");
+	private JCheckBox checkOutputResize = new JCheckBox("出力サイズ");
 
 	private SettingPanel mParent = null;
 	
@@ -23,10 +24,11 @@ public class PreviewSettingPanel extends JPanel {
 		initialize();
 	}
 
-	public void setComponents(SettingPanel parent, JCheckBox preview, JCheckBox resize){
+	public void setComponents(SettingPanel parent, JCheckBox preview, JCheckBox resize, JCheckBox outputResize){
 		mParent = parent;
 		checkPreview = preview;
 		checkResize = resize;
+		checkOutputResize = outputResize;
 		initialize();
 	}
 	
@@ -34,6 +36,7 @@ public class PreviewSettingPanel extends JPanel {
 	
 		checkPreview.setSelected(true);
 		checkResize.setSelected(true);
+		checkResize.setSelected(false);
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 
@@ -43,6 +46,7 @@ public class PreviewSettingPanel extends JPanel {
 		
 		checkPreview.addMouseListener(mouseClickAdapter);
 		checkResize.addMouseListener(mouseClickAdapter);
+		checkOutputResize.addMouseListener(mouseClickAdapter);
 	}
 	
 	public void setPreview(boolean enable){
@@ -59,6 +63,10 @@ public class PreviewSettingPanel extends JPanel {
 	
 	public boolean isResize(){
 		return checkResize.isSelected();
+	}
+
+	public boolean isOutputResize(){
+		return checkOutputResize.isSelected();
 	}
 
 	private void updateSettingValues(){

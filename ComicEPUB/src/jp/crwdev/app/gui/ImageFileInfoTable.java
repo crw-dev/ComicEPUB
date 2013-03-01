@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -73,6 +74,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		
 	}
 	
+	public void finalize(){
+		finalizeThread();
+	}
+	
 	private EventObserver mEventSender = null;
 	public void setEventObserver(EventObserver observer){
 		mEventSender = observer;
@@ -83,7 +88,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	}
 	
 	public void setImageFilterParam(ImageFilterParamSet baseParams){
-		mBaseFilterParams = baseParams;
+		synchronized(this){
+			mBaseFilterParams = baseParams;
+		}
 	}
 	
 	@Override
@@ -178,6 +185,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 
 	// Table Event
 	private void onItemSelected(int index){
+		pushQueue(index);
+	}
+	
+	private void onItemSelectedInternal(int index){
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
 			
 			IImageFileInfo info = mInfoList.get(index);
@@ -198,12 +209,72 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));
 			}
 		}
-		
 	}
+	
+	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
+	private Object mThreadLock = new Object();
+	private Thread mThread = null;
+	private boolean mThreadFinish = false;
+	public void pushQueue(int index){
+		if(mThread == null){
+			mThread = new Thread(){
+				@Override
+				public void run(){
+					while(!mThreadFinish){
+						Integer index = -1;
+						synchronized(mThreadLock){
+							try {
+								mThreadLock.wait();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							if(!mQueue.isEmpty()){
+								index = mQueue.pop();
+							}
+						}
+						boolean loop = true;
+						while(loop && !mThreadFinish){
+							onItemSelectedInternal(index);
+							synchronized(mQueue){
+								loop = !mQueue.isEmpty();
+								if(loop){
+									index = mQueue.pop();
+								}
+							}
+						}
+
+						
+					}
+				}
+			};
+			mThread.setPriority(Thread.MAX_PRIORITY);
+			mThread.start();
+		}
+		synchronized(mThreadLock){
+			while(mQueue.size() > 0){
+				mQueue.remove();
+			}
+			mQueue.push(index);
+			mThreadLock.notify();
+		}
+	}
+	
+	private void finalizeThread(){
+		if(mThread != null){
+			mThreadFinish = true;
+			synchronized(mThreadLock){
+				mThreadLock.notify();
+			}
+			mThread = null;
+		}
+	}
+	
 	
 	public void selectCurrentItem(){
 		int selected = getSelectedRow();
-		onItemSelected(selected);
+		pushQueue(selected);
+//		onItemSelected(selected);
 	}
 
 	private void onTableCellChanged(int row, int col, String value){
@@ -320,7 +391,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();
 					if(mBaseFilterParams != null){
-						filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
+						synchronized(this){
+							filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
+						}
 					}
 					boolean whitePage = checker.isWhiteImage(image, filterParam, true);
 					if(!whitePage){

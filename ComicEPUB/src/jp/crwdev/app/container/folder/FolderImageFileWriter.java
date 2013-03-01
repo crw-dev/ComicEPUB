@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -93,7 +94,7 @@ public class FolderImageFileWriter implements IImageFileWriter {
 			try {
 				FileOutputStream outStream = new FileOutputStream(file);
 				
-				BufferedImageIO.write(image, "jpeg", 0.8f, outStream);
+				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, outStream);
 				
 				outStream.close();
 			} catch (FileNotFoundException e) {

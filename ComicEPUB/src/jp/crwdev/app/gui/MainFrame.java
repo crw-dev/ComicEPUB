@@ -26,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.EventObserver.OnEventListener;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
@@ -86,6 +87,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 	    	 @Override
 	    	 public void windowClosed(WindowEvent e) {
 	    		 System.out.println("windowClosed");
+	    		 mTable.finalize();
+	    		 mImagePanel.finalize();
 	    	 }
 	     });
 	     
@@ -166,6 +169,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     //add(settingPanel);
 	     
 	     setVisible(true);
+	     
+	     Constant.jpegQuality = InifileProperty.getInstance().getJpegQuality();
 	     
 	  //   String filepath = "I:\\Android\\sample\\original";
 	     
@@ -338,7 +343,21 @@ public class MainFrame extends JFrame implements OnEventListener {
 		else{
 			AddSpaceFilter.setUnificationTextPageSize(0, 0);
 		}
+		
+		boolean isOutputResize = mSettingPanel.isOutputResize();
+		Dimension previewSize = mSettingPanel.getOutputImageSize();
+		if(previewSize == null && isOutputResize){
+			params.setResize(false);
+//			mImagePanel.setOutputSizePreview(true, previewSize.width, previewSize.height);
+		}
+		else if(previewSize != null && isOutputResize){
+			params.setResize(true);
+			mImagePanel.setOutputSizePreview(true, previewSize.width, previewSize.height);
+		}else{
+			mImagePanel.setOutputSizePreview(false, 0, 0);
+		}
 		setBaseFilterParam(params);
+		
 		mTable.selectCurrentItem(); // Baseフィルタが更新されたのでカレントイメージも更新する
 	}
 

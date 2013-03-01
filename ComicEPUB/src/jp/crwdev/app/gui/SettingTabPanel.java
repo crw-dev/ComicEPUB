@@ -3,6 +3,8 @@ package jp.crwdev.app.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -283,6 +285,21 @@ public class SettingTabPanel extends JPanel {
 			}
 		});
 
+		
+		ChangeListener listener = new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(checkCrop.isSelected()){
+					updateSettingValues();
+				}
+			}
+		};
+		
+		spinCropLeft.addChangeListener(listener);
+		spinCropRight.addChangeListener(listener);
+		spinCropTop.addChangeListener(listener);
+		spinCropBottom.addChangeListener(listener);
+		
 	}
 	
 	private void updateSettingValues(){

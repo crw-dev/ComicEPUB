@@ -20,6 +20,7 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -109,7 +110,7 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				int imageHeight = image.getHeight();
 				
 				File file = File.createTempFile("temp", "jpg");
-				BufferedImageIO.write(image, "jpeg", 0.8f, new FileOutputStream(file));
+				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, new FileOutputStream(file));
 				
 				if(document == null){
 					// Open前にサイズ指定しないと１ページ目に反映されない…

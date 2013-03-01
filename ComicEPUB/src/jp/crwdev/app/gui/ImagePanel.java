@@ -19,6 +19,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -45,6 +46,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private int mInfoIndex = 0;
 	private BufferedImage mOriginalImage = null;
 	private BufferedImage mDisplayImage = null;
+	
+	private boolean mIsOutputSizePreview = false;
+	private Dimension mPreviewSize = new Dimension(600,800);
 	
 	private Point ptLeftTop = null;
 	private Point ptRightBottom = null;
@@ -78,10 +82,16 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			@Override
 			public void ancestorResized(HierarchyEvent arg0) {
-				mImageFilter.setPreviewSize(getWidth(), getHeight());
-				System.out.println("width=" + getWidth() + " height=" + getHeight());
+				if(!mIsOutputSizePreview){
+					mImageFilter.setPreviewSize(getWidth(), getHeight());
+					System.out.println("width=" + getWidth() + " height=" + getHeight());
+				}
 			}           
         });
+	}
+	
+	public void finalize(){
+		finalizeThread();
 	}
 	
 	private EventObserver mEventSender = null;
@@ -92,7 +102,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	public void setImageFilterParam(ImageFilterParamSet params){
 		mImageFilter.setImageFilterParam(params);
 		mIsPreviewMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
-		updateDisplayImage();
+		//updateDisplayImage();
 	}
 	
 	//@Override
@@ -229,18 +239,40 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		ptLeftTop = null;
 		ptRightBottom = null;
 		if(mOriginalImage != null){
-			updateDisplayImage();
+			updateDisplayImage(false);
 		}
 	}
 
-	public void updateDisplayImage(){
+	public void updateDisplayImage(boolean async){
 		ptLeftTop = null;
 		ptRightBottom = null;
 		if(mOriginalImage == null){
 			return;
 		}
 		
+		if(async){
+			startRenderImage();
+		}
+		else{
+			updateDisplayImageInternal();
+		}
 		
+//		if(mImageFilter != null){
+//			try {
+//				BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+//				mDisplayImage = filtered;
+//			}catch(OutOfMemoryError e){
+//				mEventSender.setProgressMessage(e.getMessage());
+//				e.printStackTrace();
+//			}
+//		}
+//		//BufferedImage conv = ResizeImageFile.getFinalConvertedImage(mOriginalImage, mFileInfo, true);
+//		//Rectangle rect = ResizeImageFile.getResizedRect(conv.getWidth(), conv.getHeight(), 600, 800);
+//		//mDisplayImage = ResizeImageFile.convResize(conv, rect.width, rect.height, true);
+//		repaint();
+	}
+	
+	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
 			try {
 				BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
@@ -250,10 +282,64 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				e.printStackTrace();
 			}
 		}
-		//BufferedImage conv = ResizeImageFile.getFinalConvertedImage(mOriginalImage, mFileInfo, true);
-		//Rectangle rect = ResizeImageFile.getResizedRect(conv.getWidth(), conv.getHeight(), 600, 800);
-		//mDisplayImage = ResizeImageFile.convResize(conv, rect.width, rect.height, true);
 		repaint();
+		System.out.println("updateDisplayInternal()");
+	}
+	
+	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
+	private Object mThreadLock = new Object();
+	private Thread mThread = null;
+	private boolean mThreadFinish = false;
+	public void startRenderImage(){
+		if(mThread == null){
+			mThread = new Thread(){
+				@Override
+				public void run(){
+					while(!mThreadFinish){
+						synchronized(mThreadLock){
+							try {
+								mThreadLock.wait();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							if(!mQueue.isEmpty()){
+								mQueue.pop();
+							}
+						}
+						boolean loop = true;
+						while(loop && !mThreadFinish){
+							updateDisplayImageInternal();
+							synchronized(mQueue){
+								loop = !mQueue.isEmpty();
+								if(loop){
+									mQueue.pop();
+								}
+							}
+						}
+					}
+				}
+			};
+			mThread.setPriority(Thread.MAX_PRIORITY);
+			mThread.start();
+		}
+		synchronized(mThreadLock){
+			while(mQueue.size() > 0){
+				mQueue.remove();
+			}
+			mQueue.push(0);
+			mThreadLock.notify();
+		}
+	}
+	
+	private void finalizeThread(){
+		if(mThread != null){
+			mThreadFinish = true;
+			synchronized(mThreadLock){
+				mThreadLock.notify();
+			}
+			mThread = null;
+		}
 	}
 	
 	public void updateTableInfo(){
@@ -280,7 +366,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 				mFileInfo.getFilterParam().setRotate(false);
 				mFileInfo.getFilterParam().setRotateAngle(0.0f);
-				updateDisplayImage();
+				updateDisplayImage(true);
 				updateTableInfo();
 			}
 			else{
@@ -415,7 +501,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						param.setRotate(true);
 						double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
 						param.setRotateAngle(angle + param.getRotateAngle());
-						updateDisplayImage();
+						updateDisplayImage(true);
 						updateTableInfo();
 					}
 					ptRotateA = null;
@@ -455,7 +541,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							param.setTranslateY(param.getTranslateY() - (int)(dstPoints[1] / scaleH));
 							//param.setTranslateX(param.getTranslateX() - (int)(offset.width / scaleW));
 							//param.setTranslateY(param.getTranslateY() - (int)(offset.height / scaleH));
-							updateDisplayImage();
+							updateDisplayImage(true);
 							updateTableInfo();
 							return;
 							
@@ -513,7 +599,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			
 			
 			//if(param.getPageType() == FileInfoTable.TYPE_SPLIT_CROP){
-			updateDisplayImage();
+			updateDisplayImage(true);
 			//}
 	
 		}
@@ -528,7 +614,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		param.setPictPageCrop(0, 0, 0, 0);
 		
 		//if(param.getPageType() == FileInfoTable.TYPE_SPLIT_CROP){
-		updateDisplayImage();
+		updateDisplayImage(true);
 	}
 	
 	private Rectangle getDisplayImageRect(){
@@ -630,7 +716,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			param.setRotate(true);
 			double angle = 0.1 * rotation;
 			param.setRotateAngle(angle + param.getRotateAngle());
-			updateDisplayImage();
+			updateDisplayImage(true);
 			updateTableInfo();
 
 			
@@ -718,7 +804,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						param.setTranslate(false);
 						param.setTranslateX(0);
 						param.setTranslateY(0);
-						updateDisplayImage();
+						updateDisplayImage(true);
 						updateTableInfo();
 					}
 				});
@@ -813,7 +899,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					ImageFilterParam param = mFileInfo.getFilterParam();
 					param.setFullPageCrop(true);
 					param.setFullPageCrop(l, t, r, b);
-					updateDisplayImage();
+					updateDisplayImage(true);
 				}
 			}
 		});
@@ -889,9 +975,26 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		popup.show(this, x, y);
 	}
 
+	public void setOutputSizePreview(boolean enable, int width, int height){
+		mIsOutputSizePreview = enable;
+		if(enable){
+			mPreviewSize.setSize(width, height);
+		}else{
+			mPreviewSize.setSize(getWidth(), getHeight());
+		}
+		mImageFilter.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+	}
+	
 	@Override
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
-		// TODO Auto-generated method stub
+		switch(type){
+		case EventObserver.EventType_PreviewSize:
+			Dimension size = (Dimension)obj;
+			setOutputSizePreview(arg1 == 1, size.width, size.height);
+			break;
+		default:
+			break;
+		}
 		
 	}
 }

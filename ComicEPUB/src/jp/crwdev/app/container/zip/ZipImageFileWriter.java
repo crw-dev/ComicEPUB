@@ -14,6 +14,7 @@ import java.util.zip.ZipOutputStream;
 
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -114,7 +115,7 @@ public class ZipImageFileWriter implements IImageFileWriter {
 					
 					zipOut.putNextEntry(new ZipEntry(filename));
 					
-					BufferedImageIO.write(image, "jpeg", 0.8f, zipOut);
+					BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
 					
 					zipOut.closeEntry();
 					

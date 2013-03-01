@@ -14,6 +14,8 @@ public class Constant {
 		SUPPORT_INPUT_PREFIX.add("rar");
 		SUPPORT_INPUT_PREFIX.add("pdf");
 	}
+	
+	public static float jpegQuality = 0.8f;
 
 	public static final int PAGETYPE_AUTO = 0;
 	public static final int PAGETYPE_TEXT = 1;

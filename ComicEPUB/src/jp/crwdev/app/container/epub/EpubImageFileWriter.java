@@ -18,6 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -281,7 +282,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				if(mBaseFilter != null){
 					image = mBaseFilter.filter(image, info.getFilterParam());
 				}
-				BufferedImageIO.write(image, "jpeg", 0.8f, zipOut);
+				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
 				
 				in.close();
 

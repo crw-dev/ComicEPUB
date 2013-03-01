@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -43,6 +44,9 @@ public class OutputSettingPanel extends JPanel {
 	public JButton convertButton;
 	public JButton cancelButton;
 	
+	// CheckBox
+	public JCheckBox checkOutputResize;
+	
 	private SettingPanel mParent = null;
 	
 	/**
@@ -54,7 +58,8 @@ public class OutputSettingPanel extends JPanel {
 	
 	public void setComponents(SettingPanel parent, JComboBox imageSize, JComboBox fileType, JComboBox bookType,
 			JTextField title, JTextField titleKana, JTextField author, JTextField authorKana,
-			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn){
+			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn,
+			JCheckBox outputResize){
 		mParent = parent;
 		outputImageSize = imageSize;
 		outputFileType = fileType;
@@ -67,6 +72,7 @@ public class OutputSettingPanel extends JPanel {
 		chooseFolderButton = folderBtn;
 		convertButton = convertBtn;
 		cancelButton = cancelBtn;
+		checkOutputResize = outputResize;
 		initialize();
 	}
 	
@@ -147,6 +153,17 @@ public class OutputSettingPanel extends JPanel {
 				}
 			}
 		});
+		
+		outputImageSize.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("comboBoxChanged")){
+					if(checkOutputResize.isSelected()){
+						mParent.updateSettingValues();
+					}
+				}
+			}
+		});
 	}
 	
 	public OutputSettingParam getOutputSettingParam(){
@@ -170,6 +187,26 @@ public class OutputSettingPanel extends JPanel {
 		return param;
 	}
 
+	public Dimension getOutputImageSize(){
+		String imageSize = (String)outputImageSize.getSelectedItem();
+		return getImageSize(imageSize);
+	}
+	
+	public Dimension getImageSize(String imageSize){
+		String[] val = imageSize.split("x");
+		if(val.length == 2){
+			try{
+				int width = Integer.parseInt(val[0]);
+				int height = Integer.parseInt(val[1]);
+				return new Dimension(width, height);
+			}
+			catch(NumberFormatException ex){
+				return null;
+			}
+		}
+		return null;
+	}
+	
 	private void showOutputFolderDialog(){
 		JFileChooser filechooser = new JFileChooser();
 		filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

@@ -29,7 +29,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	public SettingPanel(JFrame parent){
 		super(parent);
 		
-		mPreviewSetting.setComponents(this, checkPreview, checkResize);
+		mPreviewSetting.setComponents(this, checkPreview, checkResize, checkOutputResize);
 		
 		mSettingTab = this.tabbedPane;
 		
@@ -41,7 +41,8 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 		
 		mOutputSetting.setComponents(this, outputImageSize, outputFileType, outputBookType,
 										textTitle, textTitleKana, textAuthor, textAuthorKana,
-										outputFolder, outpuFolderButton, convertButton, cancelButton);
+										outputFolder, outpuFolderButton, convertButton, cancelButton,
+										checkOutputResize);
 		mProgressPanel.setComponents(this, labelMessage, progressBar, cancelButton);
 		
 //		//SpringLayout layout = new SpringLayout();
@@ -142,6 +143,14 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 		if(isUnificationTextPage){
 			updateSettingValues();
 		}
+	}
+	
+	public boolean isOutputResize(){
+		return mPreviewSetting.isOutputResize();
+	}
+	
+	public Dimension getOutputImageSize(){
+		return mOutputSetting.getOutputImageSize();
 	}
 
 	/**

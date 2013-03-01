@@ -27,6 +27,7 @@ public class SettingPanelLayout extends JPanel {
 	protected DefaultTextField outputFolder;
 	protected JCheckBox checkPreview;
 	protected JCheckBox checkResize;
+	protected JCheckBox checkOutputResize;
 	protected JTabbedPane tabbedPane;
 	protected JComboBox outputImageSize;
 	protected JComboBox outputFileType;
@@ -55,14 +56,19 @@ public class SettingPanelLayout extends JPanel {
 		add(checkPreview);
 		
 		checkResize = new JCheckBox("リサイズ");
-		springLayout.putConstraint(SpringLayout.WEST, checkResize, 6, SpringLayout.EAST, checkPreview);
-		springLayout.putConstraint(SpringLayout.SOUTH, checkResize, 0, SpringLayout.SOUTH, checkPreview);
+		springLayout.putConstraint(SpringLayout.WEST, checkResize, 3, SpringLayout.WEST, this);
+		springLayout.putConstraint(SpringLayout.NORTH, checkResize, 0, SpringLayout.SOUTH, checkPreview);
 		add(checkResize);
-		
+
+		checkOutputResize = new JCheckBox("出力サイズ");
+		springLayout.putConstraint(SpringLayout.WEST, checkOutputResize, 6, SpringLayout.EAST, checkResize);
+		springLayout.putConstraint(SpringLayout.SOUTH, checkOutputResize, 0, SpringLayout.SOUTH, checkResize);
+		add(checkOutputResize);
+
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		springLayout.putConstraint(SpringLayout.NORTH, tabbedPane, 6, SpringLayout.SOUTH, checkPreview);
+		springLayout.putConstraint(SpringLayout.NORTH, tabbedPane, 6, SpringLayout.SOUTH, checkResize);
 		springLayout.putConstraint(SpringLayout.WEST, tabbedPane, 3, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, tabbedPane, 328, SpringLayout.SOUTH, checkPreview);
+		springLayout.putConstraint(SpringLayout.SOUTH, tabbedPane, 328, SpringLayout.SOUTH, checkResize);
 		springLayout.putConstraint(SpringLayout.EAST, tabbedPane, -3, SpringLayout.EAST, this);
 		add(tabbedPane);
 		
