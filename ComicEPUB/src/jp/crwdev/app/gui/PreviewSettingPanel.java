@@ -36,7 +36,7 @@ public class PreviewSettingPanel extends JPanel {
 	
 		checkPreview.setSelected(true);
 		checkResize.setSelected(true);
-		checkResize.setSelected(false);
+		checkOutputResize.setSelected(false);
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 

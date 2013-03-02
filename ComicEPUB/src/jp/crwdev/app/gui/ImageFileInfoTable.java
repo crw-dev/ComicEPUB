@@ -185,7 +185,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 
 	// Table Event
 	private void onItemSelected(int index){
-		pushQueue(index);
+		selectItem(index);
 	}
 	
 	private void onItemSelectedInternal(int index){
@@ -215,7 +215,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	private Object mThreadLock = new Object();
 	private Thread mThread = null;
 	private boolean mThreadFinish = false;
-	public void pushQueue(int index){
+	public void selectItem(int index){
 		if(mThread == null){
 			mThread = new Thread(){
 				@Override
@@ -223,29 +223,36 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					while(!mThreadFinish){
 						Integer index = -1;
 						synchronized(mThreadLock){
-							try {
-								mThreadLock.wait();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							if(mQueue.isEmpty()){
+								try {
+									mThreadLock.wait();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 							if(!mQueue.isEmpty()){
 								index = mQueue.pop();
 							}
 						}
-						boolean loop = true;
-						while(loop && !mThreadFinish){
-							onItemSelectedInternal(index);
-							synchronized(mQueue){
-								loop = !mQueue.isEmpty();
-								if(loop){
-									index = mQueue.pop();
+						try{
+							boolean loop = true;
+							while(loop && !mThreadFinish){
+								onItemSelectedInternal(index);
+								synchronized(mQueue){
+									loop = !mQueue.isEmpty();
+									if(loop){
+										index = mQueue.pop();
+									}
 								}
 							}
+						}catch(Exception e){
+							mEventSender.setProgressMessage(e.getMessage());
+						}catch(OutOfMemoryError e){
+							mEventSender.setProgressMessage(e.getMessage());
 						}
-
-						
 					}
+					mThread = null;
 				}
 			};
 			mThread.setPriority(Thread.MAX_PRIORITY);
@@ -273,7 +280,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	
 	public void selectCurrentItem(){
 		int selected = getSelectedRow();
-		pushQueue(selected);
+		selectItem(selected);
 //		onItemSelected(selected);
 	}
 
@@ -395,11 +402,18 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
 						}
 					}
-					boolean whitePage = checker.isWhiteImage(image, filterParam, true);
-					if(!whitePage){
-						info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
-						mTableModel.setValueAt(disableValue, index, 1);
+					try {
+						boolean whitePage = checker.isWhiteImage(image, filterParam, true);
+						if(!whitePage){
+							info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
+							mTableModel.setValueAt(disableValue, index, 1);
+						}
+					}catch(Exception e){
+						mEventSender.setProgressMessage(e.getMessage());
+					}catch(OutOfMemoryError e){
+						mEventSender.setProgressMessage(e.getMessage());
 					}
+					
 				}
 			}
 		});
@@ -469,7 +483,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		//String size = Long.toString(info.getSize());
 		String splitType = Constant.getSplitTypeText(param.getSplitType());
 		
-		return new String[]{info.getFileName(), pageType , rotate, position, width, height, splitType};
+		return new String[]{info.getFileName(), pageType, splitType, rotate, position, width, height};
 	}
 
 	

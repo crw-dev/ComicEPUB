@@ -297,27 +297,36 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				public void run(){
 					while(!mThreadFinish){
 						synchronized(mThreadLock){
-							try {
-								mThreadLock.wait();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							if(mQueue.isEmpty()){
+								try {
+									mThreadLock.wait();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 							if(!mQueue.isEmpty()){
 								mQueue.pop();
 							}
 						}
-						boolean loop = true;
-						while(loop && !mThreadFinish){
-							updateDisplayImageInternal();
-							synchronized(mQueue){
-								loop = !mQueue.isEmpty();
-								if(loop){
-									mQueue.pop();
+						try {
+							boolean loop = true;
+							while(loop && !mThreadFinish){
+								updateDisplayImageInternal();
+								synchronized(mQueue){
+									loop = !mQueue.isEmpty();
+									if(loop){
+										mQueue.pop();
+									}
 								}
 							}
+						}catch(Exception e){
+							mEventSender.setProgressMessage(e.getMessage());
+						}catch(OutOfMemoryError e){
+							mEventSender.setProgressMessage(e.getMessage());
 						}
 					}
+					mThread = null;
 				}
 			};
 			mThread.setPriority(Thread.MAX_PRIORITY);

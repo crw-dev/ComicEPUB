@@ -340,7 +340,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		folderButton.setEnabled(false);
 		convertButton.setText("キャンセル");
 		
-		new Thread(){
+		Thread thread = new Thread(){
 			public void run(){
 				String outputFolder = textFolder.getText();
 				int count = mTableModel.getRowCount();
@@ -361,7 +361,9 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 				convertButton.setText("変換");
 				mIsProcessing = false;
 			}
-		}.start();
+		};
+		thread.setPriority(3);
+		thread.start();
 	}
 	
 	private void cancelConvert(){

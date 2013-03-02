@@ -52,22 +52,21 @@ public class Constant {
 	
 	public static final int TABLE_COLUMN_ENTRYNAME = 0;
 	public static final int TABLE_COLUMN_PAGETYPE = 1;
-	public static final int TABLE_COLUMN_ROTATE = 2;
-	public static final int TABLE_COLUMN_POSITION = 3;
-	public static final int TABLE_COLUMN_WIDTH = 4;
-	public static final int TABLE_COLUMN_HEIGHT = 5;
+	public static final int TABLE_COLUMN_SPLITTYPE = 2;
+	public static final int TABLE_COLUMN_ROTATE = 3;
+	public static final int TABLE_COLUMN_POSITION = 4;
+	public static final int TABLE_COLUMN_WIDTH = 5;
+	public static final int TABLE_COLUMN_HEIGHT = 6;
 	//public static final int TABLE_COLUMN_SIZE = 6;
-	public static final int TABLE_COLUMN_SPLITTYPE = 6;
 	
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
 		TABLE_HEADER_ENTRYNAME,
 		TABLE_HEADER_PAGETYPE,
+		TABLE_HEADER_SPLITTYPE,
 		TABLE_HEADER_ROTATE,
 		TABLE_HEADER_POSITION,
 		TABLE_HEADER_WIDTH,
 		TABLE_HEADER_HEIGHT,
-		//TABLE_HEADER_SIZE,
-		TABLE_HEADER_SPLITTYPE,
 	};
 	
 	

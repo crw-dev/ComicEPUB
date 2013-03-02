@@ -241,6 +241,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 						}
 
 						mEventObserver.stopProgress();
+						
+						mTable.selectItem(0);
 					}
 				}.start();
 			}
