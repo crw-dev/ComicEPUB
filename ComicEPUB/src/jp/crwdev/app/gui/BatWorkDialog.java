@@ -438,7 +438,8 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			return;
 		}
 		
-		
+		list.sort();
+
 		//ImageFilterParam param = null;
 		ImageFilterParamSet params = new ImageFilterParamSet();
 		if(settingFile.exists()){
