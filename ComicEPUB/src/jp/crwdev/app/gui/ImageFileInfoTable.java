@@ -29,6 +29,7 @@ import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.container.ImageFileInfoSplitWrapper;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PageCheckFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
@@ -305,17 +306,28 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 						mEventSender.setModified();
 
+						selectCurrentItem();
 						update = true;
 					}
 				}
 				else if(col == Constant.TABLE_COLUMN_SPLITTYPE){
 					int splitType = Constant.getSplitType(value);
 					if(splitType != param.getSplitType()){
+						int selected = getSelectedRow();
+						if(param.getSplitIndex() != 0){
+							selected -= param.getSplitIndex();
+							if(info instanceof ImageFileInfoSplitWrapper){
+								ImageFileInfoSplitWrapper wrap = (ImageFileInfoSplitWrapper)info;
+								param = wrap.getFirstSplitInfo().getFilterParam();
+							}
+						}
+
 						// SplitType変更有り
 						param.setSplitType(splitType);
 						update = true;
 						//TODO:
 						renewalList();
+						selectItem(selected);
 						return;
 					}
 				}

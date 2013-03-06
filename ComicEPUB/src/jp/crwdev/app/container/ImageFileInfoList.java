@@ -101,6 +101,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 							ImageFileInfoSplitWrapper wrapInfo = new ImageFileInfoSplitWrapper(baseInfo, index);
 							if(sameCount){
 								wrapInfo.setEnable(infow.getRelativeSplitInfo(index).isEnable());
+								wrapInfo.setFilterParam(infow.getRelativeSplitInfoFilterParam(index));
 							}
 							list.add(wrapInfo);
 
