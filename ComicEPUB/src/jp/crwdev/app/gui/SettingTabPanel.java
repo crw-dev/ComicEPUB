@@ -444,7 +444,7 @@ public class SettingTabPanel extends JPanel {
 		boolean isGrayscale = checkGrayscale.isSelected();
 		boolean isCrop = checkCrop.isSelected();
 		boolean isUnificationTextPage = false;
-		if(mFilterIndex == Constant.PAGETYPE_TEXT){
+		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT){
 			isUnificationTextPage = checkUnification.isSelected();
 		}
 			
@@ -495,8 +495,10 @@ public class SettingTabPanel extends JPanel {
 		param.setContrast(convContrast(contrast));
 		param.setBrightness((float)brightness);
 			
-		param.setUnificationTextPage(isUnificationTextPage);
-		
+		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT){
+			param.setUnificationTextPage(isUnificationTextPage);
+		}
+
 		return param;
 	}
 

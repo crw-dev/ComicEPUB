@@ -42,7 +42,7 @@ public class AddSpaceFilter implements IImageFilter {
 	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
-		if(param.getPageType() == Constant.PAGETYPE_PICT){
+		if(param.getPageType() != Constant.PAGETYPE_TEXT){
 			return image;
 		}
 		

@@ -26,7 +26,7 @@ public class PageCheckFilter implements IImageFilter {
 		}
 		
 		boolean isWhitePage = isWhiteImage(image, param, false);
-		param.setConvertPageType(isWhitePage ? Constant.PAGETYPE_TEXT : Constant.PAGETYPE_PICT);
+		param.setConvertPageType(isWhitePage ? Constant.PAGETYPE_TEXT : param.getPageType());
 
 		return image;
 	}
@@ -43,14 +43,14 @@ public class PageCheckFilter implements IImageFilter {
 		//TODO: 要見直し
 		if(mIsTextPageMode){
 			if(forceCheckWithoutPicture){
-				if(param.getPageType() == Constant.PAGETYPE_PICT){
+				if(param.getPageType() == Constant.PAGETYPE_PICT || param.getPageType() == Constant.PAGETYPE_COLOR){
 					return false;
 				}
 			}else{
 				if(param.getPageType() == Constant.PAGETYPE_TEXT){
 					return true;
 				}
-				else if(param.getPageType() == Constant.PAGETYPE_PICT){
+				else if(param.getPageType() == Constant.PAGETYPE_PICT || param.getPageType() == Constant.PAGETYPE_COLOR){
 					return false;
 				}
 			}

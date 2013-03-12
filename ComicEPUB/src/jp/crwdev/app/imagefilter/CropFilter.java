@@ -32,7 +32,7 @@ public class CropFilter implements IImageFilter {
 		if(param == null){
 			return image;
 		}
-		if(!mIsFullPageMode && !param.isTextPageCrop() && !param.isPictPageCrop()){
+		if(!mIsFullPageMode && !param.isTextPageCrop() && !param.isPictPageCrop() && !param.isColorPageCrop()){
 			return image;
 		}
 		else if(mIsFullPageMode && !param.isFullPageCrop()){
@@ -54,6 +54,24 @@ public class CropFilter implements IImageFilter {
 					leftLine = param.getPictPageCropLeft();
 					subWidth = width - param.getPictPageCropLeft() - param.getPictPageCropRight();
 					subHeight = height - param.getPictPageCropTop() - param.getPictPageCropBottom();
+					
+					if(param.isPreview() && param.isDrawCropAreaInPreview() && param.isFullPageCrop()){
+						topLine += param.getFullPageCropTop();
+						leftLine += param.getFullPageCropLeft();
+						subWidth -= param.getFullPageCropLeft() + param.getFullPageCropRight();
+						subHeight -= param.getFullPageCropTop() + param.getFullPageCropBottom();
+					}
+				}
+				else{
+					return image;
+				}
+			}
+			else if(param.getConvertPageType() == Constant.PAGETYPE_COLOR){
+				if(param.isColorPageCrop()){
+					topLine = param.getColorPageCropTop();
+					leftLine = param.getColorPageCropLeft();
+					subWidth = width - param.getColorPageCropLeft() - param.getColorPageCropRight();
+					subHeight = height - param.getColorPageCropTop() - param.getColorPageCropBottom();
 					
 					if(param.isPreview() && param.isDrawCropAreaInPreview() && param.isFullPageCrop()){
 						topLine += param.getFullPageCropTop();

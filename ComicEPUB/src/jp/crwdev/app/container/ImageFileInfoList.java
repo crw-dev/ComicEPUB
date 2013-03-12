@@ -36,7 +36,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		for(int i=0; i<size; i++){
 			IImageFileInfo info = list.get(i);
 			ImageFilterParam param = info.getFilterParam();
-			if(param.getPageType() != Constant.PAGETYPE_PICT){
+			if(param.getPageType() == Constant.PAGETYPE_TEXT){
 				int width = info.getWidth();
 				int height = info.getHeight();
 				if(max.width < width){
