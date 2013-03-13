@@ -87,13 +87,17 @@ public class AutoCropFilter implements IImageFilter {
 				}else{
 					scale = mAspectX / mAspectY;
 				}
-				int width = (int)(rect.height * scale);
+				int width = Math.min((int)(rect.height * scale), image.getWidth());
 				Rectangle newRect = new Rectangle(rect.x-(width-rect.width)/2, rect.y, width, rect.height);
 				if(newRect.x < 0){
 					newRect.x = 0;
 				}
 				else if(newRect.x+newRect.width >= image.getWidth()){
-					newRect.x = image.getWidth()-newRect.width;
+					newRect.x = image.getWidth() - newRect.width;
+					if(newRect.x < 0){
+						newRect.x = 0;
+						newRect.width = image.getWidth();
+					}
 				}
 				if(rect.width < newRect.width){
 					rect = newRect;

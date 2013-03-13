@@ -24,12 +24,12 @@ public class OutputImageFilter implements IImageFilter {
 		mFilters.add(new AddSpaceFilter());
 		mFilters.add(new TransRotateFilter());
 		mFilters.add(new SplitFilter());
-		mFilters.add(new AutoCropFilter());
 		mFilters.add(new CropFilter(true));		// 全ページCrop
 		mFilters.add(new PageCheckFilter(true));
 		mFilters.add(new CropFilter(false));	// Text/Pictページ別Crop
 		mFilters.add(new ContrastFilter());
 		mFilters.add(new GammaFilter());
+		mFilters.add(new AutoCropFilter());
 		mFilters.add(new GrayscaleFilter());
 		mFilters.add(new BlurFilter(true));
 		mFilters.add(new ResizeFilter());
