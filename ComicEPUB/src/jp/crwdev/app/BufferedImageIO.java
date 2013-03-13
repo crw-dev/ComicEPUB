@@ -31,7 +31,7 @@ public class BufferedImageIO {
 		SUPPORT_PREFIX.add("gif");
 	}
 
-	public static BufferedImage read(InputStream stream, boolean isJpeg){
+	public static synchronized BufferedImage read(InputStream stream, boolean isJpeg){
 		if(isJpeg){
 			JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(stream);
 			try {

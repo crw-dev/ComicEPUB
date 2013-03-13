@@ -41,6 +41,7 @@ public class SettingTabPanel extends JPanel {
 	public JCheckBox checkGrayscale = new JCheckBox("グレースケール");
 	public JCheckBox checkCrop = new JCheckBox("切り抜き");
 	public JCheckBox checkUnification = new JCheckBox("本文ページサイズ統一");
+	public JCheckBox checkAutoCrop = new JCheckBox("自動余白除去");
 	
 	// Spinner
 	public JSpinner spinSharpness = new JSpinner();
@@ -166,6 +167,7 @@ public class SettingTabPanel extends JPanel {
 		checkPanel.add(spinCropTop);
 		checkPanel.add(spinCropRight);
 		checkPanel.add(spinCropBottom);
+		checkPanel.add(checkAutoCrop);
 		
 		layout1.putConstraint(SpringLayout.WEST, checkCrop, 0, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, checkCrop, 0, SpringLayout.SOUTH, labelBrightness);
@@ -182,6 +184,9 @@ public class SettingTabPanel extends JPanel {
 		layout1.putConstraint(SpringLayout.WEST, spinCropRight, 116, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, spinCropRight, 0, SpringLayout.NORTH, spinCropLeft);
 
+		layout1.putConstraint(SpringLayout.WEST, checkAutoCrop, 3, SpringLayout.EAST, checkCrop);
+		layout1.putConstraint(SpringLayout.NORTH, checkAutoCrop, 0, SpringLayout.NORTH, checkCrop);
+		
 		add(checkPanel);
 
 
@@ -220,6 +225,7 @@ public class SettingTabPanel extends JPanel {
 		checkGamma.addMouseListener(mouseClickAdapter);
 		checkContrast.addMouseListener(mouseClickAdapter);
 		checkCrop.addMouseListener(mouseClickAdapter);
+		checkAutoCrop.addMouseListener(mouseClickAdapter);
 		
 		spinGamma.addChangeListener(new ChangeListener(){
 			@Override
@@ -289,7 +295,7 @@ public class SettingTabPanel extends JPanel {
 		ChangeListener listener = new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if(checkCrop.isSelected()){
+				if(checkCrop.isSelected() || checkAutoCrop.isSelected()){
 					updateSettingValues();
 				}
 			}
@@ -443,6 +449,7 @@ public class SettingTabPanel extends JPanel {
 		boolean isGamma = checkGamma.isSelected();
 		boolean isGrayscale = checkGrayscale.isSelected();
 		boolean isCrop = checkCrop.isSelected();
+		boolean isAutoCrop = checkAutoCrop.isSelected();
 		boolean isUnificationTextPage = false;
 		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT){
 			isUnificationTextPage = checkUnification.isSelected();
@@ -474,20 +481,24 @@ public class SettingTabPanel extends JPanel {
 		param.setGrayscale(isGrayscale);
 		switch(mFilterIndex){
 		case ImageFilterParamSet.FILTER_INDEX_COLOR:
-			param.setColorPageCrop(isCrop);
+			param.setColorPageAutoCrop(isAutoCrop);
+			param.setColorPageCrop(isAutoCrop ? false : isCrop);
 			param.setColorPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_PICT:
-			param.setPictPageCrop(isCrop);
+			param.setPictPageAutoCrop(isAutoCrop);
+			param.setPictPageCrop(isAutoCrop ? false : isCrop);
 			param.setPictPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_TEXT:
-			param.setTextPageCrop(isCrop);
+			param.setTextPageAutoCrop(isAutoCrop);
+			param.setTextPageCrop(isAutoCrop ? false : isCrop);
 			param.setTextPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_BASIC:
 		default:
-			param.setFullPageCrop(isCrop);
+			param.setFullPageAutoCrop(isAutoCrop);
+			param.setFullPageCrop(isAutoCrop ? false : isCrop);
 			param.setFullPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		}

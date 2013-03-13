@@ -96,40 +96,41 @@ public class ZipImageFileWriter implements IImageFileWriter {
 			float progressOffset = 100 / (float)size;
 			
 			for(int i=0; i<size; i++){
-				IImageFileInfo info = list.get(i);
-				if(!info.isEnable()){
-					continue;
-				}
-				
-				BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
-				if(mBaseFilter != null){
-					image = mBaseFilter.filter(image, info.getFilterParam());
-				}
-				
 				if(mIsCancel){
 					return false;
 				}
 				
-				try {
-					String filename = String.format("P%04d.jpg", i);
+				IImageFileInfo info = list.get(i);
+				BufferedImage image = null;
+				
+				synchronized(info){
+					if(!info.isEnable()){
+						continue;
+					}
 					
-					zipOut.putNextEntry(new ZipEntry(filename));
-					
-					BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
-					
-					zipOut.closeEntry();
-					
-				} catch (IOException e) {
-					e.printStackTrace();
+					image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+					if(mBaseFilter != null){
+						image = mBaseFilter.filter(image, info.getFilterParam());
+					}
 				}
 				
+				String filename = String.format("P%04d.jpg", i);
+				
+				zipOut.putNextEntry(new ZipEntry(filename));
+				
+				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
+				
+				zipOut.flush();
+				zipOut.closeEntry();
+				
+
 				if(listener != null){
 					listener.onProgress((int)((i+1)*progressOffset), null);
 				}
 			}
 			
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		finally{

@@ -332,6 +332,42 @@ public class XmlWriter {
 			elem.setAttribute("y", Integer.toString(param.getTranslateY()));
 			paramElem.appendChild(elem);
 		}
+		if(param.isColorPageAutoCrop()){
+			Element elem = mDocument.createElement("colorAutoCrop");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("l", Integer.toString(param.getColorPageCropLeft()));
+			elem.setAttribute("t", Integer.toString(param.getColorPageCropTop()));
+			elem.setAttribute("r", Integer.toString(param.getColorPageCropRight()));
+			elem.setAttribute("b", Integer.toString(param.getColorPageCropBottom()));
+			paramElem.appendChild(elem);
+		}
+		if(param.isPictPageAutoCrop()){
+			Element elem = mDocument.createElement("pictAutoCrop");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("l", Integer.toString(param.getPictPageCropLeft()));
+			elem.setAttribute("t", Integer.toString(param.getPictPageCropTop()));
+			elem.setAttribute("r", Integer.toString(param.getPictPageCropRight()));
+			elem.setAttribute("b", Integer.toString(param.getPictPageCropBottom()));
+			paramElem.appendChild(elem);
+		}
+		if(param.isTextPageAutoCrop()){
+			Element elem = mDocument.createElement("textAutoCrop");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("l", Integer.toString(param.getTextPageCropLeft()));
+			elem.setAttribute("t", Integer.toString(param.getTextPageCropTop()));
+			elem.setAttribute("r", Integer.toString(param.getTextPageCropRight()));
+			elem.setAttribute("b", Integer.toString(param.getTextPageCropBottom()));
+			paramElem.appendChild(elem);
+		}
+		if(param.isFullPageAutoCrop()){
+			Element elem = mDocument.createElement("fullAutoCrop");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("l", Integer.toString(param.getFullPageCropLeft()));
+			elem.setAttribute("t", Integer.toString(param.getFullPageCropTop()));
+			elem.setAttribute("r", Integer.toString(param.getFullPageCropRight()));
+			elem.setAttribute("b", Integer.toString(param.getFullPageCropBottom()));
+			paramElem.appendChild(elem);
+		}
 		if(param.isFullPageCrop()){
 			Element elem = mDocument.createElement("fullCrop");
 			elem.appendChild(mDocument.createTextNode("true"));
@@ -793,6 +829,42 @@ public class XmlWriter {
 					String enable = node.getFirstChild().getNodeValue();
 					param.setPictPageCrop(Boolean.parseBoolean(enable));
 					param.setPictPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
+				}
+				else if(name.equalsIgnoreCase("colorAutoCrop")){
+					String l = getAttributeValue(attrs, "l");
+					String r = getAttributeValue(attrs, "r");
+					String t = getAttributeValue(attrs, "t");
+					String b = getAttributeValue(attrs, "b");
+					String enable = node.getFirstChild().getNodeValue();
+					param.setColorPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setColorPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
+				}
+				else if(name.equalsIgnoreCase("pictAutoCrop")){
+					String l = getAttributeValue(attrs, "l");
+					String r = getAttributeValue(attrs, "r");
+					String t = getAttributeValue(attrs, "t");
+					String b = getAttributeValue(attrs, "b");
+					String enable = node.getFirstChild().getNodeValue();
+					param.setPictPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setPictPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
+				}
+				else if(name.equalsIgnoreCase("textAutoCrop")){
+					String l = getAttributeValue(attrs, "l");
+					String r = getAttributeValue(attrs, "r");
+					String t = getAttributeValue(attrs, "t");
+					String b = getAttributeValue(attrs, "b");
+					String enable = node.getFirstChild().getNodeValue();
+					param.setTextPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setTextPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
+				}
+				else if(name.equalsIgnoreCase("fullAutoCrop")){
+					String l = getAttributeValue(attrs, "l");
+					String r = getAttributeValue(attrs, "r");
+					String t = getAttributeValue(attrs, "t");
+					String b = getAttributeValue(attrs, "b");
+					String enable = node.getFirstChild().getNodeValue();
+					param.setFullPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setFullPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("blur")){
 					String enable = node.getFirstChild().getNodeValue();

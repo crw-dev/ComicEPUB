@@ -96,21 +96,29 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				}
 				
 				IImageFileInfo info = list.get(i);
-				if(!info.isEnable()){
-					continue;
-				}
-			
-				BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
-				if(mBaseFilter != null){
-					image = mBaseFilter.filter(image, info.getFilterParam());
-				}
+				BufferedImage image = null;
 				
+				synchronized(info){
+					if(!info.isEnable()){
+						continue;
+					}
+				
+					image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+					if(mBaseFilter != null){
+						image = mBaseFilter.filter(image, info.getFilterParam());
+					}
+				}
 				
 				int imageWidth = image.getWidth();
 				int imageHeight = image.getHeight();
 				
 				File file = File.createTempFile("temp", "jpg");
-				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, new FileOutputStream(file));
+				FileOutputStream outStream = new FileOutputStream(file);
+				
+				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, outStream);
+				
+				outStream.flush();
+				outStream.close();
 				
 				if(document == null){
 					// Open前にサイズ指定しないと１ページ目に反映されない…
@@ -153,12 +161,9 @@ public class PdfImageFileWriter implements IImageFileWriter {
 			stamp.close();
 			stamp = null;
 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e){
 			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			return false;
 		}
 		finally{
 			if(tempFile != null){

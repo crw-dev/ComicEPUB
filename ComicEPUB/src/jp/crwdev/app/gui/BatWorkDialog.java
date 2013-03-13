@@ -36,6 +36,7 @@ import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFileScanner;
+import jp.crwdev.app.imagefilter.AutoCropFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
@@ -459,6 +460,11 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		}else{
 			params.setResize(true);
 			params.setResizeDimension(size);
+		}
+		if(size != null){
+			AutoCropFilter.setAspectRatio(size.width, size.height);
+		}else{
+			AutoCropFilter.setAspectRatio(0, 0);
 		}
 		
 		// 基本出力フィルタを生成

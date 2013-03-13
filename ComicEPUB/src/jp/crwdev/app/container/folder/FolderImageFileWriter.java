@@ -82,26 +82,30 @@ public class FolderImageFileWriter implements IImageFileWriter {
 			}
 			
 			IImageFileInfo info = list.get(i);
-			if(!info.isEnable()){
-				continue;
-			}
+			BufferedImage image = null;
+			
+			synchronized(info){
+				if(!info.isEnable()){
+					continue;
+				}
 
-			BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
-			if(mBaseFilter != null){
-				image = mBaseFilter.filter(image, info.getFilterParam());
+				image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+				if(mBaseFilter != null){
+					image = mBaseFilter.filter(image, info.getFilterParam());
+				}
 			}
+			
 			File file = new File(mOutputFolder, String.format("P%04d.jpg", i));
 			try {
 				FileOutputStream outStream = new FileOutputStream(file);
 				
 				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, outStream);
 				
+				outStream.flush();
 				outStream.close();
-			} catch (FileNotFoundException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return false;
 			}
 			if(listener != null){
 				listener.onProgress((int)((i+1)*progressOffset), null);

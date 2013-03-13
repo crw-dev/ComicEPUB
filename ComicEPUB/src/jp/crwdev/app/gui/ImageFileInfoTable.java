@@ -191,7 +191,6 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	
 	private void onItemSelectedInternal(int index){
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
-			
 			IImageFileInfo info = mInfoList.get(index);
 			if(info != null){
 				InputStream stream = info.getInputStream();
@@ -281,6 +280,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	
 	public void selectCurrentItem(){
 		int selected = getSelectedRow();
+		if(selected < 0){
+			selected = 0;
+		}
 		selectItem(selected);
 //		onItemSelected(selected);
 	}

@@ -17,6 +17,10 @@ public class ImageFilterParam implements Cloneable {
 		mIsEnable = false;
 		mIsPreview = false;
 		mIsDrawCropAreaInPreview = true;
+		mIsColorPageAutoCrop = false;
+		mIsPictPageAutoCrop = false;
+		mIsTextPageAutoCrop = false;
+		mIsFullPageAutoCrop = false;
 		mIsColorPageCrop = false;
 		mColorPageCropLeft = 0;
 		mColorPageCropTop = 0;
@@ -80,6 +84,10 @@ public class ImageFilterParam implements Cloneable {
 		dest.mIsEnable = src.isEnable();
 		dest.mIsPreview = src.isPreview();
 		dest.mIsDrawCropAreaInPreview = src.isDrawCropAreaInPreview();
+		dest.mIsColorPageAutoCrop = src.isColorPageAutoCrop();
+		dest.mIsPictPageAutoCrop = src.isPictPageAutoCrop();
+		dest.mIsTextPageAutoCrop = src.isTextPageAutoCrop();
+		dest.mIsFullPageAutoCrop = src.isFullPageAutoCrop();
 		dest.mIsColorPageCrop = src.isColorPageCrop();
 		dest.mColorPageCropLeft = src.getColorPageCropLeft();
 		dest.mColorPageCropTop = src.getColorPageCropTop();
@@ -125,6 +133,10 @@ public class ImageFilterParam implements Cloneable {
 	protected boolean mIsEnable;
 	protected boolean mIsPreview;
 	protected boolean mIsDrawCropAreaInPreview;
+	protected boolean mIsColorPageAutoCrop;
+	protected boolean mIsPictPageAutoCrop;
+	protected boolean mIsTextPageAutoCrop;
+	protected boolean mIsFullPageAutoCrop;
 	protected boolean mIsColorPageCrop;
 	protected int mColorPageCropLeft;
 	protected int mColorPageCropTop;
@@ -188,7 +200,23 @@ public class ImageFilterParam implements Cloneable {
 	public boolean isDrawCropAreaInPreview(){
 		return mIsDrawCropAreaInPreview;
 	}
+
+	public boolean isColorPageAutoCrop() {
+		return mIsColorPageAutoCrop;
+	}
 	
+	public boolean isPictPageAutoCrop() {
+		return mIsPictPageAutoCrop;
+	}
+	
+	public boolean isTextPageAutoCrop() {
+		return mIsTextPageAutoCrop;
+	}
+	
+	public boolean isFullPageAutoCrop() {
+		return mIsFullPageAutoCrop;
+	}
+
 	public boolean isColorPageCrop() {
 		return mIsColorPageCrop;
 	}
@@ -423,6 +451,22 @@ public class ImageFilterParam implements Cloneable {
 	public void setEqualize(boolean enable) {
 		mIsEqualize = enable;
 	}
+	
+	public void setColorPageAutoCrop(boolean enable) {
+		mIsColorPageAutoCrop = enable;
+	}
+	
+	public void setPictPageAutoCrop(boolean enable) {
+		mIsPictPageAutoCrop = enable;
+	}
+	
+	public void setTextPageAutoCrop(boolean enable) {
+		mIsTextPageAutoCrop = enable;
+	}
+	
+	public void setFullPageAutoCrop(boolean enable) {
+		mIsFullPageAutoCrop = enable;
+	}
 
 	public void setFullPageCrop(boolean enable) {
 		mIsFullPageCrop = enable;
@@ -637,8 +681,23 @@ public class ImageFilterParam implements Cloneable {
 		//if(update.isDrawCropAreaInPreview()){
 		//	dest.mIsDrawCropAreaInPreview = true;
 		//}
+		if(update.isColorPageAutoCrop()){
+			dest.mIsColorPageAutoCrop = true;
+		}
+		if(update.isPictPageAutoCrop()){
+			dest.mIsPictPageAutoCrop = true;
+		}
+		if(update.isTextPageAutoCrop()){
+			dest.mIsTextPageAutoCrop = true;
+		}
+		if(update.isFullPageAutoCrop()){
+			dest.mIsFullPageAutoCrop = true;
+		}
+		
 		if(update.isColorPageCrop()){
 			dest.mIsColorPageCrop = true;
+		}
+		if(update.isColorPageCrop() || update.isColorPageAutoCrop()){
 			dest.mColorPageCropLeft = update.getColorPageCropLeft();
 			dest.mColorPageCropTop = update.getColorPageCropTop();
 			dest.mColorPageCropRight = update.getColorPageCropRight();
@@ -646,6 +705,8 @@ public class ImageFilterParam implements Cloneable {
 		}
 		if(update.isTextPageCrop()){
 			dest.mIsTextPageCrop = true;
+		}
+		if(update.isTextPageCrop() || update.isTextPageAutoCrop()){
 			dest.mTextPageCropLeft = update.getTextPageCropLeft();
 			dest.mTextPageCropTop = update.getTextPageCropTop();
 			dest.mTextPageCropRight = update.getTextPageCropRight();
@@ -653,6 +714,8 @@ public class ImageFilterParam implements Cloneable {
 		}
 		if(update.isPictPageCrop()){
 			dest.mIsPictPageCrop = true;
+		}
+		if(update.isPictPageCrop() || update.isPictPageAutoCrop()){
 			dest.mPictPageCropLeft = update.getPictPageCropLeft();
 			dest.mPictPageCropTop = update.getPictPageCropTop();
 			dest.mPictPageCropRight = update.getPictPageCropRight();
@@ -687,6 +750,8 @@ public class ImageFilterParam implements Cloneable {
 		}
 		if(update.isFullPageCrop()){
 			dest.mIsFullPageCrop = true;
+		}
+		if(update.isFullPageCrop() || update.isFullPageAutoCrop()){
 			dest.mFullPageCropLeft = update.getFullPageCropLeft();
 			dest.mFullPageCropTop = update.getFullPageCropTop();
 			dest.mFullPageCropRight = update.getFullPageCropRight();

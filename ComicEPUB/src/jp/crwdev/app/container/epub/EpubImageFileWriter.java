@@ -276,22 +276,25 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			
 			try {
 				//File file = new File(info.getFullPath());
-				InputStream in = info.getInputStream();
-				
-				BufferedImage image = BufferedImageIO.read(in, info.isJpeg());
-				if(mBaseFilter != null){
-					image = mBaseFilter.filter(image, info.getFilterParam());
-				}
-				BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
-				
-				in.close();
+				synchronized(info){
+					InputStream in = info.getInputStream();
+					
+					BufferedImage image = BufferedImageIO.read(in, info.isJpeg());
+					if(mBaseFilter != null){
+						image = mBaseFilter.filter(image, info.getFilterParam());
+					}
+					BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
+					
+					in.close();
 
-				sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
+					sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
+				}
 
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}
 			
+			zipOut.flush();
 			zipOut.closeEntry();
 			
 			if(listener != null){

@@ -32,6 +32,7 @@ import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
+import jp.crwdev.app.imagefilter.AutoCropFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
@@ -357,6 +358,11 @@ public class MainFrame extends JFrame implements OnEventListener {
 			mImagePanel.setOutputSizePreview(true, previewSize.width, previewSize.height);
 		}else{
 			mImagePanel.setOutputSizePreview(false, 0, 0);
+		}
+		if(previewSize != null){
+			AutoCropFilter.setAspectRatio(previewSize.width, previewSize.height);
+		}else{
+			AutoCropFilter.setAspectRatio(0, 0);
 		}
 		setBaseFilterParam(params);
 		
