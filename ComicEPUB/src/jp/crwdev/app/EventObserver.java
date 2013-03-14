@@ -32,6 +32,7 @@ public class EventObserver {
 	public static final int EventType_SelectTab = 13;			// arg1: tab index
 	public static final int EventType_ModifiedSetting = 14;		// no param
 	public static final int EventType_PreviewSize = 15;			// arg1: 1:true, 0:false, obj: Dimension
+	public static final int EventType_RequestSaveSetting = 16;	// no param
 
 	/** イベントリスナ 4種類  */
 	private OnEventListener[] mListeners = new OnEventListener[4];

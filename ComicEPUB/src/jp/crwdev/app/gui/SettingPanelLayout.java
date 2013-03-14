@@ -151,17 +151,11 @@ public class SettingPanelLayout extends JPanel {
 		
 		labelMessage = new JLabel("");
 		springLayout.putConstraint(SpringLayout.WEST, labelMessage, 0, SpringLayout.WEST, checkPreview);
-		springLayout.putConstraint(SpringLayout.SOUTH, labelMessage, -6, SpringLayout.NORTH, progressBar);
+		springLayout.putConstraint(SpringLayout.SOUTH, labelMessage, 0, SpringLayout.NORTH, cancelButton);
 		springLayout.putConstraint(SpringLayout.EAST, labelMessage, 0, SpringLayout.EAST, tabbedPane);
 		add(labelMessage);
 
 		
-		packageConvertButton.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				new BatWorkDialog(mParentFrame);
-			}
-		});
 	}
 	
 	

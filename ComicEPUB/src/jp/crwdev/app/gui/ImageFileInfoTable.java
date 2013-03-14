@@ -2,6 +2,7 @@
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -743,6 +744,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			int nextIndex = getSelectedRow() + arg1;
 			if(nextIndex >= 0 && getRowCount() > nextIndex){
 				setRowSelectionInterval(nextIndex, nextIndex);
+				scrollRectToVisible(new Rectangle(getCellRect(nextIndex, 0, true)));
 			}
 			break;
 		case EventObserver.EventType_RenewalList:

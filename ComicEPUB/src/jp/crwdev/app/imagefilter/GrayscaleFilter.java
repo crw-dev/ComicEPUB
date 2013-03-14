@@ -74,6 +74,7 @@ public class GrayscaleFilter implements IImageFilter {
 	    				convertThreadProcess(destCopy, srcCopy, start, threadNum);
 	    			}
 	    		});
+	    		threads[i-1].setPriority(8);
 	    		threads[i-1].start();
 	    	}
 			convertThreadProcess(destCopy, srcCopy, 0, threadNum);

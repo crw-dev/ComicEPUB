@@ -436,6 +436,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 				+ "<package xmlns=\"http://www.idpf.org/2007/opf\" version=\"3.0\" xml:lang=\"ja\" unique-identifier=\"BookID\"\n" //=\"" + uuid + "\"\n"
 				+ "prefix=\"rendition: http://www.idpf.org/vocab/rendition/#\n"
+				+ "         prs: http://prs.dummy.jp/\n"
 				+ "         ebpaj: http://www.ebpaj.jp/\n"
 				+ "         fixed-layout-jp: http://www.digital-comic.jp/\">\n"
 				+ "<metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n"

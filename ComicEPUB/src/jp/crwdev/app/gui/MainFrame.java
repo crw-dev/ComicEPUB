@@ -69,6 +69,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	public MainFrame(){
 		 setSize(new Dimension(950,750));
 	     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	     setTitle("ComicEPUB");
 	     
 	     addWindowListener(new WindowAdapter(){
 	    	 @Override
@@ -359,11 +360,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 		}else{
 			mImagePanel.setOutputSizePreview(false, 0, 0);
 		}
-		if(previewSize != null){
-			AutoCropFilter.setAspectRatio(previewSize.width, previewSize.height);
-		}else{
-			AutoCropFilter.setAspectRatio(0, 0);
-		}
+
 		setBaseFilterParam(params);
 		
 		mTable.selectCurrentItem(); // Baseフィルタが更新されたのでカレントイメージも更新する
@@ -464,6 +461,17 @@ public class MainFrame extends JFrame implements OnEventListener {
 		}.start();
 	}
 	
+	private void saveSettingFileRequest(){
+		 if(mSettingFilePath != null){
+			 if(mIsSettingChanged){
+    			 int ret = showSettingSaveConfirmDialog();
+    			 if(ret == JOptionPane.YES_OPTION){
+    				 saveSettingFile(mSettingFilePath);
+    			 }
+			 }
+		 }
+	}
+	
 	@Override
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
@@ -483,6 +491,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 					mFileWriter.cancel();
 				}
 			}
+			break;
+		case EventObserver.EventType_RequestSaveSetting:
+			saveSettingFileRequest();
 			break;
 		default:
 			break;

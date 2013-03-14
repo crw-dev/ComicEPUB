@@ -42,7 +42,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 		mOutputSetting.setComponents(this, outputImageSize, outputFileType, outputBookType,
 										textTitle, textTitleKana, textAuthor, textAuthorKana,
 										outputFolder, outpuFolderButton, convertButton, cancelButton,
-										checkOutputResize);
+										checkOutputResize, packageConvertButton, parent);
 		mProgressPanel.setComponents(this, labelMessage, progressBar, cancelButton);
 		
 //		//SpringLayout layout = new SpringLayout();
@@ -158,6 +158,10 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	 */
 	public void updateSettingValues(){
 		onUpdateSetting(getImageFilterParamSet());
+	}
+	
+	public void saveSettingFileRequest(){
+		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_RequestSaveSetting, 0);
 	}
 	
 	@Override

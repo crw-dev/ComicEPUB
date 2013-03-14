@@ -12,15 +12,7 @@ import jp.crwdev.app.interfaces.IImageFilter;
 public class AutoCropFilter implements IImageFilter {
 
 	private static final int mCheckOffset = 3;
-	private static final int mMargin = 20;
-	
-	private static float mAspectX = 0;
-	private static float mAspectY = 0;
-	
-	public static void setAspectRatio(float width, float height){
-		mAspectX = width;
-		mAspectY = height;
-	}
+	private static final int mDefaultCropMargin = 30;
 	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
@@ -71,56 +63,14 @@ public class AutoCropFilter implements IImageFilter {
 			break;
 		}
 		if(left == 0 && right == 0 && top == 0 && bottom == 0){
-			left = mMargin;
-			top = mMargin;
-			right = mMargin;
-			bottom = mMargin;
+			left = mDefaultCropMargin;
+			top = mDefaultCropMargin;
+			right = mDefaultCropMargin;
+			bottom = mDefaultCropMargin;
 		}
 		Rectangle rect = getAutoCropRect(image, left, top, right, bottom);
 		
 		if(!rect.isEmpty()){
-			
-			if(rect.width < rect.height){
-				float scale = 1.0f;
-				if(mAspectX == 0 || mAspectY == 0){
-					scale = (float)image.getWidth() / (float)image.getHeight();
-				}else{
-					scale = mAspectX / mAspectY;
-				}
-				int width = Math.min((int)(rect.height * scale), image.getWidth());
-				Rectangle newRect = new Rectangle(rect.x-(width-rect.width)/2, rect.y, width, rect.height);
-				if(newRect.x < 0){
-					newRect.x = 0;
-				}
-				else if(newRect.x+newRect.width >= image.getWidth()){
-					newRect.x = image.getWidth() - newRect.width;
-					if(newRect.x < 0){
-						newRect.x = 0;
-						newRect.width = image.getWidth();
-					}
-				}
-				if(rect.width < newRect.width){
-					rect = newRect;
-				}
-			}else{
-				float scale = 1.0f;
-				if(mAspectX == 0 || mAspectY == 0){
-					scale = (float)image.getHeight() / (float)image.getWidth();
-				}else{
-					scale = mAspectY / mAspectX;
-				}
-				int height = (int)(rect.width * scale);
-				Rectangle newRect = new Rectangle(rect.x, rect.y-(height-rect.height)/2, rect.width, height);
-				if(newRect.y < 0){
-					newRect.y = 0;
-				}
-				else if(newRect.y+newRect.height >= image.getHeight()){
-					newRect.y = image.getHeight()-newRect.height;
-				}
-				if(rect.height < newRect.height){
-					rect = newRect;
-				}
-			}
 			
 			if(param.isPreview()){
 				Graphics2D g = image.createGraphics();
@@ -142,62 +92,78 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int left = width-1;
-		int right = 0;
-		int top = height-1;
-		int bottom = 0;
+		int left = leftMargin == 0 ? width-1 : leftMargin;
+		int right = rightMargin == 0 ? 0 : width - rightMargin - 1;
+		int top = topMargin == 0 ? height-1 : topMargin;
+		int bottom = bottomMargin == 0 ? 0 : height - bottomMargin - 1;
 		
+		boolean found = false;
 		for(int y=0; y<height; y+= mCheckOffset){
-			for(int x=0; x<left; x+= mCheckOffset){
+			for(int x=0; x<leftMargin && x<left; x+= 1){
 				if(!isWhiteColor(image.getRGB(x, y))){
 					if(x < left){
 						left = x;
+						found = true;
 					}
 					break;
 				}
 			}
 		}
-		left -= leftMargin;
+		if(found){
+			left -= 1;
+		}
 		left = Math.max(0, left);
 
 		
+		found = false;
 		for(int y=0; y<height; y+= mCheckOffset){
-			for(int x=width-1; x>=right; x-= mCheckOffset){
+			for(int x=width-1; x>=width-rightMargin-1 && x>=right; x-= 1){
 				if(!isWhiteColor(image.getRGB(x, y))){
 					if(x > right){
 						right = x;
+						found = true;
 					}
 					break;
 				}
 			}
 		}
-		right += rightMargin;
+		if(found){
+			right += 1;
+		}
 		right = Math.min(width-1, right);
 		
+		found = false;
 		for(int x=0; x<width; x+= mCheckOffset){
-			for(int y=0; y<top; y+= mCheckOffset){
+			for(int y=0; y<topMargin && y<top; y+= 1){
 				if(!isWhiteColor(image.getRGB(x, y))){
 					if(y < top){
 						top = y;
+						found = true;
 					}
 					break;
 				}
 			}
 		}
-		top -= topMargin;
+		if(found){
+			top -= 1;
+		}
 		top = Math.max(0, top);
 		
+		found = false;
 		for(int x=0; x<width; x+= mCheckOffset){
-			for(int y=height-1; y>=bottom; y-= mCheckOffset){
+			for(int y=height-1; y>=height-bottomMargin-1  && y>=bottom; y-= 1){
 				if(!isWhiteColor(image.getRGB(x, y))){
 					if(y > bottom){
 						bottom = y;
+						found = true;
 					}
 					break;
 				}
 			}
 		}
-		bottom += bottomMargin;
+		if(found){
+			bottom += 1;
+		}
 		bottom = Math.min(height-1, bottom);
 
 		if(left >= right){
@@ -218,7 +184,7 @@ public class AutoCropFilter implements IImageFilter {
 		int r = (color >> 16) & 0xff;
 		int g = (color >> 8) & 0xff;
 		int b = color & 0xff;
-		if(r >= 0xd8 && g >= 0xd8 && b >= 0xd8){
+		if(r >= 0xb8 && g >= 0xb8 && b >= 0xb8){
 			return true;
 		}
 		return false;

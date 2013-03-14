@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -27,6 +28,9 @@ public class OutputSettingPanel extends JPanel {
 	private boolean mIsInputFileName = false;
 	private String mOutputFileName = "";
 
+	// JFrame
+	public JFrame mFrame;
+	
 	// ComboBox
 	public JComboBox outputImageSize;
 	public JComboBox outputBookType;
@@ -43,6 +47,7 @@ public class OutputSettingPanel extends JPanel {
 	public JButton chooseFolderButton;
 	public JButton convertButton;
 	public JButton cancelButton;
+	public JButton packageConvertButton;
 	
 	// CheckBox
 	public JCheckBox checkOutputResize;
@@ -59,8 +64,9 @@ public class OutputSettingPanel extends JPanel {
 	public void setComponents(SettingPanel parent, JComboBox imageSize, JComboBox fileType, JComboBox bookType,
 			JTextField title, JTextField titleKana, JTextField author, JTextField authorKana,
 			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn,
-			JCheckBox outputResize){
+			JCheckBox outputResize, JButton packageConvButton, JFrame parentFrame){
 		mParent = parent;
+		mFrame = parentFrame;
 		outputImageSize = imageSize;
 		outputFileType = fileType;
 		outputBookType = bookType;
@@ -73,6 +79,7 @@ public class OutputSettingPanel extends JPanel {
 		convertButton = convertBtn;
 		cancelButton = cancelBtn;
 		checkOutputResize = outputResize;
+		packageConvertButton = packageConvButton;
 		initialize();
 	}
 	
@@ -164,6 +171,15 @@ public class OutputSettingPanel extends JPanel {
 				}
 			}
 		});
+		
+		packageConvertButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				mParent.saveSettingFileRequest();
+				new BatWorkDialog(mFrame);
+			}
+		});
+
 	}
 	
 	public OutputSettingParam getOutputSettingParam(){

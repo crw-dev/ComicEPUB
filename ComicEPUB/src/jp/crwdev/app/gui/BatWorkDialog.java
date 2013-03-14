@@ -461,11 +461,6 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			params.setResize(true);
 			params.setResizeDimension(size);
 		}
-		if(size != null){
-			AutoCropFilter.setAspectRatio(size.width, size.height);
-		}else{
-			AutoCropFilter.setAspectRatio(0, 0);
-		}
 		
 		// 基本出力フィルタを生成
 		OutputImageFilter imageFilter = new OutputImageFilter(params);
