@@ -13,6 +13,7 @@ public class AutoCropFilter implements IImageFilter {
 
 	private static final int mCheckOffset = 3;
 	private static final int mDefaultCropMargin = 30;
+	private static final int mLooseMargin = 5;
 	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
@@ -86,9 +87,13 @@ public class AutoCropFilter implements IImageFilter {
 		return image;
 	}
 
+	
 	private Rectangle getAutoCropRect(BufferedImage image, int leftMargin, int topMargin, int rightMargin, int bottomMargin){
 		Rectangle rect = new Rectangle();
 	
+//		EdgeDetectionFilter edge = new EdgeDetectionFilter();
+//		image = edge.filter(image, null);
+
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -110,7 +115,11 @@ public class AutoCropFilter implements IImageFilter {
 			}
 		}
 		if(found){
-			left -= 1;
+			if(mLooseMargin > 0){
+				left -= Math.min(10,(left / mLooseMargin)) + 1;
+			}else{
+				left -= 1;
+			}
 		}
 		left = Math.max(0, left);
 
@@ -128,7 +137,12 @@ public class AutoCropFilter implements IImageFilter {
 			}
 		}
 		if(found){
-			right += 1;
+			if(mLooseMargin > 0){
+				int offset = width - right;
+				right += Math.min(10,(offset / mLooseMargin)) + 1;
+			}else{
+				right += 1;
+			}
 		}
 		right = Math.min(width-1, right);
 		
@@ -145,7 +159,11 @@ public class AutoCropFilter implements IImageFilter {
 			}
 		}
 		if(found){
-			top -= 1;
+			if(mLooseMargin > 0){
+				top -= Math.min(10,(top / mLooseMargin)) + 1;
+			}else{
+				top -= 1;
+			}
 		}
 		top = Math.max(0, top);
 		
@@ -162,7 +180,12 @@ public class AutoCropFilter implements IImageFilter {
 			}
 		}
 		if(found){
-			bottom += 1;
+			if(mLooseMargin > 0){
+				int offset = height - bottom;
+				bottom += Math.min(10,(offset / mLooseMargin)) + 1;
+			}else{
+				bottom += 1;
+			}
 		}
 		bottom = Math.min(height-1, bottom);
 
@@ -184,7 +207,7 @@ public class AutoCropFilter implements IImageFilter {
 		int r = (color >> 16) & 0xff;
 		int g = (color >> 8) & 0xff;
 		int b = color & 0xff;
-		if(r >= 0xb8 && g >= 0xb8 && b >= 0xb8){
+		if(r >= 0x80 && g >= 0x80 && b >= 0x80){
 			return true;
 		}
 		return false;
