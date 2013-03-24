@@ -340,18 +340,43 @@ public class SettingTabPanel extends JPanel {
 			if(param.isGrayscale()){
 				checkGrayscale.setSelected(param.isGrayscale());
 			}
-			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_BASIC && param.isFullPageCrop()){
-				checkCrop.setSelected(param.isFullPageCrop());
+			
+			switch(mFilterIndex){
+			case ImageFilterParamSet.FILTER_INDEX_COLOR:
+				if(param.isColorPageCrop()){
+					checkCrop.setSelected(param.isColorPageCrop());
+				}
+				if(param.isColorPageAutoCrop()){
+					checkAutoCrop.setSelected(param.isColorPageAutoCrop());
+				}
+				break;
+			case ImageFilterParamSet.FILTER_INDEX_PICT:
+				if(param.isPictPageCrop()){
+					checkCrop.setSelected(param.isPictPageCrop());
+				}
+				if(param.isPictPageAutoCrop()){
+					checkAutoCrop.setSelected(param.isPictPageAutoCrop());
+				}
+				break;
+			case ImageFilterParamSet.FILTER_INDEX_TEXT:
+				if(param.isTextPageCrop()){
+					checkCrop.setSelected(param.isTextPageCrop());
+				}
+				if(param.isTextPageAutoCrop()){
+					checkAutoCrop.setSelected(param.isTextPageAutoCrop());
+				}
+				break;
+			case ImageFilterParamSet.FILTER_INDEX_BASIC:
+			default:
+				if(param.isFullPageCrop()){
+					checkCrop.setSelected(param.isFullPageCrop());
+				}
+				if(param.isFullPageAutoCrop()){
+					checkAutoCrop.setSelected(param.isFullPageAutoCrop());
+				}
+				break;
 			}
-			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_COLOR && param.isColorPageCrop()){
-				checkCrop.setSelected(param.isColorPageCrop());
-			}
-			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT && param.isTextPageCrop()){
-				checkCrop.setSelected(param.isTextPageCrop());
-			}
-			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_PICT && param.isPictPageCrop()){
-				checkCrop.setSelected(param.isPictPageCrop());
-			}
+
 			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT && param.isUnificationTextPage()){
 				checkUnification.setSelected(param.isUnificationTextPage());
 			}
@@ -365,16 +390,20 @@ public class SettingTabPanel extends JPanel {
 			switch(mFilterIndex){
 			case ImageFilterParamSet.FILTER_INDEX_COLOR:
 				checkCrop.setSelected(param.isColorPageCrop());
+				checkAutoCrop.setSelected(param.isColorPageAutoCrop());
 				break;
 			case ImageFilterParamSet.FILTER_INDEX_PICT:
 				checkCrop.setSelected(param.isPictPageCrop());
+				checkAutoCrop.setSelected(param.isPictPageAutoCrop());
 				break;
 			case ImageFilterParamSet.FILTER_INDEX_TEXT:
 				checkCrop.setSelected(param.isTextPageCrop());
+				checkAutoCrop.setSelected(param.isTextPageAutoCrop());
 				break;
 			case ImageFilterParamSet.FILTER_INDEX_BASIC:
 			default:
 				checkCrop.setSelected(param.isFullPageCrop());
+				checkAutoCrop.setSelected(param.isFullPageAutoCrop());
 				break;
 			}
 			if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT){
@@ -397,41 +426,52 @@ public class SettingTabPanel extends JPanel {
 			sliderBrightness.setValue((int)param.getBrightness());
 		}
 
-		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_BASIC && param.isFullPageCrop()){
-			spinCropLeft.setValue(param.getFullPageCropLeft());
-			spinCropRight.setValue(param.getFullPageCropRight());
-			spinCropTop.setValue(param.getFullPageCropTop());
-			spinCropBottom.setValue(param.getFullPageCropBottom());
-			if(checkCrop.isSelected()){
-				update = true;
+		switch(mFilterIndex){
+		case ImageFilterParamSet.FILTER_INDEX_COLOR:
+			if(param.isColorPageAutoCrop() || param.isColorPageCrop()){
+				spinCropLeft.setValue(param.getColorPageCropLeft());
+				spinCropRight.setValue(param.getColorPageCropRight());
+				spinCropTop.setValue(param.getColorPageCropTop());
+				spinCropBottom.setValue(param.getColorPageCropBottom());
+				if(checkCrop.isSelected()){
+					update = true;
+				}
 			}
-		}
-		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_COLOR && param.isColorPageCrop()){
-			spinCropLeft.setValue(param.getColorPageCropLeft());
-			spinCropRight.setValue(param.getColorPageCropRight());
-			spinCropTop.setValue(param.getColorPageCropTop());
-			spinCropBottom.setValue(param.getColorPageCropBottom());
-			if(checkCrop.isSelected()){
-				update = true;
+			break;
+		case ImageFilterParamSet.FILTER_INDEX_PICT:
+			if(param.isPictPageAutoCrop()){
+				spinCropLeft.setValue(param.getPictPageCropLeft());
+				spinCropRight.setValue(param.getPictPageCropRight());
+				spinCropTop.setValue(param.getPictPageCropTop());
+				spinCropBottom.setValue(param.getPictPageCropBottom());
+				if(checkCrop.isSelected()){
+					update = true;
+				}
 			}
-		}
-		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_PICT && param.isPictPageCrop()){
-			spinCropLeft.setValue(param.getPictPageCropLeft());
-			spinCropRight.setValue(param.getPictPageCropRight());
-			spinCropTop.setValue(param.getPictPageCropTop());
-			spinCropBottom.setValue(param.getPictPageCropBottom());
-			if(checkCrop.isSelected()){
-				update = true;
+			break;
+		case ImageFilterParamSet.FILTER_INDEX_TEXT:
+			if(param.isTextPageAutoCrop()){
+				spinCropLeft.setValue(param.getTextPageCropLeft());
+				spinCropRight.setValue(param.getTextPageCropRight());
+				spinCropTop.setValue(param.getTextPageCropTop());
+				spinCropBottom.setValue(param.getTextPageCropBottom());
+				if(checkCrop.isSelected()){
+					update = true;
+				}
 			}
-		}
-		if(mFilterIndex == ImageFilterParamSet.FILTER_INDEX_TEXT && param.isTextPageCrop()){
-			spinCropLeft.setValue(param.getTextPageCropLeft());
-			spinCropRight.setValue(param.getTextPageCropRight());
-			spinCropTop.setValue(param.getTextPageCropTop());
-			spinCropBottom.setValue(param.getTextPageCropBottom());
-			if(checkCrop.isSelected()){
-				update = true;
+			break;
+		case ImageFilterParamSet.FILTER_INDEX_BASIC:
+		default:
+			if(param.isFullPageAutoCrop() || param.isFullPageCrop()){
+				spinCropLeft.setValue(param.getFullPageCropLeft());
+				spinCropRight.setValue(param.getFullPageCropRight());
+				spinCropTop.setValue(param.getFullPageCropTop());
+				spinCropBottom.setValue(param.getFullPageCropBottom());
+				if(checkCrop.isSelected()){
+					update = true;
+				}
 			}
+			break;
 		}
 		
 		if(param.isUnificationTextPage()){
