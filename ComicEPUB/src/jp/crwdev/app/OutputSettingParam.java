@@ -35,6 +35,14 @@ public class OutputSettingParam {
 	private String mAuthor = "";
 	/** 作者名カナ */
 	private String mAuthorKana = "";
+	
+	/** シリーズ名 */
+	private String mSeriesTitle = "";
+	/** シリーズ名 カナ*/
+	private String mSeriesTitleKana = "";
+	/** シリーズ巻数 */
+	private int mSeriesNumber = 0;
+	
 
 	/**
 	 * コンストラクタ
@@ -133,7 +141,8 @@ public class OutputSettingParam {
 			return new FolderImageFileWriter();
 		}
 		else if(mOutputFileType.equalsIgnoreCase("epub")){
-			return new EpubImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana(), getEpubType());
+			return new EpubImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana(), getEpubType(),
+					getSeriesTitle(), getSeriesTitleKana(), getSeriesNumber());
 		}
 		else if(mOutputFileType.equalsIgnoreCase("pdf")){
 			return new PdfImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana());
@@ -286,5 +295,53 @@ public class OutputSettingParam {
 	 */
 	public String getAuthorKana(){
 		return mAuthorKana;
+	}
+	
+	/**
+	 * シリーズタイトル設定
+	 * @param title
+	 */
+	public void setSeriesTitle(String title){
+		mSeriesTitle = title;
+	}
+	
+	/**
+	 * シリーズタイトルカナ設定
+	 * @param kana
+	 */
+	public void setSeriesTitleKana(String kana){
+		mSeriesTitleKana = kana;
+	}
+	
+	/**
+	 * シリーズ巻数設定
+	 * @param number
+	 */
+	public void setSeriesNumber(int number){
+		mSeriesNumber = number;
+	}
+	
+	/**
+	 * シリーズタイトル取得
+	 * @return
+	 */
+	public String getSeriesTitle(){
+		return mSeriesTitle;
+	}
+	
+	/**
+	 * シリーズタイトルカナ取得
+	 * @return
+	 */
+	public String getSeriesTitleKana(){
+		return mSeriesTitleKana;
+	}
+	
+	/**
+	 * シリーズ巻数取得
+	 * @return
+	 */
+	public int getSeriesNumber(){
+		return mSeriesNumber;
 	}
 }

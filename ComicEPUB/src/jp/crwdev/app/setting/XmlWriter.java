@@ -188,6 +188,30 @@ public class XmlWriter {
 			parent.appendChild(authorKanaElem);
 		}
 
+		
+		// <seriesTitle>
+		String seriesTitle = output.getSeriesTitle();
+		if(!seriesTitle.isEmpty()){
+			Element elem = mDocument.createElement("seriesTitle");
+			elem.appendChild(mDocument.createTextNode(seriesTitle));
+			parent.appendChild(elem);
+		}
+		
+		// <seriesTitleKana>
+		String seriesTitleKana = output.getSeriesTitle();
+		if(!seriesTitleKana.isEmpty()){
+			Element elem = mDocument.createElement("seriesTitleKana");
+			elem.appendChild(mDocument.createTextNode(seriesTitleKana));
+			parent.appendChild(elem);
+		}
+
+		// <seriesNumber>
+		int seriesNumber = output.getSeriesNumber();
+		if(seriesNumber > 0){
+			Element elem = mDocument.createElement("seriesNumber");
+			elem.appendChild(mDocument.createTextNode(Integer.toString(seriesNumber)));
+			parent.appendChild(elem);
+		}
 	}
 	
 	private void writeInfo(Element parent, IImageFileInfo info){
@@ -637,6 +661,24 @@ public class XmlWriter {
 					if(node.hasChildNodes()){
 						String value = node.getFirstChild().getNodeValue();
 						output.setAuthorKana(value);
+					}
+				}
+				else if(name.equalsIgnoreCase("seriesTitle")){
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setSeriesTitle(value);
+					}
+				}
+				else if(name.equalsIgnoreCase("seriesTitleKana")){
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setSeriesTitleKana(value);
+					}
+				}
+				else if(name.equalsIgnoreCase("seriesNumber")){
+					if(node.hasChildNodes()){
+						String value = node.getFirstChild().getNodeValue();
+						output.setSeriesNumber(Integer.parseInt(value));
 					}
 				}
 			}

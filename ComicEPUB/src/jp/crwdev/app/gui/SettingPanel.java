@@ -40,6 +40,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 
 		
 		mOutputSetting.setComponents(this, outputImageSize, outputFileType, outputBookType,
+										textSeriesTitle, textSeriesTitleKana, textSeriesNumber,
 										textTitle, textTitleKana, textAuthor, textAuthorKana,
 										outputFolder, outpuFolderButton, convertButton, cancelButton,
 										checkOutputResize, packageConvertButton, parent);

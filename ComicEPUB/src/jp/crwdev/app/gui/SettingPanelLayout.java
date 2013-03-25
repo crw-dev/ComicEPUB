@@ -24,6 +24,9 @@ public class SettingPanelLayout extends JPanel {
 	protected DefaultTextField textAuthor;
 	protected DefaultTextField textAuthorKana;
 	protected DefaultTextField textTitleKana;
+	protected DefaultTextField textSeriesTitle;
+	protected DefaultTextField textSeriesTitleKana;
+	protected DefaultTextField textSeriesNumber;
 	protected DefaultTextField outputFolder;
 	protected JCheckBox checkPreview;
 	protected JCheckBox checkResize;
@@ -72,8 +75,29 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, tabbedPane, -3, SpringLayout.EAST, this);
 		add(tabbedPane);
 		
+		//
+		textSeriesTitle = new DefaultTextField(14, "シリーズ名");
+		springLayout.putConstraint(SpringLayout.NORTH, textSeriesTitle, 6, SpringLayout.SOUTH, tabbedPane);
+		springLayout.putConstraint(SpringLayout.WEST, textSeriesTitle, 3, SpringLayout.WEST, this);
+		add(textSeriesTitle);
+		textSeriesTitle.setColumns(14);
+		
+		textSeriesNumber = new DefaultTextField(3, "巻");
+		springLayout.putConstraint(SpringLayout.NORTH, textSeriesNumber, 0, SpringLayout.NORTH, textSeriesTitle);
+		springLayout.putConstraint(SpringLayout.WEST, textSeriesNumber, 3, SpringLayout.EAST, textSeriesTitle);
+		add(textSeriesNumber);
+		textSeriesNumber.setColumns(3);
+
+		textSeriesTitleKana = new DefaultTextField(14, "シリーズ名カナ");
+		springLayout.putConstraint(SpringLayout.NORTH, textSeriesTitleKana, 6, SpringLayout.SOUTH, textSeriesTitle);
+		springLayout.putConstraint(SpringLayout.WEST, textSeriesTitleKana, 3, SpringLayout.WEST, this);
+		add(textSeriesTitleKana);
+		textSeriesTitleKana.setColumns(14);
+
+		//
+		
 		textTitle = new DefaultTextField(10, "タイトル");
-		springLayout.putConstraint(SpringLayout.NORTH, textTitle, 6, SpringLayout.SOUTH, tabbedPane);
+		springLayout.putConstraint(SpringLayout.NORTH, textTitle, 6, SpringLayout.SOUTH, textSeriesTitleKana);
 		springLayout.putConstraint(SpringLayout.WEST, textTitle, 3, SpringLayout.WEST, this);
 		add(textTitle);
 		textTitle.setColumns(10);
@@ -95,7 +119,7 @@ public class SettingPanelLayout extends JPanel {
 		textTitleKana = new DefaultTextField(10, "タイトルカナ");
 		springLayout.putConstraint(SpringLayout.WEST, textTitleKana, 182, SpringLayout.WEST, this);
 		springLayout.putConstraint(SpringLayout.EAST, textTitle, -6, SpringLayout.WEST, textTitleKana);
-		springLayout.putConstraint(SpringLayout.NORTH, textTitleKana, 6, SpringLayout.SOUTH, tabbedPane);
+		springLayout.putConstraint(SpringLayout.NORTH, textTitleKana, 6, SpringLayout.SOUTH, textSeriesTitleKana);
 		springLayout.putConstraint(SpringLayout.SOUTH, textTitleKana, -6, SpringLayout.NORTH, textAuthorKana);
 		springLayout.putConstraint(SpringLayout.EAST, textTitleKana, -3, SpringLayout.EAST, this);
 		textTitleKana.setColumns(10);

@@ -374,7 +374,7 @@ public class AutoCropFilter implements IImageFilter {
 		int r = (color >> 16) & 0xff;
 		int g = (color >> 8) & 0xff;
 		int b = color & 0xff;
-		if(r >= 0x60 && g >= 0x60 && b >= 0x60){
+		if(r >= 0x70 && g >= 0x70 && b >= 0x70){
 			return true;
 		}
 		return false;

@@ -43,6 +43,10 @@ public class OutputSettingPanel extends JPanel {
 	public JTextField outputAuthor;
 	public JTextField outputAuthorKana;
 	
+	public JTextField outputSeriesTitle;
+	public JTextField outputSeriesTitleKana;
+	public JTextField outputSeriesNumber;
+	
 	// Button
 	public JButton chooseFolderButton;
 	public JButton convertButton;
@@ -62,6 +66,7 @@ public class OutputSettingPanel extends JPanel {
 	}
 	
 	public void setComponents(SettingPanel parent, JComboBox imageSize, JComboBox fileType, JComboBox bookType,
+			JTextField seriesTitle, JTextField seriesTitleKana, JTextField seriesNumber,
 			JTextField title, JTextField titleKana, JTextField author, JTextField authorKana,
 			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn,
 			JCheckBox outputResize, JButton packageConvButton, JFrame parentFrame){
@@ -70,6 +75,9 @@ public class OutputSettingPanel extends JPanel {
 		outputImageSize = imageSize;
 		outputFileType = fileType;
 		outputBookType = bookType;
+		outputSeriesTitle = seriesTitle;
+		outputSeriesTitleKana = seriesTitleKana;
+		outputSeriesNumber = seriesNumber;
 		outputTitle = title;
 		outputTitleKana = titleKana;
 		outputAuthor = author;
@@ -198,6 +206,15 @@ public class OutputSettingPanel extends JPanel {
 		param.setAuthor(outputAuthor.getText());
 		param.setAuthorKana(outputAuthorKana.getText());
 		
+		param.setSeriesTitle(outputSeriesTitle.getText());
+		param.setSeriesTitleKana(outputSeriesTitleKana.getText());
+		int number = 0;
+		try {
+			number = Integer.parseInt(outputSeriesNumber.getText());
+		}catch(Exception e){
+		}
+		param.setSeriesNumber(number);
+		
 		param.setOutputFileName(mOutputFileName);
 		
 		return param;
@@ -242,6 +259,7 @@ public class OutputSettingPanel extends JPanel {
 	public void applyOutputParam(OutputSettingParam param){
 		
 		// ComboBox
+		// imageSize
 		Dimension size = param.getImageSize();
 		int selectedIndex = -1;
 		if(size != null && size.width != 0 && size.height != 0){
@@ -258,6 +276,28 @@ public class OutputSettingPanel extends JPanel {
 			outputImageSize.setSelectedIndex(selectedIndex);
 		}else{
 			outputImageSize.setSelectedIndex(outputImageSize.getItemCount()-1);
+		}
+		
+		// fileType
+		String fileType = param.getFileType();
+		if(fileType != null && !fileType.isEmpty()){
+			for(int i=0; i<outputFileType.getItemCount(); i++){
+				String value = (String)outputFileType.getItemAt(i);
+				if(fileType.equalsIgnoreCase(value)){
+					outputFileType.setSelectedIndex(i);
+				}
+			}
+		}
+		
+		// epubType
+		String epubType = param.getEpubType();
+		if(epubType != null && !epubType.isEmpty()){
+			for(int i=0; i<outputBookType.getItemCount(); i++){
+				String value = (String)outputBookType.getItemAt(i);
+				if(epubType.equalsIgnoreCase(value)){
+					outputBookType.setSelectedIndex(i);
+				}
+			}
 		}
 		
 		if(!param.getOutputPath().isEmpty()){
@@ -278,6 +318,15 @@ public class OutputSettingPanel extends JPanel {
 			outputAuthorKana.setText(param.getAuthorKana());
 		}
 		
+		if(!param.getSeriesTitle().isEmpty()){
+			outputSeriesTitle.setText(param.getSeriesTitle());
+		}
+		if(!param.getSeriesTitleKana().isEmpty()){
+			outputSeriesTitleKana.setText(param.getSeriesTitleKana());
+		}
+		if(param.getSeriesNumber() > 0){
+			outputSeriesNumber.setText(Integer.toString(param.getSeriesNumber()));
+		}
 	}
 	
 	/**
