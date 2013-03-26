@@ -198,7 +198,7 @@ public class XmlWriter {
 		}
 		
 		// <seriesTitleKana>
-		String seriesTitleKana = output.getSeriesTitle();
+		String seriesTitleKana = output.getSeriesTitleKana();
 		if(!seriesTitleKana.isEmpty()){
 			Element elem = mDocument.createElement("seriesTitleKana");
 			elem.appendChild(mDocument.createTextNode(seriesTitleKana));
@@ -468,6 +468,12 @@ public class XmlWriter {
 			Element elem = mDocument.createElement("pageType");
 			elem.appendChild(mDocument.createTextNode("true"));
 			elem.setAttribute("type", Integer.toString(param.getPageType()));
+			paramElem.appendChild(elem);
+		}
+		if(!param.getPageSpread().equals(Constant.PAGESPREAD_AUTO)){
+			Element elem = mDocument.createElement("pageSpread");
+			elem.appendChild(mDocument.createTextNode("true"));
+			elem.setAttribute("type", param.getPageSpread());
 			paramElem.appendChild(elem);
 		}
 					
@@ -950,6 +956,13 @@ public class XmlWriter {
 					String enable = node.getFirstChild().getNodeValue();
 					if(Boolean.parseBoolean(enable)){
 						param.setPageType(Integer.parseInt(type));
+					}
+				}
+				else if(name.equalsIgnoreCase("pageSpread")){
+					String type = getAttributeValue(attrs, "type");
+					String enable = node.getFirstChild().getNodeValue();
+					if(Boolean.parseBoolean(enable)){
+						param.setPageSpread(type);
 					}
 				}
 			}

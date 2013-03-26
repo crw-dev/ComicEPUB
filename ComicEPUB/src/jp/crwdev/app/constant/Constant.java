@@ -40,9 +40,14 @@ public class Constant {
 	public static final String TEXT_SPLITTYPE_L2R_3x3 = "順Ｚ 3x3";
 	public static final String TEXT_SPLITTYPE_CUSTOM = "カスタム";
 	
+	public static final String PAGESPREAD_AUTO = "";
+	public static final String PAGESPREAD_LEFT = "left";
+	public static final String PAGESPREAD_RIGHT = "right";
+	public static final String PAGESPREAD_CENTER = "center";
 	
 	public static final String TABLE_HEADER_ENTRYNAME = "ファイル名";
 	public static final String TABLE_HEADER_PAGETYPE = "種別";
+	public static final String TABLE_HEADER_PAGESPREAD = "配置";
 	public static final String TABLE_HEADER_ROTATE = "回転";
 	public static final String TABLE_HEADER_POSITION = "座標";
 	public static final String TABLE_HEADER_WIDTH = "幅";
@@ -52,16 +57,18 @@ public class Constant {
 	
 	public static final int TABLE_COLUMN_ENTRYNAME = 0;
 	public static final int TABLE_COLUMN_PAGETYPE = 1;
-	public static final int TABLE_COLUMN_SPLITTYPE = 2;
-	public static final int TABLE_COLUMN_ROTATE = 3;
-	public static final int TABLE_COLUMN_POSITION = 4;
-	public static final int TABLE_COLUMN_WIDTH = 5;
-	public static final int TABLE_COLUMN_HEIGHT = 6;
+	public static final int TABLE_COLUMN_PAGESPREAD = 2;
+	public static final int TABLE_COLUMN_SPLITTYPE = 3;
+	public static final int TABLE_COLUMN_ROTATE = 4;
+	public static final int TABLE_COLUMN_POSITION = 5;
+	public static final int TABLE_COLUMN_WIDTH = 6;
+	public static final int TABLE_COLUMN_HEIGHT = 7;
 	//public static final int TABLE_COLUMN_SIZE = 6;
 	
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
 		TABLE_HEADER_ENTRYNAME,
 		TABLE_HEADER_PAGETYPE,
+		TABLE_HEADER_PAGESPREAD,
 		TABLE_HEADER_SPLITTYPE,
 		TABLE_HEADER_ROTATE,
 		TABLE_HEADER_POSITION,

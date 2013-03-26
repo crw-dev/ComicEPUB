@@ -944,41 +944,41 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			
 			popup.add(splitMenu);
 		}
-		else{
-			JMenuItem splitMenu1 = new JMenuItem("カスタム分割モード(3x3)");
-			splitMenu1.addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					if(mIsCustomSplitMode){
-						float[] v = splitLineHandle.getV();
-						float[] h = splitLineHandle.getH();
-						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
-						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
-					}
-					mIsCustomSplitMode = !mIsCustomSplitMode;
-					splitLineHandle.setSplitColRow(3, 3);
-					repaint();
-				}
-			});
-			JMenuItem splitMenu2 = new JMenuItem("カスタム分割モード(3x4)");
-			splitMenu2.addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					if(mIsCustomSplitMode){
-						float[] v = splitLineHandle.getV();
-						float[] h = splitLineHandle.getH();
-						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
-						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
-					}
-					mIsCustomSplitMode = !mIsCustomSplitMode;
-					splitLineHandle.setSplitColRow(3, 4);
-					repaint();
-				}
-			});
-			
-			popup.add(splitMenu1);
-			popup.add(splitMenu2);
-		}
+//		else{
+//			JMenuItem splitMenu1 = new JMenuItem("カスタム分割モード(3x3)");
+//			splitMenu1.addActionListener(new ActionListener(){
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					if(mIsCustomSplitMode){
+//						float[] v = splitLineHandle.getV();
+//						float[] h = splitLineHandle.getH();
+//						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
+//						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
+//					}
+//					mIsCustomSplitMode = !mIsCustomSplitMode;
+//					splitLineHandle.setSplitColRow(3, 3);
+//					repaint();
+//				}
+//			});
+//			JMenuItem splitMenu2 = new JMenuItem("カスタム分割モード(3x4)");
+//			splitMenu2.addActionListener(new ActionListener(){
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					if(mIsCustomSplitMode){
+//						float[] v = splitLineHandle.getV();
+//						float[] h = splitLineHandle.getH();
+//						mFileInfo.getFilterParam().setSplitType(SplitFilter.TYPE_CUSTOM, v, h);
+//						mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_RenewalList, 0);
+//					}
+//					mIsCustomSplitMode = !mIsCustomSplitMode;
+//					splitLineHandle.setSplitColRow(3, 4);
+//					repaint();
+//				}
+//			});
+//			
+//			popup.add(splitMenu1);
+//			popup.add(splitMenu2);
+//		}
 
 		
 		popup.show(this, x, y);

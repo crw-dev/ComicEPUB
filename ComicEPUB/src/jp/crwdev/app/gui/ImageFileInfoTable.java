@@ -313,6 +313,20 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						update = true;
 					}
 				}
+				else if(col == Constant.TABLE_COLUMN_PAGESPREAD){
+					if(value != param.getPageSpread()){
+						// PageSpread変更有り
+						param.setPageSpread(value);
+						
+						//TODO
+						// FileInfo更新通知
+						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
+						mEventSender.setModified();
+
+						selectCurrentItem();
+						update = true;
+					}
+				}
 				else if(col == Constant.TABLE_COLUMN_SPLITTYPE){
 					int splitType = Constant.getSplitType(value);
 					if(splitType != param.getSplitType()){
@@ -497,8 +511,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		String height = Integer.toString(info.getHeight());
 		//String size = Long.toString(info.getSize());
 		String splitType = Constant.getSplitTypeText(param.getSplitType());
+		String pageSpread = param.getPageSpread();
 		
-		return new String[]{info.getFileName(), pageType, splitType, rotate, position, width, height};
+		return new String[]{info.getFileName(), pageType, pageSpread, splitType, rotate, position, width, height};
 	}
 
 	
@@ -713,6 +728,19 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		
 		TableColumn splitTypeColum = getColumnModel().getColumn(Constant.TABLE_COLUMN_SPLITTYPE);
 		splitTypeColum.setCellEditor(new DefaultCellEditor(splitBox));
+		
+		
+		// PageSpread Column
+		JComboBox spreadBox = new JComboBox(new String[]{
+				Constant.PAGESPREAD_AUTO,
+				Constant.PAGESPREAD_CENTER,
+				Constant.PAGESPREAD_LEFT,
+				Constant.PAGESPREAD_RIGHT,
+			});
+		spreadBox.setBorder(BorderFactory.createEmptyBorder()); 
+			
+		TableColumn spreadTypeColum = getColumnModel().getColumn(Constant.TABLE_COLUMN_PAGESPREAD);
+		spreadTypeColum.setCellEditor(new DefaultCellEditor(spreadBox));
 	}
 	
 	public void deleteItem(int row){

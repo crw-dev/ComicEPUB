@@ -89,6 +89,7 @@ public class SettingTabPanel extends JPanel {
 		
 		// 無変換
 		checkPanel.add(checkEnable);
+		checkEnable.setEnabled(false); //TODO: 未実装なのでDisable
 	
 		layout1.putConstraint(SpringLayout.WEST, checkEnable, 0, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, checkEnable, 0, SpringLayout.NORTH, checkPanel);

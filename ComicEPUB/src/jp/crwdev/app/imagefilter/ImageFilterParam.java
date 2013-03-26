@@ -61,6 +61,7 @@ public class ImageFilterParam implements Cloneable {
 		mRotateAngle = 0.0f;
 		mSplitType = SplitFilter.TYPE_NONE;
 		mSplitIndex = 0;
+		mPageSpread = Constant.PAGESPREAD_AUTO;
 		
 		mPageType = Constant.PAGETYPE_AUTO;
 		mConvertPageType = Constant.PAGETYPE_AUTO;
@@ -128,6 +129,7 @@ public class ImageFilterParam implements Cloneable {
 		dest.mRotateAngle = src.getRotateAngle();
 		dest.mSplitType = src.getSplitType();
 		dest.mSplitIndex = src.getSplitIndex();
+		dest.mPageSpread = src.getPageSpread();
 	}
 	
 	protected boolean mIsEnable;
@@ -179,6 +181,7 @@ public class ImageFilterParam implements Cloneable {
 	protected int mSplitIndex;
 	protected float[] mSplitOffsetV;
 	protected float[] mSplitOffsetH;
+	protected String mPageSpread;
 	
 	protected boolean mIsUnificationTextPage = false;
 	//protected static Dimension mUnificationTextPageSize = new Dimension(0, 0);
@@ -375,6 +378,10 @@ public class ImageFilterParam implements Cloneable {
 	
 	public int getSplitIndex() {
 		return mSplitIndex;
+	}
+	
+	public String getPageSpread(){
+		return mPageSpread;
 	}
 	
 	public boolean isUnificationTextPage() {
@@ -642,6 +649,10 @@ public class ImageFilterParam implements Cloneable {
 		mTranslateY = y;
 	}
 	
+	public void setPageSpread(String spread){
+		mPageSpread = spread;
+	}
+	
 	public void setUnificationTextPage(boolean enable) {
 		mIsUnificationTextPage = enable;
 	}
@@ -655,7 +666,7 @@ public class ImageFilterParam implements Cloneable {
 	//}
 
 	public boolean isEdit() {
-		return (mIsFullPageCrop || mIsTextPageCrop || mIsPictPageCrop || mIsRotate || mIsTranslate);
+		return (mIsFullPageCrop || mIsTextPageCrop || mIsPictPageCrop || mIsRotate || mIsTranslate || !mPageSpread.equals(Constant.PAGESPREAD_AUTO));
 	}
 
 
@@ -777,6 +788,8 @@ public class ImageFilterParam implements Cloneable {
 		}
 		
 		dest.mPageType = update.getPageType();
+		
+		dest.mPageSpread = update.getPageSpread();
 		
 		return dest;
 	}

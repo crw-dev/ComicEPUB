@@ -592,14 +592,24 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		sb.append("<!-- itemref -->\n");
 		index = 0;
+		String prevSpread = Constant.PAGESPREAD_AUTO;
 		for(int i=0; i<size; i++){
-			if(!list.get(i).isEnable()){
+			IImageFileInfo info = list.get(i);
+			if(!info.isEnable()){
 				continue;
 			}
 			String properties = "";
-			if(!getItemRefProperties(index).equals("")){
-				properties = " properties=\"" + getItemRefProperties(index) + "\"";
+			String curSpread = info.getFilterParam().getPageSpread();
+			
+			//if(!getItemRefProperties(index).equals("")){
+			//	properties = " properties=\"" + getItemRefProperties(index) + "\"";
+			//}
+			String spreadProp = getItemRefProperties(prevSpread, curSpread);
+			if(!spreadProp.isEmpty()){
+				properties = " properties=\"" + spreadProp + "\"";
 			}
+			prevSpread = propToConstant(spreadProp);
+			
 			sb.append("<itemref linear=\"yes\" idref=\"" + getXhtmlId(index) + "\"" + properties + "/>\n");
 			index++;
 		}
@@ -629,6 +639,61 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				return "page-spread-left";
 			}
 		}
+	}
+	private String getItemRefProperties(String prev, String current){
+		if(true){
+			String next = "";
+			if(current.equals(Constant.PAGESPREAD_CENTER)){
+				next = "rendition:page-spread-center";
+			}
+			else if(current.equals(Constant.PAGESPREAD_RIGHT)){
+				next = "page-spread-right";
+			}
+			else if(current.equals(Constant.PAGESPREAD_LEFT)){
+				next = "page-spread-left";
+			}
+			else{
+				next = "";
+			}
+			return next;
+		}
+		else{
+			String next = "rendition:page-spread-center";
+			if(current.equals(Constant.PAGESPREAD_AUTO)){
+				if(prev.equals(Constant.PAGESPREAD_CENTER)){
+					next = "page-spread-right";
+				}
+				else if(prev.equals(Constant.PAGESPREAD_RIGHT)){
+					next = "page-spread-left";
+				}
+				else if(prev.equals(Constant.PAGESPREAD_LEFT)){
+					next = "page-spread-right";
+				}
+			}
+			else{
+				if(current.equals(Constant.PAGESPREAD_CENTER)){
+					next = "rendition:page-spread-center";
+				}
+				else if(current.equals(Constant.PAGESPREAD_RIGHT)){
+					next = "page-spread-right";
+				}
+				else if(current.equals(Constant.PAGESPREAD_LEFT)){
+					next = "page-spread-left";
+				}
+			}
+			
+			return next;
+		}
+	}
+	
+	private String propToConstant(String spread){
+		if(spread.equals("page-spread-right")){
+			return Constant.PAGESPREAD_RIGHT;
+		}
+		if(spread.equals("page-spread-left")){
+			return Constant.PAGESPREAD_LEFT;
+		}
+		return Constant.PAGESPREAD_CENTER;
 	}
 
 	
