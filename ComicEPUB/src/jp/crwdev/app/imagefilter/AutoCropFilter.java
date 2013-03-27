@@ -283,7 +283,7 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		rect.setBounds(left, top, width - left - right - 1, height - top - bottom - 1);
+		rect.setBounds(left, top, width - left - right, height - top - bottom);
 		
 		return rect;
 	}
