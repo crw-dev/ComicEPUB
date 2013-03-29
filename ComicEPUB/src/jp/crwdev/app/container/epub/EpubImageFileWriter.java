@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.imagefilter.MaximumSizeCheckFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -281,6 +282,26 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		
 		int size = list.size();
 		float progressOffset = 95 / (float)size;
+		
+//		//
+//		MaximumSizeCheckFilter maxcheck = new MaximumSizeCheckFilter();
+//		maxcheck.setImageFilter(mBaseFilter);
+//		for(int i=0; i<size; i++){
+//			IImageFileInfo info = list.get(i);
+//			if(!info.isEnable()){
+//				continue;
+//			}
+//			synchronized(info){
+//				InputStream in = info.getInputStream();
+//				
+//				BufferedImage image = BufferedImageIO.read(in, info.isJpeg());
+//				maxcheck.filter(image, info.getFilterParam());
+//			}
+//		}
+//		Dimension maxSize = maxcheck.getMaxSize();
+//		System.out.println("MaxSize=(" + maxSize.width + ", " + maxSize.height);
+//		//
+		
 		
 		List<Dimension> sizeList = new ArrayList<Dimension>(size);
 		
@@ -641,7 +662,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		}
 	}
 	private String getItemRefProperties(String prev, String current){
-		if(true){
+		if(false){
 			String next = "";
 			if(current.equals(Constant.PAGESPREAD_CENTER)){
 				next = "rendition:page-spread-center";
@@ -661,13 +682,13 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			String next = "rendition:page-spread-center";
 			if(current.equals(Constant.PAGESPREAD_AUTO)){
 				if(prev.equals(Constant.PAGESPREAD_CENTER)){
-					next = "page-spread-right";
+					next = "rendition:page-spread-right";
 				}
 				else if(prev.equals(Constant.PAGESPREAD_RIGHT)){
-					next = "page-spread-left";
+					next = "rendition:page-spread-left";
 				}
 				else if(prev.equals(Constant.PAGESPREAD_LEFT)){
-					next = "page-spread-right";
+					next = "rendition:page-spread-right";
 				}
 			}
 			else{
@@ -675,10 +696,10 @@ public class EpubImageFileWriter implements IImageFileWriter {
 					next = "rendition:page-spread-center";
 				}
 				else if(current.equals(Constant.PAGESPREAD_RIGHT)){
-					next = "page-spread-right";
+					next = "rendition:page-spread-right";
 				}
 				else if(current.equals(Constant.PAGESPREAD_LEFT)){
-					next = "page-spread-left";
+					next = "rendition:page-spread-left";
 				}
 			}
 			
@@ -687,10 +708,10 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	}
 	
 	private String propToConstant(String spread){
-		if(spread.equals("page-spread-right")){
+		if(spread.equals("rendition:page-spread-right")){
 			return Constant.PAGESPREAD_RIGHT;
 		}
-		if(spread.equals("page-spread-left")){
+		if(spread.equals("rendition:page-spread-left")){
 			return Constant.PAGESPREAD_LEFT;
 		}
 		return Constant.PAGESPREAD_CENTER;

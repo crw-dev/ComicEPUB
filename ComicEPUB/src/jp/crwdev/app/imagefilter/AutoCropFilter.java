@@ -15,6 +15,9 @@ public class AutoCropFilter implements IImageFilter {
 	private static final int mDefaultCropMargin = 30;
 	private static final int mLooseMargin = 5;
 	
+	private static final int mNoiseLimit = 5;  // ノイズ許容pixel数
+	private static final int mRelapseLimit = 6;	// ノイズじゃないと判断したときに戻る最大pixel数
+	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 	
@@ -283,6 +286,11 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		left = Math.max(0, left-5);  // ギリギリでクリップするとReaderで縮小した時に影が出来てしまうので余裕を持たせる
+		right = Math.max(0, right-5);
+		top = Math.max(0, top-1);
+		bottom = Math.max(0, bottom-1);
+		
 		rect.setBounds(left, top, width - left - right, height - top - bottom);
 		
 		return rect;
@@ -293,13 +301,20 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		int first = -1;
 		int left = max;
+		int count = 0;
 		boolean found = false;
-		for(int y=0; y<height; y++){
-			for(int x=0; x<max && x<left; x++){
+		for(int x=0; x<max && !found; x++){
+			for(int y=0; y<height; y++){
 				if(!isWhiteColor(image.getRGB(x, y))){
+					if(first < 0){
+						first = x;
+					}
 					if(x < left){
 						left = x;
+					}
+					if(++count >= mNoiseLimit){
 						found = true;
 						break;
 					}
@@ -308,6 +323,9 @@ public class AutoCropFilter implements IImageFilter {
 		}
 		
 		if(found){
+			if(left - first <= mRelapseLimit){
+				left = first;
+			}
 			return (max - left);
 		}
 		else{
@@ -319,13 +337,20 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		int first = -1;
 		int top = max;
+		int count = 0;
 		boolean found = false;
-		for(int x=0; x<width; x++){
-			for(int y=0; y<max && y<top; y++){
+		for(int y=0; y<max && !found; y++){
+			for(int x=0; x<width; x++){
 				if(!isWhiteColor(image.getRGB(x, y))){
+					if(first < 0){
+						first = y;
+					}
 					if(y < top){
 						top = y;
+					}
+					if(++count >= mNoiseLimit){
 						found = true;
 						break;
 					}
@@ -334,6 +359,9 @@ public class AutoCropFilter implements IImageFilter {
 		}
 		
 		if(found){
+			if(top - first <= mRelapseLimit){
+				top = first;
+			}
 			return (max - top);
 		}
 		else{
@@ -345,13 +373,20 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		int first = -1;
 		int right = max;
+		int count = 0;
 		boolean found = false;
-		for(int y=0; y<height; y++){
-			for(int x=0; x<max && x<right; x++){
+		for(int x=0; x<max && !found; x++){
+			for(int y=0; y<height; y++){
 				if(!isWhiteColor(image.getRGB(width - x - 1, y))){
+					if(first < 0){
+						first = x;
+					}
 					if(x < right){
 						right = x;
+					}
+					if(++count >= mNoiseLimit){
 						found = true;
 						break;
 					}
@@ -360,6 +395,9 @@ public class AutoCropFilter implements IImageFilter {
 		}
 		
 		if(found){
+			if(right - first <= mRelapseLimit){
+				right = first;
+			}
 			return (max - right);
 		}
 		else{
@@ -371,13 +409,20 @@ public class AutoCropFilter implements IImageFilter {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
+		int first = -1;
 		int bottom = max;
+		int count = 0;
 		boolean found = false;
-		for(int x=0; x<width; x++){
-			for(int y=0; y<max && y<bottom; y++){
+		for(int y=0; y<max && !found; y++){
+			for(int x=0; x<width; x++){
 				if(!isWhiteColor(image.getRGB(x, height - y - 1))){
+					if(first < 0){
+						first = y;
+					}
 					if(y < bottom){
 						bottom = y;
+					}
+					if(++count >= mNoiseLimit){
 						found = true;
 						break;
 					}
@@ -386,6 +431,9 @@ public class AutoCropFilter implements IImageFilter {
 		}
 		
 		if(found){
+			if(bottom - first <= mRelapseLimit){
+				bottom = first;
+			}
 			return (max - bottom);
 		}
 		else{
@@ -398,7 +446,7 @@ public class AutoCropFilter implements IImageFilter {
 		int r = (color >> 16) & 0xff;
 		int g = (color >> 8) & 0xff;
 		int b = color & 0xff;
-		if(r >= 0x70 && g >= 0x70 && b >= 0x70){
+		if(r >= 0x40 && g >= 0x40 && b >= 0x40){
 			return true;
 		}
 		return false;
