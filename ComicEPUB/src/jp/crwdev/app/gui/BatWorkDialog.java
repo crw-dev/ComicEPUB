@@ -63,6 +63,9 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		"出力サイズ",
 		"ファイル種別",
 		"Book種別",
+		"シリーズ名",
+		"巻数",
+		"シリーズ名カナ",
 	};
 
 	private static final int TABLE_INDEX_STATUS = 0;
@@ -75,6 +78,9 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 	private static final int TABLE_INDEX_IMAGESIZE = 7;
 	private static final int TABLE_INDEX_FILETYPE = 8;
 	private static final int TABLE_INDEX_BOOKTYPE = 9;
+	private static final int TABLE_INDEX_SERIES_TITLE = 10;
+	private static final int TABLE_INDEX_SERIES_NUMBER = 11;
+	private static final int TABLE_INDEX_SERIES_TITLE_KANA = 12;
 	
 	
 	private final JPanel contentPanel = new JPanel();
@@ -248,6 +254,15 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 				mTableModel.setValueAt(filename, row, TABLE_INDEX_OUTPUT_NAME);
 			}
 		}
+		else if(col == TABLE_INDEX_SERIES_NUMBER){
+			if(!value.isEmpty()){
+				try{
+					Integer.parseInt(value);
+				}catch(NumberFormatException e){
+					mTableModel.setValueAt("", row, TABLE_INDEX_SERIES_NUMBER);
+				}
+			}
+		}
 	}
 	
 	private void showOutputFolderDialog(){
@@ -292,8 +307,12 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		String imagesize = size.width + "x" + size.height;
 		String fileType = output.getFileType();
 		String bookType = output.getEpubType();
+		String seriesTitle = output.getSeriesTitle();
+		String seriesNumber = Integer.toString(output.getSeriesNumber());
+		String seriesTitleKana = output.getSeriesTitleKana();
 		
-		return new String[]{"未変換", contentPath, title, author, titleKana, authorKana, filename, imagesize, fileType, bookType};
+		return new String[]{"未変換", contentPath, title, author, titleKana, authorKana, filename, imagesize, fileType, bookType,
+				seriesTitle, seriesNumber, seriesTitleKana};
 	}
 
 	@Override
@@ -397,6 +416,10 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			String imageSize = (String)mTableModel.getValueAt(index, TABLE_INDEX_IMAGESIZE);
 			String fileType = (String)mTableModel.getValueAt(index, TABLE_INDEX_FILETYPE);
 			String bookType = (String)mTableModel.getValueAt(index, TABLE_INDEX_BOOKTYPE);
+			String seriesTitle = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_TITLE);
+			String seriesNumber = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_NUMBER);
+			String seriesTitleKana = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_TITLE_KANA);
+
 			
 			OutputSettingParam param = new OutputSettingParam("", fileType, bookType, imageSize);
 			param.setTitle(title);
@@ -404,6 +427,12 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			param.setAuthor(author);
 			param.setAuthorKana(authorKana);
 			param.setOutputFileName(filename);
+			
+			param.setSeriesTitle(seriesTitle);
+			if(!seriesNumber.isEmpty()){
+				param.setSeriesNumber(Integer.parseInt(seriesNumber));
+			}
+			param.setSeriesTitleKana(seriesTitleKana);
 		
 			return param;
 			
