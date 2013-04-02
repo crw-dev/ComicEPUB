@@ -15,7 +15,7 @@ public class AutoCropFilter implements IImageFilter {
 	private static final int mDefaultCropMargin = 30;
 	private static final int mLooseMargin = 5;
 	
-	private static final int mNoiseLimit = 5;  // ノイズ許容pixel数
+	private static final int mNoiseLimit = 8;  // ノイズ許容pixel数
 	private static final int mRelapseLimit = 6;	// ノイズじゃないと判断したときに戻る最大pixel数
 	
 	@Override
@@ -302,7 +302,7 @@ public class AutoCropFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		int first = -1;
-		int left = max;
+		int left = 0;
 		int count = 0;
 		boolean found = false;
 		for(int x=0; x<max && !found; x++){
@@ -311,7 +311,7 @@ public class AutoCropFilter implements IImageFilter {
 					if(first < 0){
 						first = x;
 					}
-					if(x < left){
+					if(x > left){
 						left = x;
 					}
 					if(++count >= mNoiseLimit){
@@ -338,7 +338,7 @@ public class AutoCropFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		int first = -1;
-		int top = max;
+		int top = 0;
 		int count = 0;
 		boolean found = false;
 		for(int y=0; y<max && !found; y++){
@@ -347,7 +347,7 @@ public class AutoCropFilter implements IImageFilter {
 					if(first < 0){
 						first = y;
 					}
-					if(y < top){
+					if(y > top){
 						top = y;
 					}
 					if(++count >= mNoiseLimit){
@@ -374,7 +374,7 @@ public class AutoCropFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		int first = -1;
-		int right = max;
+		int right = 0;
 		int count = 0;
 		boolean found = false;
 		for(int x=0; x<max && !found; x++){
@@ -383,7 +383,7 @@ public class AutoCropFilter implements IImageFilter {
 					if(first < 0){
 						first = x;
 					}
-					if(x < right){
+					if(x > right){
 						right = x;
 					}
 					if(++count >= mNoiseLimit){
@@ -410,7 +410,7 @@ public class AutoCropFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		int first = -1;
-		int bottom = max;
+		int bottom = 0;
 		int count = 0;
 		boolean found = false;
 		for(int y=0; y<max && !found; y++){
@@ -419,7 +419,7 @@ public class AutoCropFilter implements IImageFilter {
 					if(first < 0){
 						first = y;
 					}
-					if(y < bottom){
+					if(y > bottom){
 						bottom = y;
 					}
 					if(++count >= mNoiseLimit){
