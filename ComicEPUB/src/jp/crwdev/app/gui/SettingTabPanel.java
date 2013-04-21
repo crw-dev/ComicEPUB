@@ -440,7 +440,7 @@ public class SettingTabPanel extends JPanel {
 			}
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_PICT:
-			if(param.isPictPageAutoCrop()){
+			if(param.isPictPageAutoCrop() || param.isPictPageCrop()){
 				spinCropLeft.setValue(param.getPictPageCropLeft());
 				spinCropRight.setValue(param.getPictPageCropRight());
 				spinCropTop.setValue(param.getPictPageCropTop());
@@ -451,7 +451,7 @@ public class SettingTabPanel extends JPanel {
 			}
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_TEXT:
-			if(param.isTextPageAutoCrop()){
+			if(param.isTextPageAutoCrop() || param.isTextPageCrop()){
 				spinCropLeft.setValue(param.getTextPageCropLeft());
 				spinCropRight.setValue(param.getTextPageCropRight());
 				spinCropTop.setValue(param.getTextPageCropTop());

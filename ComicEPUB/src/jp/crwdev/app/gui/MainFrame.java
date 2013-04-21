@@ -289,6 +289,17 @@ public class MainFrame extends JFrame implements OnEventListener {
 		
 		if(title != null && !title.isEmpty()){
 			param.setTitle(title);
+
+			String[] value = title.split("\\s");
+			if(value.length >= 2){
+				String seriesTitle = value[0];
+				param.setSeriesTitle(seriesTitle);
+			}
+			try{
+				int num = Integer.parseInt(title.replaceAll("[^0-9]", ""));
+				param.setSeriesNumber(num);
+			}catch(Exception e){
+			}
 		}
 		if(author != null && !author.isEmpty()){
 			param.setAuthor(author);
