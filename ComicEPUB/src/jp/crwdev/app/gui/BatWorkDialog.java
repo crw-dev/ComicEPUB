@@ -66,6 +66,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		"シリーズ名",
 		"巻数",
 		"シリーズ名カナ",
+		"固定サイズ出力",
 	};
 
 	private static final int TABLE_INDEX_STATUS = 0;
@@ -81,6 +82,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 	private static final int TABLE_INDEX_SERIES_TITLE = 10;
 	private static final int TABLE_INDEX_SERIES_NUMBER = 11;
 	private static final int TABLE_INDEX_SERIES_TITLE_KANA = 12;
+	private static final int TABLE_INDEX_OUTPUT_FIXED_SIZE = 13;
 	
 	
 	private final JPanel contentPanel = new JPanel();
@@ -175,6 +177,11 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			public boolean isCellEditable(int row, int column) {
 				return (column > 1);	// 0,1カラム目の編集禁止
 			}
+			
+			@Override
+			public Class getColumnClass(int col){
+		        return getValueAt(0, col).getClass();
+		    }
 		};
 
 		table.setModel(mTableModel);
@@ -281,12 +288,12 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 	}
 	
 	public void addData(String contentPath, OutputSettingParam output){
-		String[] record = createRecord(contentPath, output);
+		Object[] record = createRecord(contentPath, output);
 		mTableModel.addRow(record);
 	}
 	
 	
-	private String[] createRecord(String contentPath, OutputSettingParam output){
+	private Object[] createRecord(String contentPath, OutputSettingParam output){
 		
 //		private static final int TABLE_INDEX_INPUT_PATH = 0;
 //		private static final int TABLE_INDEX_TITLE = 1;
@@ -310,9 +317,10 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		String seriesTitle = output.getSeriesTitle();
 		String seriesNumber = Integer.toString(output.getSeriesNumber());
 		String seriesTitleKana = output.getSeriesTitleKana();
+		Boolean fixedSize = new Boolean(output.isFixedSize());
 		
-		return new String[]{"未変換", contentPath, title, author, titleKana, authorKana, filename, imagesize, fileType, bookType,
-				seriesTitle, seriesNumber, seriesTitleKana};
+		return new Object[]{"未変換", contentPath, title, author, titleKana, authorKana, filename, imagesize, fileType, bookType,
+				seriesTitle, seriesNumber, seriesTitleKana, fixedSize};
 	}
 
 	@Override
@@ -419,7 +427,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			String seriesTitle = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_TITLE);
 			String seriesNumber = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_NUMBER);
 			String seriesTitleKana = (String)mTableModel.getValueAt(index, TABLE_INDEX_SERIES_TITLE_KANA);
-
+			Boolean fixedSize = (Boolean)mTableModel.getValueAt(index, TABLE_INDEX_OUTPUT_FIXED_SIZE);
 			
 			OutputSettingParam param = new OutputSettingParam("", fileType, bookType, imageSize);
 			param.setTitle(title);
@@ -434,6 +442,8 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			}
 			param.setSeriesTitleKana(seriesTitleKana);
 		
+			param.setFixedSize(fixedSize);
+			
 			return param;
 			
 		}catch(Exception e){
@@ -492,7 +502,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 		}
 		
 		// 基本出力フィルタを生成
-		OutputImageFilter imageFilter = new OutputImageFilter(params);
+		OutputImageFilter imageFilter = new OutputImageFilter(params, output.isFixedSize());
 		
 		// 出力設定からImageFileWriterを生成
 		IImageFileWriter writer = output.getImageFileWriter();

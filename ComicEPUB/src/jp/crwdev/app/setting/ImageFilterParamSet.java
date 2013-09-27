@@ -15,6 +15,8 @@ public class ImageFilterParamSet extends ArrayList<ImageFilterParam> {
 	public static final int FILTER_INDEX_PICT = 2;
 	public static final int FILTER_INDEX_TEXT = 3;
 
+	private boolean mIsSimpleZoom = false;
+	
 	public ImageFilterParamSet(){
 		add(new ImageFilterParam());	// basic
 		add(null);	// color
@@ -83,6 +85,14 @@ public class ImageFilterParamSet extends ArrayList<ImageFilterParam> {
 				param.setResizeDimension(size);
 			}
 		}
+	}
+	
+	public void setSimpleZoom(boolean simpleZoom){
+		mIsSimpleZoom = simpleZoom;
+	}
+	
+	public boolean isSimpleZoom(){
+		return mIsSimpleZoom;
 	}
 
 }

@@ -37,10 +37,18 @@ import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
+import jp.crwdev.app.util.QueueingThread;
+import jp.crwdev.app.util.QueueingThread.IQueueProcess;
 
 public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
 	
 	private PreviewImageFilter mImageFilter = new PreviewImageFilter();
+	
+	/** Zoom用の画像を作るかどうか */
+	private boolean mCreateZoomImage = true;
+	private PreviewImageFilter mPreviewZoomFilter = new PreviewImageFilter();
+	private BufferedImage mPreviewZoomImage = null;
+	private Object mLockZoomImage = new Object();
 	
 	private IImageFileInfo mFileInfo = null;
 	private int mInfoIndex = 0;
@@ -84,6 +92,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			public void ancestorResized(HierarchyEvent arg0) {
 				if(!mIsOutputSizePreview){
 					mImageFilter.setPreviewSize(getWidth(), getHeight());
+					if(mCreateZoomImage){
+						mPreviewZoomFilter.setPreviewSize((int)(getWidth()*1.5), (int)(getHeight()*1.5));
+					}
 					System.out.println("width=" + getWidth() + " height=" + getHeight());
 				}
 			}           
@@ -101,6 +112,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	public void setImageFilterParam(ImageFilterParamSet params){
 		mImageFilter.setImageFilterParam(params);
+		if(mCreateZoomImage){
+			mPreviewZoomFilter.setImageFilterParam(params);
+		}
 		mIsPreviewMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
 		//updateDisplayImage();
 	}
@@ -128,6 +142,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			else{
 				
 				if(!mIsPreviewMode && mIsZoomDrag){
+					if(mCreateZoomImage){
+						createZoomImage();
+						imageW = mPreviewZoomImage.getWidth();
+						imageH = mPreviewZoomImage.getHeight();
+					}
 					//TODO
 					float imageScale = 1.5f;
 					if(imageW > w || imageH > h){
@@ -142,7 +161,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					int offsety = mZoomPoint.y - h/2;
 					dx -= offsetx * scale;
 					dy -= offsety * scale;
-					g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+					
+					if(mCreateZoomImage){
+						g.drawImage(mPreviewZoomImage, dx, dy, dx+imageW, dy+imageH, 0, 0, imageW, imageH, null);
+					}
+					else{
+						g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+					}
 				}
 				else{
 					g.drawImage(mDisplayImage, x, y, this);
@@ -180,6 +205,16 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 	}
 	
+	private void createZoomImage(){
+		if(mCreateZoomImage){
+			synchronized(mLockZoomImage){
+				if(mPreviewZoomImage == null){
+					BufferedImage filtered = mPreviewZoomFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+					mPreviewZoomImage = filtered;
+				}
+			}
+		}
+	}
 	private Rectangle getCropRect(){
 		Rectangle rect = null;
 		if (mDisplayImage != null && ptLeftTop != null && ptRightBottom != null){
@@ -257,33 +292,49 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			updateDisplayImageInternal();
 		}
 		
-//		if(mImageFilter != null){
-//			try {
-//				BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
-//				mDisplayImage = filtered;
-//			}catch(OutOfMemoryError e){
-//				mEventSender.setProgressMessage(e.getMessage());
-//				e.printStackTrace();
-//			}
-//		}
-//		//BufferedImage conv = ResizeImageFile.getFinalConvertedImage(mOriginalImage, mFileInfo, true);
-//		//Rectangle rect = ResizeImageFile.getResizedRect(conv.getWidth(), conv.getHeight(), 600, 800);
-//		//mDisplayImage = ResizeImageFile.convResize(conv, rect.width, rect.height, true);
-//		repaint();
 	}
+	
+	private QueueingThread mZoomThread = null;
 	
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
 			try {
 				BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
 				mDisplayImage = filtered;
+				mPreviewZoomImage = null;
+				
+				if(mCreateZoomImage && !mIsPreviewMode){
+					
+					/*
+					if(mZoomThread == null){
+						mZoomThread = new QueueingThread();
+						mZoomThread.start();
+					}
+					mZoomThread.add(new IQueueProcess(){
+
+						@Override
+						public void doProcess() {
+							createZoomImage();
+						}
+						
+					}, true);
+					*/
+					
+					new Thread(){
+						@Override
+						public void run(){
+							createZoomImage();
+						}
+					}.start();
+				}
+				
 			}catch(OutOfMemoryError e){
 				mEventSender.setProgressMessage(e.getMessage());
 				e.printStackTrace();
 			}
 		}
 		repaint();
-		System.out.println("updateDisplayInternal()");
+		//System.out.println("updateDisplayInternal()");
 	}
 	
 	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
@@ -992,6 +1043,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			mPreviewSize.setSize(getWidth(), getHeight());
 		}
 		mImageFilter.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+	}
+	
+	public void setSimpleZoom(boolean simpleZoom){
+		mCreateZoomImage = !simpleZoom;
+		if(mCreateZoomImage){
+			mPreviewZoomImage = null;
+		}
 	}
 	
 	@Override

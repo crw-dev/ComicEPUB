@@ -212,6 +212,14 @@ public class XmlWriter {
 			elem.appendChild(mDocument.createTextNode(Integer.toString(seriesNumber)));
 			parent.appendChild(elem);
 		}
+
+		// <fixedSize>
+		boolean fixedSize = output.isFixedSize();
+		if(true){
+			Element elem = mDocument.createElement("fixedSize");
+			elem.appendChild(mDocument.createTextNode(fixedSize ? "true" : "false"));
+			parent.appendChild(elem);
+		}
 	}
 	
 	private void writeInfo(Element parent, IImageFileInfo info){
@@ -685,6 +693,12 @@ public class XmlWriter {
 					if(node.hasChildNodes()){
 						String value = node.getFirstChild().getNodeValue();
 						output.setSeriesNumber(Integer.parseInt(value));
+					}
+				}
+				else if(name.equalsIgnoreCase("fixedSize")){
+					if(node.hasChildNodes()){
+						String enable = node.getFirstChild().getNodeValue();
+						output.setFixedSize(Boolean.parseBoolean(enable));
 					}
 				}
 			}

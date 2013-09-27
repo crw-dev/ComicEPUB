@@ -681,8 +681,96 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							//deleteItem(selected);
 						}
 					});
+					JMenuItem item2 = new JMenuItem("選択アイテム種別変更（カラー）");
+					item2.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int rowCount = table.getRowCount();
+							//int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(table.isRowSelected(i)){
+									IImageFileInfo info = mInfoList.get(i);
+									info.getFilterParam().setPageType(Constant.PAGETYPE_COLOR);
+									//mInfoList.remove(listIndex);
+									//continue;
+								}
+								//listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
+						}
+					});
+					JMenuItem item3 = new JMenuItem("選択アイテム種別変更（挿絵）");
+					item3.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int rowCount = table.getRowCount();
+							//int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(table.isRowSelected(i)){
+									IImageFileInfo info = mInfoList.get(i);
+									info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
+									//mInfoList.remove(listIndex);
+									//continue;
+								}
+								//listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
+						}
+					});
+					JMenuItem item4 = new JMenuItem("選択アイテム種別変更（本文）");
+					item4.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int rowCount = table.getRowCount();
+							//int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(table.isRowSelected(i)){
+									IImageFileInfo info = mInfoList.get(i);
+									info.getFilterParam().setPageType(Constant.PAGETYPE_TEXT);
+									//mInfoList.remove(listIndex);
+									//continue;
+								}
+								//listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
+						}
+					});
+					JMenuItem item5 = new JMenuItem("選択アイテム種別変更（未設定）");
+					item5.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int rowCount = table.getRowCount();
+							//int listIndex = 0;
+							for(int i=0; i<rowCount; i++){
+								if(table.isRowSelected(i)){
+									IImageFileInfo info = mInfoList.get(i);
+									info.getFilterParam().setPageType(Constant.PAGETYPE_AUTO);
+									//mInfoList.remove(listIndex);
+									//continue;
+								}
+								//listIndex++;
+							}
+							
+							renewalList();
+							//int selected = table.getSelectedRow();
+							//deleteItem(selected);
+						}
+					});
 					popup.add(item0);
 					popup.add(item1);
+					popup.add(item2);
+					popup.add(item3);
+					popup.add(item4);
+					popup.add(item5);
 
 					popup.show(e.getComponent(), e.getX(), e.getY());
 				}

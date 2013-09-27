@@ -43,6 +43,9 @@ public class OutputSettingParam {
 	/** シリーズ巻数 */
 	private int mSeriesNumber = 0;
 	
+	/** 固定サイズ出力フラグ */
+	private boolean mIsFixedSize = false;
+	
 
 	/**
 	 * コンストラクタ
@@ -343,5 +346,19 @@ public class OutputSettingParam {
 	 */
 	public int getSeriesNumber(){
 		return mSeriesNumber;
+	}
+	
+	/**
+	 * 固定サイズ出力設定
+	 */
+	public void setFixedSize(boolean fixedSize){
+		mIsFixedSize = fixedSize;
+	}
+	/**
+	 * 固定サイズ出力取得
+	 * @return
+	 */
+	public boolean isFixedSize(){
+		return mIsFixedSize;
 	}
 }

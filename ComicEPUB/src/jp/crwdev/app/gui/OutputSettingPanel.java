@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.util.InifileProperty;
@@ -55,6 +57,7 @@ public class OutputSettingPanel extends JPanel {
 	
 	// CheckBox
 	public JCheckBox checkOutputResize;
+	public JCheckBox checkFixedSize;
 	
 	private SettingPanel mParent = null;
 	
@@ -69,7 +72,7 @@ public class OutputSettingPanel extends JPanel {
 			JTextField seriesTitle, JTextField seriesTitleKana, JTextField seriesNumber,
 			JTextField title, JTextField titleKana, JTextField author, JTextField authorKana,
 			JTextField folder, JButton folderBtn, JButton convertBtn, JButton cancelBtn,
-			JCheckBox outputResize, JButton packageConvButton, JFrame parentFrame){
+			JCheckBox outputResize, JButton packageConvButton, JCheckBox fixedSize, JFrame parentFrame){
 		mParent = parent;
 		mFrame = parentFrame;
 		outputImageSize = imageSize;
@@ -88,6 +91,7 @@ public class OutputSettingPanel extends JPanel {
 		cancelButton = cancelBtn;
 		checkOutputResize = outputResize;
 		packageConvertButton = packageConvButton;
+		checkFixedSize = fixedSize;
 		initialize();
 	}
 	
@@ -187,7 +191,15 @@ public class OutputSettingPanel extends JPanel {
 				new BatWorkDialog(mFrame);
 			}
 		});
+		packageConvertButton.setToolTipText("編集済みファイルを一括で変換します。");
 
+		checkFixedSize.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				mParent.updateSettingValues();
+			}
+		});
+		checkFixedSize.setToolTipText("全ページ同じサイズで出力します。");
 	}
 	
 	public OutputSettingParam getOutputSettingParam(){
@@ -205,6 +217,7 @@ public class OutputSettingPanel extends JPanel {
 		param.setTitleKana(outputTitleKana.getText());
 		param.setAuthor(outputAuthor.getText());
 		param.setAuthorKana(outputAuthorKana.getText());
+		param.setFixedSize(checkFixedSize.isSelected());
 		
 		param.setSeriesTitle(outputSeriesTitle.getText());
 		param.setSeriesTitleKana(outputSeriesTitleKana.getText());
@@ -327,6 +340,9 @@ public class OutputSettingPanel extends JPanel {
 		if(param.getSeriesNumber() > 0){
 			outputSeriesNumber.setText(Integer.toString(param.getSeriesNumber()));
 		}
+		
+		boolean fixedSize = param.isFixedSize();
+		checkFixedSize.setSelected(fixedSize);
 	}
 	
 	/**

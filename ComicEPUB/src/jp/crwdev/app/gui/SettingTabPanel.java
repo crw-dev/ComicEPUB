@@ -228,6 +228,10 @@ public class SettingTabPanel extends JPanel {
 		checkCrop.addMouseListener(mouseClickAdapter);
 		checkAutoCrop.addMouseListener(mouseClickAdapter);
 		
+		checkUnification.setToolTipText("本文ページの画像サイズを統一します。");
+		checkCrop.setToolTipText("画像端から指定されたサイズをカットします。");
+		checkAutoCrop.setToolTipText("指定されたサイズを元に余白と判定した部分をカットします。上下と左右は連動します。");
+		
 		spinGamma.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent arg0) {

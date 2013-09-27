@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 public class PreviewSettingPanel extends JPanel {
 
 	private JCheckBox checkPreview = new JCheckBox("編集モード");
+	private JCheckBox checkSimpleZoom;
 	private JCheckBox checkResize = new JCheckBox("リサイズ");
 	private JCheckBox checkOutputResize = new JCheckBox("出力サイズ");
 
@@ -21,12 +22,13 @@ public class PreviewSettingPanel extends JPanel {
 	 */
 	public PreviewSettingPanel(){
 		super();
-		initialize();
+		//initialize();
 	}
 
-	public void setComponents(SettingPanel parent, JCheckBox preview, JCheckBox resize, JCheckBox outputResize){
+	public void setComponents(SettingPanel parent, JCheckBox preview, JCheckBox zoom, JCheckBox resize, JCheckBox outputResize){
 		mParent = parent;
 		checkPreview = preview;
+		checkSimpleZoom = zoom;
 		checkResize = resize;
 		checkOutputResize = outputResize;
 		initialize();
@@ -35,8 +37,14 @@ public class PreviewSettingPanel extends JPanel {
 	private void initialize(){
 	
 		checkPreview.setSelected(true);
+		checkSimpleZoom.setSelected(false);
 		checkResize.setSelected(true);
 		checkOutputResize.setSelected(false);
+		
+		checkPreview.setToolTipText("編集モードをOFFにすると出力結果のプレビューが表示されます。");
+		checkSimpleZoom.setToolTipText("ズーム用の画像を作成しません。");
+		checkResize.setToolTipText("ウインドウサイズに合わせて画像サイズを変更します。");
+		checkOutputResize.setToolTipText("出力サイズで画像を表示します。(※リサイズより優先)");
 		
 		MouseAdapter mouseClickAdapter = new MouseAdapter(){
 			public void mouseClicked(MouseEvent evt) { 
@@ -45,6 +53,7 @@ public class PreviewSettingPanel extends JPanel {
 		};
 		
 		checkPreview.addMouseListener(mouseClickAdapter);
+		checkSimpleZoom.addMouseListener(mouseClickAdapter);
 		checkResize.addMouseListener(mouseClickAdapter);
 		checkOutputResize.addMouseListener(mouseClickAdapter);
 	}
@@ -59,6 +68,10 @@ public class PreviewSettingPanel extends JPanel {
 	
 	public boolean isPreview(){
 		return checkPreview.isSelected();
+	}
+	
+	public boolean isSimpleZoom(){
+		return checkSimpleZoom.isSelected();
 	}
 	
 	public boolean isResize(){

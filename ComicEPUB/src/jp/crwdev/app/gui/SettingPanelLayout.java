@@ -29,8 +29,10 @@ public class SettingPanelLayout extends JPanel {
 	protected DefaultTextField textSeriesNumber;
 	protected DefaultTextField outputFolder;
 	protected JCheckBox checkPreview;
+	protected JCheckBox checkSimpleZoom;
 	protected JCheckBox checkResize;
 	protected JCheckBox checkOutputResize;
+	protected JCheckBox checkFixedSize;
 	protected JTabbedPane tabbedPane;
 	protected JComboBox outputImageSize;
 	protected JComboBox outputFileType;
@@ -58,12 +60,17 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.WEST, checkPreview, 3, SpringLayout.WEST, this);
 		add(checkPreview);
 		
-		checkResize = new JCheckBox("リサイズ");
+		checkSimpleZoom = new JCheckBox("簡易ズーム");
+		springLayout.putConstraint(SpringLayout.NORTH, checkSimpleZoom, 3, SpringLayout.NORTH, checkPreview);
+		springLayout.putConstraint(SpringLayout.WEST, checkSimpleZoom, 3, SpringLayout.EAST, checkPreview);
+		add(checkSimpleZoom);
+		
+		checkResize = new JCheckBox("画面サイズ合わせ");
 		springLayout.putConstraint(SpringLayout.WEST, checkResize, 3, SpringLayout.WEST, this);
 		springLayout.putConstraint(SpringLayout.NORTH, checkResize, 0, SpringLayout.SOUTH, checkPreview);
 		add(checkResize);
 
-		checkOutputResize = new JCheckBox("出力サイズ");
+		checkOutputResize = new JCheckBox("出力サイズで表示");
 		springLayout.putConstraint(SpringLayout.WEST, checkOutputResize, 6, SpringLayout.EAST, checkResize);
 		springLayout.putConstraint(SpringLayout.SOUTH, checkOutputResize, 0, SpringLayout.SOUTH, checkResize);
 		add(checkOutputResize);
@@ -129,6 +136,11 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.NORTH, outputImageSize, 6, SpringLayout.SOUTH, textAuthor);
 		springLayout.putConstraint(SpringLayout.WEST, outputImageSize, 0, SpringLayout.WEST, checkPreview);
 		add(outputImageSize);
+		
+		checkFixedSize = new JCheckBox("固定サイズ出力");
+		springLayout.putConstraint(SpringLayout.NORTH, checkFixedSize, 0, SpringLayout.NORTH, outputImageSize);
+		springLayout.putConstraint(SpringLayout.WEST, checkFixedSize, 6, SpringLayout.EAST, outputImageSize);
+		add(checkFixedSize);
 		
 		outputFileType = new JComboBox();
 		springLayout.putConstraint(SpringLayout.NORTH, outputFileType, 6, SpringLayout.SOUTH, outputImageSize);

@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -121,7 +123,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     //settingPanel.setSize(300,800);
 	     //settingPanel.setMinimumSize(new Dimension(300, 800));
 	     mSettingPanel = settingPanel;
-	     
+
 	     ImageFilterParamSet defaultParam = settingPanel.getImageFilterParamSet();
 	     setBaseFilterParam(defaultParam);
 
@@ -250,7 +252,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 			}
 	     }));
 	     
-
+	     //GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	     //device.setFullScreenWindow(this);
 	}
 	
 	
@@ -371,6 +374,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 		}else{
 			mImagePanel.setOutputSizePreview(false, 0, 0);
 		}
+		
+		mImagePanel.setSimpleZoom(params.isSimpleZoom());
 
 		setBaseFilterParam(params);
 		
@@ -409,7 +414,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 					}
 					
 					// 基本出力フィルタを生成
-					OutputImageFilter imageFilter = new OutputImageFilter(params);
+					OutputImageFilter imageFilter = new OutputImageFilter(params, outSetting.isFixedSize());
 					
 					// 出力設定からImageFileWriterを生成
 					IImageFileWriter writer = outSetting.getImageFileWriter();

@@ -29,7 +29,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	public SettingPanel(JFrame parent){
 		super(parent);
 		
-		mPreviewSetting.setComponents(this, checkPreview, checkResize, checkOutputResize);
+		mPreviewSetting.setComponents(this, checkPreview, checkSimpleZoom, checkResize, checkOutputResize);
 		
 		mSettingTab = this.tabbedPane;
 		
@@ -43,7 +43,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 										textSeriesTitle, textSeriesTitleKana, textSeriesNumber,
 										textTitle, textTitleKana, textAuthor, textAuthorKana,
 										outputFolder, outpuFolderButton, convertButton, cancelButton,
-										checkOutputResize, packageConvertButton, parent);
+										checkOutputResize, packageConvertButton, checkFixedSize, parent);
 		mProgressPanel.setComponents(this, labelMessage, progressBar, cancelButton);
 		
 //		//SpringLayout layout = new SpringLayout();
@@ -75,6 +75,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 		//Preview
 		boolean preview = mPreviewSetting.isPreview();
 		boolean resize = mPreviewSetting.isResize();
+		boolean simpleZoom = mPreviewSetting.isSimpleZoom();
 		
 		//Filter
 		ImageFilterParamSet params = new ImageFilterParamSet();
@@ -83,6 +84,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 		}
 		params.setPreview(preview);
 		params.setResize(resize);
+		params.setSimpleZoom(simpleZoom);
 		
 		return params;
 	}

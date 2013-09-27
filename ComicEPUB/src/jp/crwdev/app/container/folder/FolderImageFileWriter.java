@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.constant.Constant;
@@ -88,10 +89,19 @@ public class FolderImageFileWriter implements IImageFileWriter {
 				if(!info.isEnable()){
 					continue;
 				}
-
-				image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+				
+				InputStream in = info.getInputStream();
+				
+				image = BufferedImageIO.read(in, info.isJpeg());
 				if(mBaseFilter != null){
 					image = mBaseFilter.filter(image, info.getFilterParam());
+				}
+				
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 			

@@ -20,7 +20,7 @@ public class OutputImageFilter implements IImageFilter {
 	/**
 	 * コンストラクタ
 	 */
-	public OutputImageFilter(){
+	public OutputImageFilter(boolean fixedSize){
 		mFilters.add(new AddSpaceFilter());
 		mFilters.add(new TransRotateFilter());
 		mFilters.add(new SplitFilter());
@@ -34,14 +34,17 @@ public class OutputImageFilter implements IImageFilter {
 		mFilters.add(new BlurFilter(true));
 		mFilters.add(new ResizeFilter());
 		mFilters.add(new BlurFilter(false));
+		//mFilters.add(new FixedCropFilter());
+		mFilters.add(new FixedSizeFilter(fixedSize));
+		//mFilters.add(new SpecificSizeFilter(600,800));
 	}
 	
 	/**
 	 * コンストラクタ
 	 * @param param
 	 */
-	public OutputImageFilter(ImageFilterParamSet params){
-		this();
+	public OutputImageFilter(ImageFilterParamSet params, boolean fixedSize){
+		this(fixedSize);
 		mBaseFilterParams = params.clone();
 	}
 

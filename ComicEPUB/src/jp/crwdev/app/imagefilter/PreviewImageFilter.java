@@ -24,7 +24,7 @@ public class PreviewImageFilter extends OutputImageFilter {
 	 * コンストラクタ
 	 */
 	public PreviewImageFilter(){
-		super();
+		super(false);
 		
 		//mIsPreview = true;
 		
@@ -78,6 +78,9 @@ public class PreviewImageFilter extends OutputImageFilter {
 			if(filter instanceof ResizeFilter){
 				mResizeFilter = (ResizeFilter)filter;
 			}
+//			if(filter instanceof FixedSizeFilter){
+//				((FixedSizeFilter)filter).setEnable(false);
+//			}
 		}
 	}
 
