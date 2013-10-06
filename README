@@ -1,6 +1,10 @@
 ﻿自炊画像編集＆出力アプリ
 
-主にSony Reader用のEPUB3コミックを作成するためのツールです。
+主にSony Reader用のEPUB3コミックを作成するためのツールです。(PRS-T3Sでの全画面化を確認)
+
+Download (※Javaインストール必須)
+https://www.dropbox.com/sh/lla977one19xlft/lROyPm97tK
+
 
 機能：
 　ぼかし、シャープネス、グレースケール化、ガンマ補正
@@ -27,9 +31,7 @@ Android版SonyReader用に分類指定(書籍、雑誌、コミック)可。
 
 
 
-binary
-https://www.dropbox.com/sh/lla977one19xlft/lROyPm97tK
-
+----------------------------------------------------
 
 input - folder .zip .rar .pdf(implementing)
 
