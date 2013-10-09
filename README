@@ -23,6 +23,7 @@ https://www.dropbox.com/sh/lla977one19xlft/lROyPm97tK
 EPUB出力時はメタデータとしてシリーズ名、巻数、タイトル、著者名を設定できます。
 Android版SonyReader用に分類指定(書籍、雑誌、コミック)可。
 見開き表示時の配置(center,left,right)もページ毎に指定可能です。
+目次指定に対応(EPUBのみ)
 
 画像の出力サイズは設定ファイル(default.ini)に追加可能。
 
