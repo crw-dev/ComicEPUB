@@ -26,6 +26,10 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	protected int mHeight;
 	/** 画像サイズ */
 	protected long mSize;
+	/** TOCテキスト */
+	protected String mTocText = null;
+	/** 編集フラグ */
+	private boolean mIsModify = false;
 	/** 有効フラグ */
 	protected boolean mIsEnable = true;
 	
@@ -129,6 +133,16 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	}
 	
 	@Override
+	public void setTocText(String text){
+		mTocText = text;
+	}
+	
+	@Override
+	public String getTocText(){
+		return mTocText;
+	}
+	
+	@Override
 	public void setEnable(boolean enable){
 		mIsEnable = enable;
 	}
@@ -136,6 +150,16 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	@Override
 	public boolean isEnable(){
 		return mIsEnable;
+	}
+	
+	@Override
+	public void setModify(boolean modify){
+		mIsModify = modify;
+	}
+	
+	@Override
+	public boolean isModify(){
+		return mIsModify;
 	}
 
 	/**

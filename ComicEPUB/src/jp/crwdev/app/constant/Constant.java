@@ -46,6 +46,7 @@ public class Constant {
 	public static final String PAGESPREAD_CENTER = "center";
 	
 	public static final String TABLE_HEADER_ENTRYNAME = "ファイル名";
+	public static final String TABLE_HEADER_TOC = "目次";
 	public static final String TABLE_HEADER_PAGETYPE = "種別";
 	public static final String TABLE_HEADER_PAGESPREAD = "配置";
 	public static final String TABLE_HEADER_ROTATE = "回転";
@@ -59,10 +60,11 @@ public class Constant {
 	public static final int TABLE_COLUMN_PAGETYPE = 1;
 	public static final int TABLE_COLUMN_PAGESPREAD = 2;
 	public static final int TABLE_COLUMN_SPLITTYPE = 3;
-	public static final int TABLE_COLUMN_ROTATE = 4;
-	public static final int TABLE_COLUMN_POSITION = 5;
-	public static final int TABLE_COLUMN_WIDTH = 6;
-	public static final int TABLE_COLUMN_HEIGHT = 7;
+	public static final int TABLE_COLUMN_TOC = 4;
+	public static final int TABLE_COLUMN_ROTATE = 5;
+	public static final int TABLE_COLUMN_POSITION = 6;
+	public static final int TABLE_COLUMN_WIDTH = 7;
+	public static final int TABLE_COLUMN_HEIGHT = 8;
 	//public static final int TABLE_COLUMN_SIZE = 6;
 	
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
@@ -70,6 +72,7 @@ public class Constant {
 		TABLE_HEADER_PAGETYPE,
 		TABLE_HEADER_PAGESPREAD,
 		TABLE_HEADER_SPLITTYPE,
+		TABLE_HEADER_TOC,
 		TABLE_HEADER_ROTATE,
 		TABLE_HEADER_POSITION,
 		TABLE_HEADER_WIDTH,

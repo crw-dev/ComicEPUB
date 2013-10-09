@@ -75,6 +75,16 @@ public interface IImageFileInfo {
 	void setFilterParam(ImageFilterParam param);
 	
 	/**
+	 * TOCテキスト設定
+	 */
+	void setTocText(String text);
+	
+	/**
+	 * TOCテキスト取得
+	 */
+	String getTocText();
+	
+	/**
 	 * 有効フラグ設定
 	 * @param enable
 	 */
@@ -85,6 +95,17 @@ public interface IImageFileInfo {
 	 * @return
 	 */
 	boolean isEnable();
+	
+	
+	/**
+	 * 編集フラグ設定
+	 */
+	void setModify(boolean modify);
+
+	/**
+	 * 編集フラグ
+	 */
+	boolean isModify();
 	
 	/**
 	 * リソース解放

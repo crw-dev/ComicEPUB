@@ -138,12 +138,12 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		    mkdir(XHTML_DIR, zipOut);
 		    writeXHtmlFiles(sizeList, zipOut);
 		    
-		    writeNcxFile(uuid, mTitle, zipOut);
+		    writeNcxFile(uuid, mTitle, zipOut, list);
 
 		    mkdir(ITEM_DIR, zipOut);
 		    writeStandardOpf(zipOut, list, uuid, mBookType, mTitle, mTitleKana, mSeriesTitle, mSeriesTitleKana, mSeriesNumber, mAuthor, mAuthorKana, -1, -1);
 		    
-		    writeNavigationFile(zipOut);
+		    writeNavigationFile(zipOut, list);
 
 		}catch(Exception e){
 			if(!e.getMessage().equals("user cancel")){
@@ -374,12 +374,11 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		}
 	}
 	
-	private void writeNcxFile(String uuid, String title, ZipOutputStream zipOut) throws IOException{
+	private void writeNcxFile(String uuid, String title, ZipOutputStream zipOut, IImageFileInfoList list) throws IOException{
 		zipOut.putNextEntry(new ZipEntry(ITEM_DIR + "/" + NCX_FILENAME));
 		
 		title = convEscape(title);
 		
-		String filename = getXhtmlFileName(0);
 
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
 
@@ -398,12 +397,46 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("  <text>" + title + "</text>\n");
 		sb.append("</docTitle>\n");
 		sb.append("<navMap>\n");
-		sb.append("  <navPoint id=\"navPoint-1\" playOrder=\"1\">\n");
-		sb.append("    <navLabel>\n");
-		sb.append("      <text>表紙</text>\n");
-		sb.append("    </navLabel>\n");
-		sb.append("    <content src=\"xhtml/" + filename + "\" />\n");
-		sb.append("  </navPoint>\n");
+		
+		int index = 0;
+		int playOrder = 1;
+		int count = list.size();
+		for(int i=0; i<count; i++){
+			IImageFileInfo info = list.get(i);
+			if(!info.isEnable()){
+				continue;
+			}
+			
+			String tocText = info.getTocText();
+			if(tocText != null && tocText.length() > 0){
+				String filename = getXhtmlFileName(index);
+
+				sb.append("  <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+				sb.append("    <navLabel>\n");
+				sb.append("      <text>" + tocText + "</text>\n");
+				sb.append("    </navLabel>\n");
+				sb.append("    <content src=\"xhtml/" + filename + "\" />\n");
+				sb.append("  </navPoint>\n");
+				
+				playOrder++;
+			}
+			else if(index == 0){
+				String filename = getXhtmlFileName(0);
+				
+				sb.append("  <navPoint id=\"navPoint-" + playOrder + "\" playOrder=\"" + playOrder + "\">\n");
+				sb.append("    <navLabel>\n");
+				sb.append("      <text>表紙</text>\n");
+				sb.append("    </navLabel>\n");
+				sb.append("    <content src=\"xhtml/" + filename + "\" />\n");
+				sb.append("  </navPoint>\n");
+				
+				playOrder++;
+			}
+			
+			index++;
+		}
+		
+		
 		sb.append("</navMap>\n");
 		sb.append("</ncx>\n");
 
@@ -414,10 +447,8 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		zipOut.closeEntry();
 	}
 	
-	private void writeNavigationFile(ZipOutputStream zipOut) throws IOException{
+	private void writeNavigationFile(ZipOutputStream zipOut, IImageFileInfoList list) throws IOException{
 		zipOut.putNextEntry(new ZipEntry(ITEM_DIR + "/" + NAVIGATION_FILENAME));
-
-		String filename = getXhtmlFileName(0);
 
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
 
@@ -434,7 +465,27 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("<nav epub:type=\"toc\" id=\"toc\">\n");
 		sb.append("<h1>Navigation</h1>\n");
 		sb.append("<ol>\n");
-		sb.append("<li><a href=\"xhtml/" + filename + "\">表紙</a></li>\n");
+		
+		
+		int index = 0;
+		int count = list.size();
+		for(int i=0; i<count; i++){
+			IImageFileInfo info = list.get(i);
+			if(!info.isEnable()){
+				continue;
+			}
+			String tocText = info.getTocText();
+			if(tocText != null && tocText.length() > 0){
+				String filename = getXhtmlFileName(index);
+				sb.append("<li><a href=\"xhtml/" + filename + "\">" + tocText + "</a></li>\n");
+			}
+			else if(index == 0){
+				String filename = getXhtmlFileName(index);
+				sb.append("<li><a href=\"xhtml/" + filename + "\">表紙</a></li>\n");
+			}
+			index++;
+		}
+		
 		sb.append("</ol>\n");
 		sb.append("</nav>\n");
 		sb.append("</body>\n");

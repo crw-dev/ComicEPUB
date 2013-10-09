@@ -24,6 +24,12 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	/** index=0以外のWrapperはindex=0への参照を持つ */
 	private ImageFileInfoSplitWrapper mFirstWrapper = null;
 	
+	/** TOCテキスト */
+	private String mTocText = null;
+	
+	/** 編集フラグ */
+	private boolean mIsModify = false;
+	
 	/** 有効フラグ */
 	boolean mIsEnable = true;
 	
@@ -155,6 +161,26 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	@Override
 	public void release() {
 		// NOP
+	}
+
+	@Override
+	public void setTocText(String text) {
+		mTocText = text;
+	}
+
+	@Override
+	public String getTocText() {
+		return mTocText;
+	}
+
+	@Override
+	public void setModify(boolean modify){
+		mIsModify = modify;
+	}
+
+	@Override
+	public boolean isModify() {
+		return mIsModify;
 	}
 
 }

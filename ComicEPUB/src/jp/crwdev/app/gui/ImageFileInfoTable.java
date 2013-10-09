@@ -348,6 +348,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						return;
 					}
 				}
+				else if(col == Constant.TABLE_COLUMN_TOC){
+					info.setTocText(value);
+					info.setModify(true);
+				}
 				if(update){
 				    //if(mListener != null){
 				    //	mListener.onItemSelected(row);
@@ -512,8 +516,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		//String size = Long.toString(info.getSize());
 		String splitType = Constant.getSplitTypeText(param.getSplitType());
 		String pageSpread = param.getPageSpread();
+		String tocText = info.getTocText();
 		
-		return new String[]{info.getFileName(), pageType, pageSpread, splitType, rotate, position, width, height};
+		return new String[]{info.getFileName(), pageType, pageSpread, splitType, tocText, rotate, position, width, height};
 	}
 
 	

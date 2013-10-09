@@ -240,7 +240,7 @@ public class XmlWriter {
 		}
 		
 		ImageFilterParam param = info.getFilterParam();
-		if(param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE || !isEnable){
+		if(info.isModify() || param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE || !isEnable){
 		
 			if(param.getSplitType() == SplitFilter.TYPE_NONE || (param.getSplitType() != SplitFilter.TYPE_NONE && param.getSplitIndex() == 0)){
 				
@@ -252,6 +252,15 @@ public class XmlWriter {
 				filenameElem.appendChild(mDocument.createTextNode(info.getFileName()));
 				
 				infoElem.appendChild(filenameElem);
+				
+				//<toc>
+				String tocText = info.getTocText();
+				if(tocText != null && tocText.length() > 0){
+					Element tocElem = mDocument.createElement("toc");
+					tocElem.appendChild(mDocument.createTextNode(tocText));
+					
+					infoElem.appendChild(tocElem);
+				}
 	
 				//<split>
 				writeSplit(infoElem, info);
@@ -711,6 +720,7 @@ public class XmlWriter {
 
 			NodeList nodes = infoNode.getChildNodes();
 			Node filenameNode = null;
+			Node tocNode = null;
 			Node paramNode = null;
 			for(int i=0; i<nodes.getLength(); i++){
 				Node node = nodes.item(i);
@@ -720,11 +730,18 @@ public class XmlWriter {
 				else if(node.getNodeName().equalsIgnoreCase("split")){
 					paramNode = node;
 				}
+				else if(node.getNodeName().equalsIgnoreCase("toc")){
+					tocNode = node;
+				}
 			}
 			if(filenameNode != null && paramNode != null){
 				String filename = filenameNode.getFirstChild().getNodeValue();
 				IImageFileInfo info = map.get(filename);
 				if(info != null){
+					if(tocNode != null){
+						String tocName = tocNode.getFirstChild().getNodeValue();
+						info.setTocText(tocName);
+					}
 					loadSplit(paramNode, info);
 					//loadParam(paramNode, info.getFilterParam());
 				}
