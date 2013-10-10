@@ -159,7 +159,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	
 	@Override
 	public boolean isModify(){
-		return mIsModify;
+		return mIsModify || (mTocText != null && mTocText.length() > 0);
 	}
 
 	/**
