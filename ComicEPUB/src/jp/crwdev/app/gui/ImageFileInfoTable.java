@@ -108,7 +108,11 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 			else{
 				ImageFilterParam param = mInfoList.get(row).getFilterParam();
-				if(param.isEdit()){
+				int cropHeight = param.getFullPageCropTop() + param.getFullPageCropBottom();
+				if(cropHeight >= 400){
+					c.setBackground(Color.RED);
+				}
+				else if(param.isEdit()){
 					c.setBackground(Color.YELLOW);
 				}
 				else{

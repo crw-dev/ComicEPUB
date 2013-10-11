@@ -30,6 +30,7 @@ import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFileInfoList;
+import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
@@ -411,6 +412,16 @@ public class MainFrame extends JFrame implements OnEventListener {
 					}else{
 						params.setResize(true);
 						params.setResizeDimension(size);
+					}
+					
+					if(outSetting.isFixedSize()){
+						// 固定出力サイズチェック
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "画像サイズチェック中...");
+						OutputImageFilter preconvertFilter = new OutputImageFilter(params, false);
+						ImageFilePreconverter checker = new ImageFilePreconverter(preconvertFilter);
+						checker.write(list, null);
+						Dimension unionSize = checker.getUnionSize();
+						params.setFixedSize(unionSize);
 					}
 					
 					// 基本出力フィルタを生成

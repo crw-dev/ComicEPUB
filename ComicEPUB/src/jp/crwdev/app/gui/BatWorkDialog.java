@@ -35,6 +35,7 @@ import javax.swing.table.TableColumn;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.imagefilter.AutoCropFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
@@ -501,6 +502,15 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 			params.setResizeDimension(size);
 		}
 		
+		if(output.isFixedSize()){
+			// 固定出力サイズチェック
+			OutputImageFilter preconvertFilter = new OutputImageFilter(params, false);
+			ImageFilePreconverter checker = new ImageFilePreconverter(preconvertFilter);
+			checker.write(list, null);
+			Dimension unionSize = checker.getUnionSize();
+			params.setFixedSize(unionSize);
+		}
+
 		// 基本出力フィルタを生成
 		OutputImageFilter imageFilter = new OutputImageFilter(params, output.isFixedSize());
 		

@@ -87,6 +87,15 @@ public class ImageFilterParamSet extends ArrayList<ImageFilterParam> {
 		}
 	}
 	
+	public void setFixedSize(Dimension size){
+		for(int i=0; i<size(); i++){
+			ImageFilterParam param = get(i);
+			if(param != null){
+				param.setFixedSize(size);
+			}
+		}
+	}
+
 	public void setSimpleZoom(boolean simpleZoom){
 		mIsSimpleZoom = simpleZoom;
 	}

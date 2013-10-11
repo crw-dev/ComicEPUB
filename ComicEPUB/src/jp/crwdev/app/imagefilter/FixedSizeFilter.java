@@ -35,7 +35,7 @@ public class FixedSizeFilter implements IImageFilter {
 			return image;
 		}
 		
-		Dimension targetSize = param.getResizeDimension();
+		Dimension targetSize = param.getFixedSize();
 		if(targetSize.width == 0 || targetSize.height == 0){
 			return image;
 		}

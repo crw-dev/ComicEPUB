@@ -38,6 +38,7 @@ public class ImageFilterParam implements Cloneable {
 		mPictPageCropBottom = 0;
 		mIsResize = false;
 		mResizeDimension = new Dimension(0, 0);
+		mFixedSize = new Dimension(0, 0);
 		mIsGrayscale = false;
 		mIsGamma = false;
 		mGamma = 1.0f;
@@ -106,6 +107,7 @@ public class ImageFilterParam implements Cloneable {
 		dest.mPictPageCropBottom = src.getPictPageCropBottom();
 		dest.mIsResize = src.isResize();
 		dest.mResizeDimension = src.getResizeDimension();
+		dest.mFixedSize = src.getFixedSize();
 		dest.mIsGrayscale = src.isGrayscale();
 		dest.mIsGamma = src.isGamma();
 		dest.mGamma = src.getGamma();
@@ -156,6 +158,7 @@ public class ImageFilterParam implements Cloneable {
 	protected int mPictPageCropBottom;
 	protected boolean mIsResize;
 	protected Dimension mResizeDimension = new Dimension();
+	protected Dimension mFixedSize = new Dimension();
 	protected boolean mIsGrayscale;
 	protected boolean mIsGamma;
 	protected double mGamma;
@@ -286,6 +289,10 @@ public class ImageFilterParam implements Cloneable {
 
 	public Dimension getResizeDimension() {
 		return mResizeDimension;
+	}
+	
+	public Dimension getFixedSize() {
+		return mFixedSize;
 	}
 	
 	public boolean isGrayscale() {
@@ -555,6 +562,10 @@ public class ImageFilterParam implements Cloneable {
 
 	public void setResizeDimension(int width, int height) {
 		mResizeDimension.setSize(width, height);
+	}
+
+	public void setFixedSize(Dimension size) {
+		mFixedSize.setSize(size);
 	}
 
 	public void setSplitType(int splitType) {
