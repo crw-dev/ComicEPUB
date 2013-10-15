@@ -241,8 +241,10 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 				int row = event.getLastRow();
 				int col = event.getColumn();
 				if(row >= 0 && col >= 0){
-					String value = (String)mTableModel.getValueAt(row, col);
-					onTableCellChanged(row, col, value);
+					if(col != TABLE_INDEX_OUTPUT_FIXED_SIZE){
+						String value = (String)mTableModel.getValueAt(row, col);
+						onTableCellChanged(row, col, value);
+					}
 				}
 			}
 		});
