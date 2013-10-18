@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import jp.crwdev.app.BufferedImageIO;
-import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -59,7 +58,6 @@ public class ImageFilePreconverter implements IImageFileWriter {
 			listener.onProgress(0, null);
 		}
 		
-		int index = 0;
 		int size = list.size();
 		float progressOffset = 100 / (float)size;
 		
@@ -76,14 +74,6 @@ public class ImageFilePreconverter implements IImageFileWriter {
 				if(!info.isEnable()){
 					continue;
 				}
-				
-				String curSpread = info.getFilterParam().getPageSpread();
-				if((index==0 && curSpread.equals(Constant.PAGESPREAD_AUTO)) 
-					|| curSpread.equals(Constant.PAGESPREAD_CENTER)){
-					index++;
-					continue;
-				}
-				index++;
 				
 				InputStream in = info.getInputStream();
 				

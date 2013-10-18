@@ -14,6 +14,7 @@ public class EventObserver {
 	public static final int EventTarget_Panel = 1;
 	public static final int EventTarget_Setting = 2;
 	public static final int EventTarget_Main = 3;
+	public static final int EventTarget_Thumbnail = 4;
 	
 	// Event Type
 	public static final int EventType_UpdateFileInfo = 0;	// arg1: rowIndex
@@ -33,9 +34,11 @@ public class EventObserver {
 	public static final int EventType_ModifiedSetting = 14;		// no param
 	public static final int EventType_PreviewSize = 15;			// arg1: 1:true, 0:false, obj: Dimension
 	public static final int EventType_RequestSaveSetting = 16;	// no param
+	public static final int EventType_UpdateFileInfoList = 17;	// obj: IImageFileInfoList
+	public static final int EventType_ShowHide_ThumbnailView = 18; // no param
 
 	/** イベントリスナ 4種類  */
-	private OnEventListener[] mListeners = new OnEventListener[4];
+	private OnEventListener[] mListeners = new OnEventListener[5];
 	
 	/**
 	 * コンストラクタ

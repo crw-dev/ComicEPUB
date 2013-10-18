@@ -108,8 +108,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 			else{
 				ImageFilterParam param = mInfoList.get(row).getFilterParam();
-				int cropHeight = param.getFullPageCropTop() + param.getFullPageCropBottom();
-				if(cropHeight >= 400){
+				int cropWidth = param.getFullPageCropLeft() + param.getFullPageCropRight();
+				if(cropWidth >= 400){
 					c.setBackground(Color.RED);
 				}
 				else if(param.isEdit()){
@@ -134,6 +134,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}
 		startLoadFileInfoThread();
+		
+		// ThumbnailView
+		mEventSender.sendEvent(EventObserver.EventTarget_Thumbnail,
+				EventObserver.EventType_UpdateFileInfoList, 0, 0, list);
 	}
 	
 	private void startLoadFileInfoThread(){
@@ -542,7 +546,19 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			public void mouseClicked(MouseEvent e) {
 				if(javax.swing.SwingUtilities.isRightMouseButton(e)){
 					int column = getTableHeader().columnAtPoint(e.getPoint());
-					if(column == Constant.TABLE_COLUMN_PAGETYPE){
+					if(column == Constant.TABLE_COLUMN_ENTRYNAME){
+						JPopupMenu popup = new JPopupMenu();
+						JMenuItem item0 = new JMenuItem("サムネイルビュー表示切替");
+						item0.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								mEventSender.sendEvent(EventObserver.EventTarget_Thumbnail, EventObserver.EventType_ShowHide_ThumbnailView, 0);
+							}
+						});
+						popup.add(item0);
+						popup.show(e.getComponent(), e.getX(), e.getY());
+					}
+					else if(column == Constant.TABLE_COLUMN_PAGETYPE){
 						JPopupMenu popup = new JPopupMenu();
 						JMenuItem item0 = new JMenuItem("一括クリア");
 						JMenuItem item1 = new JMenuItem("一括挿絵");

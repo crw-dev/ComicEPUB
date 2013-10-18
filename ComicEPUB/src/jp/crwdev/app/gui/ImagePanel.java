@@ -80,7 +80,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	public ImagePanel(){
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);

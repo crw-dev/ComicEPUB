@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
+import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
@@ -60,6 +61,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private ImageFileInfoTable mTable;
 	private ImagePanel mImagePanel;
 	private SettingPanel mSettingPanel;
+	private ThumbnailView mThumbnailView;
 	
 	//private ImageFilterParam mBaseFilterParam = new ImageFilterParam();	// global setting
 	private ImageFilterParamSet mBaseFilterParams = new ImageFilterParamSet();
@@ -73,6 +75,14 @@ public class MainFrame extends JFrame implements OnEventListener {
 		 setSize(new Dimension(950,750));
 	     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	     setTitle("ComicEPUB");
+	     
+	     GraphicsEnvironment ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
+	     GraphicsDevice gd = ge.getDefaultScreenDevice();
+	     boolean supported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSLUCENT);
+	     if(supported){
+	    	 //setUndecorated(true);
+	    	 //setBackground(new Color(0,0,0,0));
+	     }
 	     
 	     addWindowListener(new WindowAdapter(){
 	    	 @Override
@@ -108,12 +118,13 @@ public class MainFrame extends JFrame implements OnEventListener {
 
 	     mTable = table;
 		    
+	     mThumbnailView = new ThumbnailView();
+	     mThumbnailView.setImageFileInfoTable(mTable);
 
 	     // ImagePanel
 	     ImagePanel imagePanel = new ImagePanel();
 	     imagePanel.setBackground(Color.WHITE);
 	     //imagePanel.setPreferredSize(new Dimension(600, 800));
-	     
 	     
 	     mTable.setImagePanel(imagePanel);
 	     mImagePanel = imagePanel;
@@ -154,6 +165,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     mEventObserver.setEventListener(EventObserver.EventTarget_Panel, imagePanel);
 	     mEventObserver.setEventListener(EventObserver.EventTarget_Setting, settingPanel);
 	     mEventObserver.setEventListener(EventObserver.EventTarget_Main, this);
+	     mEventObserver.setEventListener(EventObserver.EventTarget_Thumbnail, mThumbnailView);
 	     
 	     
 	     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, imagePanel);
@@ -232,6 +244,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 		
 							list.sort();
 							mTable.setImageFileInfoList(list);
+							//if(mThumbnailView != null){
+							//	mThumbnailView.setImageFileInfoList(list);
+							//}
 							
 							if(params != null){
 								// 全体設定を反映
