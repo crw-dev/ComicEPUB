@@ -34,7 +34,7 @@ Android版SonyReader用に分類指定(書籍、雑誌、コミック)可。
 
 ----------------------------------------------------
 
-input - folder .zip .rar .pdf(implementing)
+input - folder .zip .rar .pdf(動作確認中)
 
 output - folder .zip .epub .pdf
 
