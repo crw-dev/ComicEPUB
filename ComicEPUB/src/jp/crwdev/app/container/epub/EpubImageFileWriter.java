@@ -324,14 +324,22 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				synchronized(info){
 					InputStream in = info.getInputStream();
 					
-					BufferedImage image = BufferedImageIO.read(in, info.isJpeg());
+					BufferedImage image = null;
+					if(in != null){
+						image = BufferedImageIO.read(in, info.isJpeg());
+					}
+					else{
+						image = info.getImage();
+					}
 					if(mBaseFilter != null){
 						image = mBaseFilter.filter(image, info.getFilterParam());
 					}
 					BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
 					
-					in.close();
-
+					if(in != null){
+						in.close();
+					}
+					
 					sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
 				}
 

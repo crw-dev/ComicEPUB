@@ -3,9 +3,12 @@
  */
 package jp.crwdev.app.container;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -32,6 +35,8 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	private boolean mIsModify = false;
 	/** 有効フラグ */
 	protected boolean mIsEnable = true;
+	/** ソート用テキスト */
+	protected String mSortText;
 	
 	/**
 	 * 基本データの読み込み
@@ -69,6 +74,27 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 
 	}
 
+	@Override
+	public String getSortString(){
+		if(mSortText == null){
+			String regex = "(\\d+)";
+			Pattern p = Pattern.compile(regex);
+			
+			String filename = getFileName();
+			Matcher m = p.matcher(filename);
+			if(m.find()){
+				String value = m.group();
+				value = String.format("%05d", Integer.parseInt(value));
+				String result = m.replaceFirst(value);
+				mSortText = result;
+			}
+			else{
+				mSortText = filename;
+			}
+		}
+		return mSortText;
+	}
+	
 	@Override
 	public ImageFilterParam getFilterParam(){
 		return mPrivateFilter;
@@ -130,6 +156,11 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 				reader.dispose();
 			}
 		}
+	}
+	
+	@Override
+	public BufferedImage getImage(){
+		return null;
 	}
 	
 	@Override

@@ -1,9 +1,13 @@
 package jp.crwdev.app.container.pdf;
 
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.jpedal.PdfDecoder;
+import org.jpedal.exception.PdfException;
 
 import com.itextpdf.text.pdf.PRStream;
 import com.itextpdf.text.pdf.PdfDictionary;
@@ -28,6 +32,8 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 	/** Name */
 	private int mNumber = 0;
 	
+	private PdfDecoder mPdfDecoder = null;
+	
 	public PdfImageFileInfo(ImageRenderInfo info){
 		super();
 		try {
@@ -42,7 +48,14 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 		}catch(Exception e){
 			
 		}
-		
+	}
+	
+	public PdfImageFileInfo(PdfDecoder decoder, int page, int width, int height){
+		super();
+		mPdfDecoder = decoder;
+		mWidth = width;
+		mHeight = height;
+		mNumber = page;
 	}
 	
 	public PdfImageFileInfo(int number, PdfImageObject image, int width, int height, String format){
@@ -74,6 +87,11 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 	public String getFileName() {
 		return Integer.toString(mNumber);
 	}
+	
+	@Override
+	public String getSortString() {
+		return String.format("%05d", mNumber);
+	}
 
 	@Override
 	public String getFullPath() {
@@ -89,6 +107,25 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override
+	public BufferedImage getImage() {
+		if(mPdfDecoder != null){
+			try {
+				mPdfDecoder.setPageParameters(1.0f, mNumber);
+				//mPdfDecoder.decodePage(mNumber);
+				//mPdfDecoder.waitForDecodingToFinish();
+				return mPdfDecoder.getPageAsTransparentImage(mNumber);
+				//return mPdfDecoder.getPageAsImage(mNumber);
+			} catch (PdfException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}

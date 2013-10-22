@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -246,7 +247,14 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 	}
 	
 	public BufferedImage getThumbnail(IImageFileInfo info){
-		BufferedImage image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+		InputStream in = info.getInputStream();
+		BufferedImage image = null;
+		if(in != null){
+			image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+		}
+		else{
+			image = info.getImage();
+		}
 		ImageFilterParam param = new ImageFilterParam();
 		param.setResize(true);
 		param.setResizeDimension(120, 120);

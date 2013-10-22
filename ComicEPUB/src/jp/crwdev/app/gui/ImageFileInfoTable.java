@@ -204,7 +204,13 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			if(info != null){
 				InputStream stream = info.getInputStream();
 				try {
-					BufferedImage image = BufferedImageIO.read(stream, info.isJpeg());
+					BufferedImage image = null;
+					if(stream != null){
+						image = BufferedImageIO.read(stream, info.isJpeg());
+					}
+					else{
+						image = info.getImage();
+					}
 					if(mImagePanel != null){
 						mImagePanel.setImage(image, info, index);
 					}
@@ -435,7 +441,13 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				int pageType = info.getFilterParam().getPageType();
 				if(pageType != Constant.PAGETYPE_PICT){
 					InputStream stream = info.getInputStream();
-					BufferedImage image = BufferedImageIO.read(stream, info.isJpeg());
+					BufferedImage image = null;
+					if(stream != null){
+						image = BufferedImageIO.read(stream, info.isJpeg());
+					}
+					else{
+						image = info.getImage();
+					}
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();
 					if(mBaseFilterParams != null){

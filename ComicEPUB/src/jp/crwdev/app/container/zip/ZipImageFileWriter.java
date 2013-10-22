@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -108,7 +109,13 @@ public class ZipImageFileWriter implements IImageFileWriter {
 						continue;
 					}
 					
-					image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
+					InputStream in = info.getInputStream();
+					if(in != null){
+						image = BufferedImageIO.read(in, info.isJpeg());
+					}
+					else{
+						image = info.getImage();
+					}
 					if(mBaseFilter != null){
 						image = mBaseFilter.filter(image, info.getFilterParam());
 					}

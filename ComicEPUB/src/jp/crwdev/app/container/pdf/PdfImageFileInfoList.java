@@ -3,6 +3,9 @@ package jp.crwdev.app.container.pdf;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import org.jpedal.PdfDecoder;
+import org.jpedal.objects.PdfPageData;
+
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfReader;
@@ -20,6 +23,9 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 	/** PdfReader */
 	protected PdfReader mPdfReader = null;
 	
+	protected PdfDecoder mPdfDecoder = null;
+	
+	
 	/**
 	 * コンストラクタ
 	 * @param pdfReader 入力PdfファイルReader
@@ -28,7 +34,12 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 		super();
 		setList(pdfReader);
 	}
-
+	
+	public PdfImageFileInfoList(PdfDecoder pdfDecoder){
+		super();
+		setList(pdfDecoder);
+	}
+	
 	/**
 	 * コンストラクタ
 	 */
@@ -58,7 +69,22 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 			}
 		}
 	}
-	
+
+	private void setList(PdfDecoder pdfDecoder){
+		mPdfDecoder = pdfDecoder;
+		
+		if(mPdfDecoder != null){
+			PdfPageData pageData = mPdfDecoder.getPdfPageData();
+			int pageCount = pageData.getPageCount();
+			
+			for(int page=1; page<=pageCount; page++){
+				int width = pageData.getCropBoxWidth(page);
+				int height = pageData.getCropBoxHeight(page);
+				add(new PdfImageFileInfo(mPdfDecoder, page, width, height));
+			}
+		}
+	}
+
 
 	private class MyRenderImageListener implements RenderListener {
 

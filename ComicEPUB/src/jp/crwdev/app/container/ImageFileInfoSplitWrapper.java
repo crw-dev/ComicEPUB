@@ -3,6 +3,7 @@
  */
 package jp.crwdev.app.container;
 
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -104,6 +105,11 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	public String getFileName() {
 		return mBaseInfo.getFileName();
 	}
+	
+	@Override
+	public String getSortString() {
+		return mBaseInfo.getSortString();
+	}
 
 	@Override
 	public String getFullPath() {
@@ -135,6 +141,11 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	@Override
 	public InputStream getInputStream() {
 		return mBaseInfo.getInputStream();
+	}
+	
+	@Override
+	public BufferedImage getImage() {
+		return mBaseInfo.getImage();
 	}
 
 	@Override

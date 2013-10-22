@@ -3,6 +3,7 @@
  */
 package jp.crwdev.app.interfaces;
 
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
 import jp.crwdev.app.imagefilter.ImageFilterParam;
@@ -15,6 +16,11 @@ public interface IImageFileInfo {
 	 */
 	String getFileName();
 
+	/**
+	 * ソート用テキスト
+	 */
+	String getSortString();
+	
 	/**
 	 * フルパス取得
 	 * @return
@@ -55,6 +61,12 @@ public interface IImageFileInfo {
 	 * @return
 	 */
 	InputStream getInputStream();
+	
+	/**
+	 * 画像取得(if supported)
+	 * @return
+	 */
+	BufferedImage getImage();
 	
 	/**
 	 * Jpeg判定

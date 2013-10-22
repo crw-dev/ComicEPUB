@@ -197,7 +197,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 				IImageFileInfo a = (IImageFileInfo)o1;
 				IImageFileInfo b = (IImageFileInfo)o2;
 				
-				int comp = a.getFileName().compareToIgnoreCase(b.getFileName());
+				int comp = a.getSortString().compareToIgnoreCase(b.getSortString());
 				if(comp == 0){
 					comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
 				}
