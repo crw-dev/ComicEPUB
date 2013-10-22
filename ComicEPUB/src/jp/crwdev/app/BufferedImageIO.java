@@ -52,9 +52,9 @@ public class BufferedImageIO {
 		return null;
 	}
 	
-	private static BufferedImage prepareBufferedImage(BufferedImage image){
+	public static BufferedImage prepareBufferedImage(BufferedImage image){
 		int type = image.getType();
-		if(type == BufferedImage.TYPE_BYTE_INDEXED || type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_BINARY || type == BufferedImage.TYPE_CUSTOM){
+		if(type == BufferedImage.TYPE_BYTE_INDEXED || type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_BINARY || type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_CUSTOM){
 			BufferedImage dest = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 			Graphics2D g = dest.createGraphics();
 			g.drawImage(image, 0, 0, null);

@@ -23,6 +23,7 @@ import com.itextpdf.text.pdf.parser.RenderListener;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
+import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.container.ImageFileInfoBase;
 
 public class PdfImageFileInfo extends ImageFileInfoBase {
@@ -118,7 +119,7 @@ public class PdfImageFileInfo extends ImageFileInfoBase {
 				mPdfDecoder.setPageParameters(1.0f, mNumber);
 				//mPdfDecoder.decodePage(mNumber);
 				//mPdfDecoder.waitForDecodingToFinish();
-				return mPdfDecoder.getPageAsTransparentImage(mNumber);
+				return BufferedImageIO.prepareBufferedImage(mPdfDecoder.getPageAsTransparentImage(mNumber));
 				//return mPdfDecoder.getPageAsImage(mNumber);
 			} catch (PdfException e) {
 				e.printStackTrace();
