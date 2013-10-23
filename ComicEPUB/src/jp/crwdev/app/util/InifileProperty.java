@@ -25,6 +25,7 @@ public class InifileProperty {
 	private static final String PROP_OUTPUTDIR = "outputFolder";
 	private static final String PROP_IMAGESIZE = "imageSize";
 	private static final String PROP_JPEG_QUALITY = "jpegQuality";
+	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
 	
 	private boolean mIsModified = false;
 	
@@ -129,6 +130,14 @@ public class InifileProperty {
 			mProp.setProperty(PROP_JPEG_QUALITY, "0.8");
 			mIsModified = true;
 		}
+		
+		String ghostScriptPath = mProp.getProperty(PROP_GHOSTSCRIPT);
+		if(ghostScriptPath == null || ghostScriptPath.isEmpty()){
+			ghostScriptPath = "";
+			mProp.setProperty(PROP_GHOSTSCRIPT, "");
+			mIsModified = true;
+		}
+		
 	}
 	
 	public String getOutputFolder(){
@@ -182,4 +191,17 @@ public class InifileProperty {
 	public float getJpegQuality(){
 		return Float.parseFloat(mProp.getProperty(PROP_JPEG_QUALITY));
 	}
+	
+	public String getGhostScriptPath(){
+		return mProp.getProperty(PROP_GHOSTSCRIPT);
+	}
+
+	public void setGhostScriptPath(String path){
+		if(path == null){
+			path = "";
+		}
+		mProp.setProperty(PROP_GHOSTSCRIPT, path);
+		mIsModified = true;
+	}
+
 }

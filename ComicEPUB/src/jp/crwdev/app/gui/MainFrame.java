@@ -34,6 +34,7 @@ import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
 import jp.crwdev.app.container.folder.FolderImageFileWriter;
+import jp.crwdev.app.container.pdf.GhostscriptUtil;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.AutoCropFilter;
@@ -98,6 +99,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	    			 }
 	    		 }
 	    		 InifileProperty.getInstance().save();
+	    		 GhostscriptUtil.getInstance().close();
 	    	 }
 	    	 @Override
 	    	 public void windowClosed(WindowEvent e) {
