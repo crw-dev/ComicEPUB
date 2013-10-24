@@ -30,7 +30,9 @@ Android版SonyReader用に分類指定(書籍、雑誌、コミック)可。
 編集データは編集元ファイルと同じ場所にXMLファイルとして保存されます。
 一括変換も可能です。
 
-
+PDFの読み込みにはGhostScriptを使用します。
+インストール後にコマンドライン実行ファイルのパスを設定ファイル(default.ini)に指定してください。
+(例：ghostScriptPath=C:/gs/gs9.1/bin/gswin64c.exe)
 
 ----------------------------------------------------
 
@@ -53,4 +55,5 @@ http://code.google.com/p/java-image-scaling/
 iText (GPLv3)
 http://itextpdf.com/
 
+GhostScript
 
