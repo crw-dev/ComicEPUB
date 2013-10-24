@@ -252,6 +252,7 @@ public class GhostscriptUtil {
 		
 		
 		String imageName = String.format(mTmpImageHead + mTmpImageName, page);
+		imageName = imageName.replaceAll(" ", "_");
 		File file = new File(mTmpFolder + imageName);
 		if(file.exists()){
 			return file;
