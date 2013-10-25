@@ -242,4 +242,8 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		return mList.add(info);
 	}
 
+	@Override
+	public void release(){
+		
+	}
 }

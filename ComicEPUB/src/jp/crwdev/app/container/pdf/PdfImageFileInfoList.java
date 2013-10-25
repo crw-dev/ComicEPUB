@@ -1,16 +1,13 @@
 package jp.crwdev.app.container.pdf;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
-import com.itextpdf.text.pdf.parser.PdfImageObject;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.RenderListener;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
+import com.jmupdf.pdf.PdfDocument;
 
 import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
@@ -21,7 +18,8 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 	protected PdfReader mPdfReader = null;
 	
 	protected GhostscriptUtil mGSUtil;
-	
+	protected PdfDocument mPdfDocument;
+	protected PdfReaderContentParser mParser;
 	
 	/**
 	 * コンストラクタ
@@ -35,6 +33,11 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 	public PdfImageFileInfoList(GhostscriptUtil gs){
 		super();
 		setList(gs);
+	}
+	
+	public PdfImageFileInfoList(PdfDocument doc, PdfReaderContentParser parser){
+		super();
+		setList(doc, parser);
 	}
 	
 	/**
@@ -58,7 +61,6 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 				try {
 					parser.processContent(page, listener);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -79,6 +81,18 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 		}
 	}
 
+	private void setList(PdfDocument doc, PdfReaderContentParser parser){
+		mPdfDocument = doc;
+		mParser = parser;
+		
+		if(mPdfDocument != null){
+			int pageCount = mPdfDocument.getPageCount();
+			
+			for(int page=1; page<=pageCount; page++){
+				add(new PdfImageFileInfo(mPdfDocument, mParser, page));
+			}
+		}
+	}
 
 	private class MyRenderImageListener implements RenderListener {
 
@@ -107,7 +121,6 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 //				System.out.println("fileType=" + filetype + " number=" + number + " w=" + width + " h=" + height);
 				
 //			} catch (IOException e) {
-//				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
 			
@@ -137,4 +150,11 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 		return renewInternal(list);
 	}
 
+	@Override
+	public void release(){
+		if(mPdfDocument != null){
+			mPdfDocument.dispose();
+			mPdfDocument = null;
+		}
+	}
 }

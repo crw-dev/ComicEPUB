@@ -125,6 +125,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	}
 	
 	public void setImageFileInfoList(IImageFileInfoList list){
+		if(mInfoList != null){
+			mInfoList.release();
+		}
 		mInfoList = null;
 		clearData();
 		mInfoList = list;

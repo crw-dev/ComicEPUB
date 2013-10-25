@@ -26,6 +26,7 @@ public class InifileProperty {
 	private static final String PROP_IMAGESIZE = "imageSize";
 	private static final String PROP_JPEG_QUALITY = "jpegQuality";
 	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
+	private static final String PROP_DEBUGWINDOW = "debugWindow";
 	
 	private boolean mIsModified = false;
 	
@@ -150,6 +151,15 @@ public class InifileProperty {
 		}
 		mProp.setProperty(PROP_OUTPUTDIR, path);
 		mIsModified = true;
+	}
+	
+	public boolean isShowDebugWindow(){
+		String value = mProp.getProperty(PROP_DEBUGWINDOW, "false");
+		if(value.compareToIgnoreCase("true") == 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	public List<String> getImageSizeList(){

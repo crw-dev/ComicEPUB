@@ -49,4 +49,8 @@ public interface IImageFileInfoList {
 	 */
 	public void sort();
 	
+	/**
+	 * リリース
+	 */
+	void release();
 }

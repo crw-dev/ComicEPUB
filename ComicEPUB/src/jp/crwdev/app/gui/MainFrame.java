@@ -1,30 +1,18 @@
 ﻿package jp.crwdev.app.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.Hashtable;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.table.DefaultTableModel;
 
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
@@ -33,14 +21,10 @@ import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
-import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.pdf.GhostscriptUtil;
-import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
-import jp.crwdev.app.imagefilter.AutoCropFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
-import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -73,127 +57,124 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private Object mLock = new Object();
 	
 	public MainFrame(){
-		 setSize(new Dimension(950,750));
-	     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	     setTitle("ComicEPUB");
-	     
-	     GraphicsEnvironment ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
-	     GraphicsDevice gd = ge.getDefaultScreenDevice();
-	     boolean supported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSLUCENT);
-	     if(supported){
-	    	 //setUndecorated(true);
-	    	 //setBackground(new Color(0,0,0,0));
-	     }
-	     
-	     addWindowListener(new WindowAdapter(){
-	    	 @Override
-	    	 public void windowClosing(WindowEvent e) {
-	    		 System.out.println("windowClosing");
-	    		 //dispose();
-	    		 if(mSettingFilePath != null){
-	    			 if(mIsSettingChanged){
-		    			 int ret = showSettingSaveConfirmDialog();
-		    			 if(ret == JOptionPane.YES_OPTION){
-		    				 saveSettingFile(mSettingFilePath);
-		    			 }
-	    			 }
-	    		 }
-	    		 InifileProperty.getInstance().save();
-	    		 GhostscriptUtil.getInstance().close();
-	    	 }
-	    	 @Override
-	    	 public void windowClosed(WindowEvent e) {
-	    		 System.out.println("windowClosed");
-	    		 mTable.finalize();
-	    		 mImagePanel.finalize();
-	    	 }
-	     });
-	     
-	     
-	     //mIsUnificationTextPage = ImageFilterParam.isUnificationTextPage();
-	     
-	     // Table
-	     ImageFileInfoTable table = new ImageFileInfoTable();
-	 
-	     JScrollPane scrollTable = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-	     scrollTable.setPreferredSize(new Dimension(200, 800));
+		setSize(new Dimension(950,750));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("ComicEPUB");
+		
+		if(InifileProperty.getInstance().isShowDebugWindow()){
+			DebugWindow.initialize();
+		}
+		
+		
+		addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.println("windowClosing");
+				//dispose();
+				if(mSettingFilePath != null){
+					if(mIsSettingChanged){
+						int ret = showSettingSaveConfirmDialog();
+						if(ret == JOptionPane.YES_OPTION){
+							saveSettingFile(mSettingFilePath);
+						}
+					}
+				}
+				InifileProperty.getInstance().save();
+				GhostscriptUtil.getInstance().close();
+			}
+			@Override
+			public void windowClosed(WindowEvent e) {
+				System.out.println("windowClosed");
+				mTable.finalize();
+				mImagePanel.finalize();
+			}
+		});
+		
+		
+		//mIsUnificationTextPage = ImageFilterParam.isUnificationTextPage();
+		
+		// Table
+		ImageFileInfoTable table = new ImageFileInfoTable();
+		
+		JScrollPane scrollTable = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollTable.setPreferredSize(new Dimension(200, 800));
+		
+		mTable = table;
+		
+		mThumbnailView = new ThumbnailView();
+		mThumbnailView.setImageFileInfoTable(mTable);
 
-	     mTable = table;
-		    
-	     mThumbnailView = new ThumbnailView();
-	     mThumbnailView.setImageFileInfoTable(mTable);
+		// ImagePanel
+		ImagePanel imagePanel = new ImagePanel();
+		imagePanel.setBackground(Color.WHITE);
+		//imagePanel.setPreferredSize(new Dimension(600, 800));
+		
+		mTable.setImagePanel(imagePanel);
+		mImagePanel = imagePanel;
+		
+		// SettingPanel
+		SettingPanel settingPanel = new SettingPanel(this);
+		settingPanel.setPreferredSize(new Dimension(250, 800));
+		//settingPanel.setSize(300,800);
+		//settingPanel.setMinimumSize(new Dimension(300, 800));
+		mSettingPanel = settingPanel;
 
-	     // ImagePanel
-	     ImagePanel imagePanel = new ImagePanel();
-	     imagePanel.setBackground(Color.WHITE);
-	     //imagePanel.setPreferredSize(new Dimension(600, 800));
-	     
-	     mTable.setImagePanel(imagePanel);
-	     mImagePanel = imagePanel;
+		ImageFilterParamSet defaultParam = settingPanel.getImageFilterParamSet();
+		setBaseFilterParam(defaultParam);
 
-	     // SettingPanel
-	     SettingPanel settingPanel = new SettingPanel(this);
-	     settingPanel.setPreferredSize(new Dimension(250, 800));
-	     //settingPanel.setSize(300,800);
-	     //settingPanel.setMinimumSize(new Dimension(300, 800));
-	     mSettingPanel = settingPanel;
-
-	     ImageFilterParamSet defaultParam = settingPanel.getImageFilterParamSet();
-	     setBaseFilterParam(defaultParam);
-
-	     
-	     SpringLayout layout = new SpringLayout();
-	     setLayout(layout);
-	     
-	     Container p = getContentPane();
-	     
-	     layout.putConstraint(SpringLayout.NORTH, scrollTable, 3, SpringLayout.NORTH, p);
-	     layout.putConstraint(SpringLayout.SOUTH, scrollTable, 3, SpringLayout.SOUTH, p);
-	     layout.putConstraint(SpringLayout.WEST, scrollTable, 3, SpringLayout.WEST, p);
-	     
-	     layout.putConstraint(SpringLayout.NORTH, imagePanel, 3, SpringLayout.NORTH, p);
-	     layout.putConstraint(SpringLayout.SOUTH, imagePanel, 3, SpringLayout.SOUTH, p);
-	     layout.putConstraint(SpringLayout.WEST, imagePanel, 3, SpringLayout.EAST, scrollTable);
-	     layout.putConstraint(SpringLayout.EAST, imagePanel, -5, SpringLayout.WEST, settingPanel);
-	     
-	     layout.putConstraint(SpringLayout.NORTH, settingPanel, 3, SpringLayout.NORTH, p);
-	     layout.putConstraint(SpringLayout.SOUTH, settingPanel, -3, SpringLayout.SOUTH, p);
-	     layout.putConstraint(SpringLayout.EAST, settingPanel, -5, SpringLayout.EAST, p);
-	     
-	     table.setEventObserver(mEventObserver);
-	     imagePanel.setEventObserver(mEventObserver);
-	     settingPanel.setEventObserver(mEventObserver);
-	     mEventObserver.setEventListener(EventObserver.EventTarget_Table, table);
-	     mEventObserver.setEventListener(EventObserver.EventTarget_Panel, imagePanel);
-	     mEventObserver.setEventListener(EventObserver.EventTarget_Setting, settingPanel);
-	     mEventObserver.setEventListener(EventObserver.EventTarget_Main, this);
-	     mEventObserver.setEventListener(EventObserver.EventTarget_Thumbnail, mThumbnailView);
-	     
-	     
-	     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, imagePanel);
-	     splitPane.setDividerSize(5);
-	     add(splitPane);
-	     
-	     layout.putConstraint(SpringLayout.NORTH, splitPane, 3, SpringLayout.NORTH, p);
-	     layout.putConstraint(SpringLayout.SOUTH, splitPane, 3, SpringLayout.SOUTH, p);
-	     layout.putConstraint(SpringLayout.WEST, splitPane, 3, SpringLayout.WEST, p);
-	     layout.putConstraint(SpringLayout.EAST, splitPane, 0, SpringLayout.WEST, settingPanel);
+		
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+		
+		Container p = getContentPane();
+		
+		layout.putConstraint(SpringLayout.NORTH, scrollTable, 3, SpringLayout.NORTH, p);
+		layout.putConstraint(SpringLayout.SOUTH, scrollTable, 3, SpringLayout.SOUTH, p);
+		layout.putConstraint(SpringLayout.WEST, scrollTable, 3, SpringLayout.WEST, p);
+		
+		layout.putConstraint(SpringLayout.NORTH, imagePanel, 3, SpringLayout.NORTH, p);
+		layout.putConstraint(SpringLayout.SOUTH, imagePanel, 3, SpringLayout.SOUTH, p);
+		layout.putConstraint(SpringLayout.WEST, imagePanel, 3, SpringLayout.EAST, scrollTable);
+		layout.putConstraint(SpringLayout.EAST, imagePanel, -5, SpringLayout.WEST, settingPanel);
+		
+		layout.putConstraint(SpringLayout.NORTH, settingPanel, 3, SpringLayout.NORTH, p);
+		layout.putConstraint(SpringLayout.SOUTH, settingPanel, -3, SpringLayout.SOUTH, p);
+		layout.putConstraint(SpringLayout.EAST, settingPanel, -5, SpringLayout.EAST, p);
+		
+		table.setEventObserver(mEventObserver);
+		imagePanel.setEventObserver(mEventObserver);
+		settingPanel.setEventObserver(mEventObserver);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Table, table);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, imagePanel);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Setting, settingPanel);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Main, this);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Thumbnail, mThumbnailView);
+		
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, imagePanel);
+		splitPane.setDividerSize(5);
+		add(splitPane);
+		
+		layout.putConstraint(SpringLayout.NORTH, splitPane, 3, SpringLayout.NORTH, p);
+		layout.putConstraint(SpringLayout.SOUTH, splitPane, 3, SpringLayout.SOUTH, p);
+		layout.putConstraint(SpringLayout.WEST, splitPane, 3, SpringLayout.WEST, p);
+		layout.putConstraint(SpringLayout.EAST, splitPane, 0, SpringLayout.WEST, settingPanel);
 
 //	     add(scrollTable);
 //	     add(imagePanel);
-	     add(settingPanel);
+		add(settingPanel);
 		    //add(settingPanel,BorderLayout.CENTER);
 		    
-	     //add(imagePanel);
-	     //add(settingPanel);
-	     
-	     setVisible(true);
-	     
-	     Constant.jpegQuality = InifileProperty.getInstance().getJpegQuality();
-	     
-	  //   String filepath = "I:\\Android\\sample\\original";
-	     
-	     new DropTarget(this, new FileDropTargetAdapter(new OnDropListener(){
+		//add(imagePanel);
+		//add(settingPanel);
+		
+		setVisible(true);
+		
+		Constant.jpegQuality = InifileProperty.getInstance().getJpegQuality();
+		
+		//   String filepath = "I:\\Android\\sample\\original";
+		
+		new DropTarget(this, new FileDropTargetAdapter(new OnDropListener(){
 			@Override
 			public void onDrop(String filepath) {
 				final String filePath = filepath;
