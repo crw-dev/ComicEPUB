@@ -10,6 +10,7 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.gui.DebugWindow;
 import jp.crwdev.app.util.DPIRenderListener;
 import jp.crwdev.app.util.DPIRenderListener.DPI;
 import jp.crwdev.app.util.InifileProperty;
@@ -161,9 +162,12 @@ public class GhostscriptUtil {
 		String imageName = String.format(mTmpImageHead + mTmpImageName, page);
 		File file = new File(mTmpFolder + imageName);
 		if(file.exists()){
+			DebugWindow.log("getPageAsFile", "find tmpfile.");
 			return file;
 		}
 		else{
+			DebugWindow.log("getPageAsFile", "begin create tmpfile.");
+			
 			Runtime r = Runtime.getRuntime();
 			DPI dpi = getDPI(page);
 			String dpiStr = "72";
@@ -173,6 +177,9 @@ public class GhostscriptUtil {
 			String command = mGSC + " -dSAFER -dBATCH -dFirstPage=" + page + " -dLastPage=" + page + " -dNOPAUSE -sDEVICE=jpeg -dDisplayFormat=16#30804 -dJPEGQ=100 -dQFactor=1.0 -r" + dpiStr;
 			command += " -sOutputFile=\"" + mTmpFolder + imageName + "\" ";
 			command += "\"" + mPdfFilePath + "\"";
+			
+			DebugWindow.log("getPageAsFile", "gs command=" + command);
+			
 			int result = 0;
 			try {
 				Process p = r.exec(command);
@@ -182,6 +189,9 @@ public class GhostscriptUtil {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			DebugWindow.log("getPageAsFile", "end create tmpfile. result=" + result);
+			
 			if(result == 0){
 				if(file.exists()){
 					return file;

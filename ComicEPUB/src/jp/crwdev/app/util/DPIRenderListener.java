@@ -2,6 +2,8 @@ package jp.crwdev.app.util;
 
 import java.io.IOException;
 
+import jp.crwdev.app.gui.DebugWindow;
+
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfDictionary;
@@ -25,10 +27,15 @@ public class DPIRenderListener implements RenderListener {
 			dpiY = y;
 			width = 0;
 			height = 0;
+			mHasText = false;
+		}
+		
+		public boolean hasText(){
+			return mHasText;
 		}
 		
 		public float getResolution(){
-			int dpi = Math.round((dpiX + dpiY)/2.0f);
+			float dpi = (float)Math.floor((dpiX + dpiY)/2.0f);
 			return dpi;
 		}
 		
@@ -36,9 +43,15 @@ public class DPIRenderListener implements RenderListener {
 			int dpi = (int)Math.round((dpiX + dpiY)/2.0f);
 			return Integer.toString(dpi);
 		}
+		
+		protected void setHasText(boolean hasText){
+			mHasText = hasText;
+		}
 	}
 
 	private DPI mDPI = new DPI(300f, 300f);
+	private boolean mRendered = false;
+	private boolean mHasText = false;
 	
 	@Override
 	public void beginTextBlock() {
@@ -50,7 +63,9 @@ public class DPIRenderListener implements RenderListener {
 
 	@Override
 	public void renderImage(ImageRenderInfo renderInfo) {
-		
+		if(mRendered){
+			return;
+		}
 		try {
 			PdfImageObject imgObj = renderInfo.getImage();
 			PdfDictionary imgDic = imgObj.getDictionary();
@@ -84,6 +99,9 @@ public class DPIRenderListener implements RenderListener {
 						mDPI.dpiX = image.getScaledWidth() / widthScale * 72f;
 						mDPI.dpiY = image.getScaledHeight() / heightScale * 72f;
 					//}
+						mRendered = true;
+						DebugWindow.log("renderImage", "imageDpi=("+image.getDpiX()+","+image.getDpiY()+")");
+						DebugWindow.log("renderImage", "ctmDPI=("+mDPI.dpiX+","+mDPI.dpiY+")");
 				}
 			}
 			
@@ -96,6 +114,7 @@ public class DPIRenderListener implements RenderListener {
 
 	@Override
 	public void renderText(TextRenderInfo arg0) {
+		mDPI.setHasText(true);
 	}
 	
 	public DPI getDPI(){

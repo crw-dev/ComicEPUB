@@ -253,7 +253,7 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 			image = BufferedImageIO.read(info.getInputStream(), info.isJpeg());
 		}
 		else{
-			image = info.getImage();
+			image = info.getImage(true);
 		}
 		ImageFilterParam param = new ImageFilterParam();
 		param.setResize(true);

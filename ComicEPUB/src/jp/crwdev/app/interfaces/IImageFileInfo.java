@@ -66,7 +66,7 @@ public interface IImageFileInfo {
 	 * 画像取得(if supported)
 	 * @return
 	 */
-	BufferedImage getImage();
+	BufferedImage getImage(boolean preview);
 	
 	/**
 	 * Jpeg判定

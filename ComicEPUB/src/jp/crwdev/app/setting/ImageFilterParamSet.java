@@ -60,6 +60,18 @@ public class ImageFilterParamSet extends ArrayList<ImageFilterParam> {
 		}
 	}
 	
+	public boolean isPreview(){
+		for(int i=0; i<size(); i++){
+			ImageFilterParam param = get(i);
+			if(param != null){
+				if(param.isPreview()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public void setPreview(boolean enable){
 		for(int i=0; i<size(); i++){
 			ImageFilterParam param = get(i);

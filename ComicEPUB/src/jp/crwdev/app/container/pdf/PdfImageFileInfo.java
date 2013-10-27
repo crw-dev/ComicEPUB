@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.PdfImageObject;
@@ -19,6 +20,8 @@ import com.jmupdf.pdf.PdfDocument;
 import jp.crwdev.app.container.ImageFileInfoBase;
 import jp.crwdev.app.container.pdf.GhostscriptUtil.GhostscriptUtilEventListener;
 import jp.crwdev.app.gui.DebugWindow;
+import jp.crwdev.app.imagefilter.ImageFilterParam;
+import jp.crwdev.app.imagefilter.ResizeFilter;
 import jp.crwdev.app.util.DPIRenderListener;
 import jp.crwdev.app.util.DPIRenderListener.DPI;
 
@@ -82,6 +85,14 @@ public class PdfImageFileInfo extends ImageFileInfoBase implements GhostscriptUt
 		if(mWidth != 0 && mHeight != 0){
 			return;
 		}
+		if(mPdfDocument != null){
+//			BufferedImage buffered = getImage();
+//			if(buffered != null){
+//				mWidth = buffered.getWidth();
+//				mHeight = buffered.getHeight();
+//				DebugWindow.log("update", "width=" + mWidth + " height=" + mHeight);
+//			}
+		}
 		if(mPdfImage != null){
 			try {
 				BufferedImage buffered = mPdfImage.getBufferedImage();
@@ -140,8 +151,11 @@ public class PdfImageFileInfo extends ImageFileInfoBase implements GhostscriptUt
 	}
 	
 	@Override
-	public BufferedImage getImage() {
+	public BufferedImage getImage(boolean preview) {
 		if(mPdfDocument != null){
+			DebugWindow.log("getImage", "begin");
+			long start = System.currentTimeMillis();
+			
 			Page page = mPdfDocument.getPage(mNumber);
 			PageRect boundBox = page.getBoundBox();
 			
@@ -154,40 +168,46 @@ public class PdfImageFileInfo extends ImageFileInfoBase implements GhostscriptUt
 			
 			DPI dpi = listener.getDPI();
 			float originalResolution = dpi.getResolution();
+
+			DebugWindow.log("getImage", "page=" + mNumber);
+			DebugWindow.log("getImage", "originalResolution=" + originalResolution);
+
+			if(!preview && dpi.hasText()){
+				originalResolution = 400.0f;
+				DebugWindow.log("getImage", "renderingResolution=" + originalResolution);
+			}
 			float scale = originalResolution / 72.0f;
 			
 			PageRenderer render = new PageRenderer(page, scale, Page.PAGE_ROTATE_AUTO, ImageType.IMAGE_TYPE_RGB);
 			
 			render.render(true);
 			
-			DebugWindow.log("getImage", "page=" + mNumber);
-			DebugWindow.log("getImage", "resolution=" + originalResolution);
 			DebugWindow.log("getImage", "size=(" + boundBox.getWidth() + "," + boundBox.getHeight() + ")");
 			DebugWindow.log("getImage", "dpiSize=(" + dpi.width + "," + dpi.height + ")");
 
 			BufferedImage image = render.getImage();
+			if(!preview && dpi.hasText()){
+				try {
+					float targetScale = dpi.getResolution()/72.0f;
+					ResizeFilter resize = new ResizeFilter();
+					ImageFilterParam param = new ImageFilterParam();
+					param.setResize(true);
+					param.setResizeDimension((int)(boundBox.getWidth() * targetScale), (int)(boundBox.getHeight() * targetScale));
+					image = resize.filter(image, param);
+				}catch(OutOfMemoryError e){
+					e.printStackTrace();
+					DebugWindow.log("getImage", "Out of Memory. " + e.getMessage());
+				}
+			}
+			long end = System.currentTimeMillis();
 			
-			DebugWindow.log("getImage", "imageSize=(" + image.getWidth() + "," + image.getHeight() + ")");
+			DebugWindow.log("getImage", "end. imageSize=(" + image.getWidth() + "," + image.getHeight() + ") time=" + (end-start));
 
 			render.dispose();
 			
 			return image;
 		}
 		
-//		if(mPdfDecoder != null){
-//			try {
-//				mPdfDecoder.setPageParameters(1.0f, mNumber);
-//				//mPdfDecoder.decodePage(mNumber);
-//				//mPdfDecoder.waitForDecodingToFinish();
-//				return BufferedImageIO.prepareBufferedImage(mPdfDecoder.getPageAsTransparentImage(mNumber));
-//				//return mPdfDecoder.getPageAsImage(mNumber);
-//			} catch (PdfException e) {
-//				e.printStackTrace();
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
 		return null;
 	}
 

@@ -40,31 +40,39 @@ public class PdfImageFileScanner implements IImageFileScanner {
 				
 				mFilePath = path;
 				
+				mSupportJMuPDF = false;
+				mSupportGS = false;
 				
-				if(mSupportJMuPDF){
-					DebugWindow.log("open pdf " + path);
+				DebugWindow.log("open pdf " + path);
+				try {
 					mPdfDocument = new PdfDocument(path, 20);
 					mPdfReader = new PdfReader(path);
+					mSupportJMuPDF = true;
+					DebugWindow.log("use JMuPDF");
+					return true;
+				} catch (DocSecurityException e) {
+					err = e.getMessage();
+					e.printStackTrace();
+				} catch (UnsatisfiedLinkError e){
+					err = e.getMessage();
+					e.printStackTrace();
+				}
+				
+				GhostscriptUtil gs = GhostscriptUtil.getInstance();
+				if(gs.isEnable()){
+					gs.open(path);
+					mSupportGS = true;
+					DebugWindow.log("use GhostScript");
 					return true;
 				}
 				else{
-					GhostscriptUtil gs = GhostscriptUtil.getInstance();
-					if(mSupportGS && gs.isEnable()){
-						gs.open(path);
-						return true;
-					}
-					else{
-						JOptionPane.showMessageDialog(null, "default.iniにGhostScriptのコマンドライン実行ファイルパスを設定して下さい。\n(例: ghostScriptPath=C:/gs/gs9.10/bin/gswin64c.exe)");
-					}
+					JOptionPane.showMessageDialog(null, "default.iniにGhostScriptのコマンドライン実行ファイルパスを設定して下さい。\n(例: ghostScriptPath=C:/gs/gs9.10/bin/gswin64c.exe)");
 				}
 				
 			} catch (OutOfMemoryError e) {
 				err = e.getMessage();
 				e.printStackTrace();
 			} catch (DocException e) {
-				err = e.getMessage();
-				e.printStackTrace();
-			} catch (DocSecurityException e) {
 				err = e.getMessage();
 				e.printStackTrace();
 			} catch (IOException e) {

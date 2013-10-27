@@ -212,7 +212,11 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						image = BufferedImageIO.read(stream, info.isJpeg());
 					}
 					else{
-						image = info.getImage();
+						boolean preview = true;
+						if(mBaseFilterParams != null){
+							preview = mBaseFilterParams.isPreview();
+						}
+						image = info.getImage(preview);
 					}
 					if(mImagePanel != null){
 						mImagePanel.setImage(image, info, index);
@@ -449,7 +453,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						image = BufferedImageIO.read(stream, info.isJpeg());
 					}
 					else{
-						image = info.getImage();
+						image = info.getImage(true);
 					}
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();

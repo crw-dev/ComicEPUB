@@ -144,8 +144,8 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	}
 	
 	@Override
-	public BufferedImage getImage() {
-		return mBaseInfo.getImage();
+	public BufferedImage getImage(boolean preview) {
+		return mBaseInfo.getImage(preview);
 	}
 
 	@Override

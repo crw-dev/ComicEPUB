@@ -159,7 +159,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	}
 	
 	@Override
-	public BufferedImage getImage(){
+	public BufferedImage getImage(boolean preview){
 		return null;
 	}
 	

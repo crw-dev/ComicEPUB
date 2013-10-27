@@ -80,7 +80,7 @@ public class ImageFilePreconverter implements IImageFileWriter {
 					image = BufferedImageIO.read(in, info.isJpeg());
 				}
 				else{
-					image = info.getImage();
+					image = info.getImage(true);
 				}
 				if(mBaseFilter != null){
 					image = mBaseFilter.filter(image, info.getFilterParam());

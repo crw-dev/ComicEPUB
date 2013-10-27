@@ -329,7 +329,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 						image = BufferedImageIO.read(in, info.isJpeg());
 					}
 					else{
-						image = info.getImage();
+						image = info.getImage(false);
 					}
 					if(mBaseFilter != null){
 						image = mBaseFilter.filter(image, info.getFilterParam());
