@@ -34,6 +34,10 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	/** 有効フラグ */
 	boolean mIsEnable = true;
 	
+	/** 並び順(ソート無効時) */
+	protected int mSortOrder = -1;
+	
+	
 	/**
 	 * コンストラクタ
 	 * @param info 画像ファイル情報元データ
@@ -192,6 +196,15 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 	@Override
 	public boolean isModify() {
 		return mIsModify;
+	}
+
+	@Override
+	public void setSortOrder(int order){
+		mSortOrder = order;
+	}
+	
+	public int getSortOrder(){
+		return mSortOrder;
 	}
 
 }

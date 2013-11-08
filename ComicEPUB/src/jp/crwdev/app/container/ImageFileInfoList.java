@@ -20,7 +20,10 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 
 	/** 画像ファイル情報リスト */
 	protected List<IImageFileInfo> mList = new ArrayList<IImageFileInfo>();
-		
+	
+	/** ソート有効フラグ */
+	protected boolean mEnableSort = true;
+	
 	/**
 	 * 本文ページの最大サイズを取得
 	 * @param list
@@ -63,6 +66,21 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 			if(info instanceof ImageFileInfoSplitWrapper){
 				// 分割中
 				ImageFileInfoSplitWrapper infow = (ImageFileInfoSplitWrapper)info;
+				
+				// 1つめのSplitType
+				boolean update = false;
+				ImageFileInfoSplitWrapper firstInfo = infow.getFirstSplitInfo();
+				int orgSplitType = firstInfo.getFilterParam().getSplitType();
+				for(int n=1; n<firstInfo.getRelativeSplitInfoSize(); n++){
+					if(orgSplitType != firstInfo.getRelativeSplitInfoFilterParam(n).getSplitType()){
+						update = true;
+						break;
+					}
+				}
+				if(!update){
+					list.add(infow);
+				}
+				else
 				if(param.getSplitIndex() == 0){
 					// １つ目が全ての情報を持っている
 					int pageType = param.getSplitType();
@@ -155,6 +173,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 			
 		}
 		
+		list.setEnableSort(isEnableSort());
 		list.sort();
 		
 //		for(int i=0; i<mList.size(); i++){
@@ -191,19 +210,65 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 
 	@Override
 	public void sort() {
-		Collections.sort(mList, new Comparator(){
-			@Override
-			public int compare(Object o1, Object o2) {
-				IImageFileInfo a = (IImageFileInfo)o1;
-				IImageFileInfo b = (IImageFileInfo)o2;
-				
-				int comp = a.getSortString().compareToIgnoreCase(b.getSortString());
-				if(comp == 0){
-					comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
+		if(mEnableSort){
+			Collections.sort(mList, new Comparator(){
+				@Override
+				public int compare(Object o1, Object o2) {
+					IImageFileInfo a = (IImageFileInfo)o1;
+					IImageFileInfo b = (IImageFileInfo)o2;
+					
+					int comp = a.getSortString().compareToIgnoreCase(b.getSortString());
+					if(comp == 0){
+						comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
+					}
+					return comp;
 				}
-				return comp;
+			});
+		}
+		else{
+			Collections.sort(mList, new Comparator(){
+				@Override
+				public int compare(Object o1, Object o2) {
+					IImageFileInfo a = (IImageFileInfo)o1;
+					IImageFileInfo b = (IImageFileInfo)o2;
+					
+					int aOrder = a.getSortOrder();
+					int bOrder = b.getSortOrder();
+					if(aOrder < 0 && bOrder < 0){
+						int comp = a.getSortString().compareToIgnoreCase(b.getSortString());
+						if(comp == 0){
+							comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
+						}
+						return comp;
+					}
+					else if(aOrder < 0){
+						return -1;
+					}
+					else if(bOrder < 0){
+						return 1;
+					}
+					else{
+						return aOrder - bOrder;
+					}
+				}
+			});
+		}
+	}
+	
+	@Override
+	public void setEnableSort(boolean enable){
+		mEnableSort = enable;
+		if(!enable){
+			for(int i=0; i<size(); i++){
+				IImageFileInfo info = get(i);
+				info.setSortOrder(i);
 			}
-		});
+		}
+	}
+	
+	@Override
+	public boolean isEnableSort(){
+		return mEnableSort;
 	}
 	
 	protected String getSuffix(String fileName) {
@@ -240,6 +305,11 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 	@Override
 	public boolean add(IImageFileInfo info) {
 		return mList.add(info);
+	}
+	
+	@Override
+	public void insert(int index, IImageFileInfo info) {
+		mList.add(index, info);
 	}
 
 	@Override

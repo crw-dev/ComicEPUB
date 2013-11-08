@@ -37,6 +37,8 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	protected boolean mIsEnable = true;
 	/** ソート用テキスト */
 	protected String mSortText;
+	/** 並び順(ソート無効時) */
+	protected int mSortOrder = -1;
 	
 	/**
 	 * 基本データの読み込み
@@ -191,6 +193,15 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	@Override
 	public boolean isModify(){
 		return mIsModify || (mTocText != null && mTocText.length() > 0);
+	}
+
+	@Override
+	public void setSortOrder(int order){
+		mSortOrder = order;
+	}
+	
+	public int getSortOrder(){
+		return mSortOrder;
 	}
 
 	/**

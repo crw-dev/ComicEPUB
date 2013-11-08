@@ -109,10 +109,23 @@ public class XmlWriter {
 		writeFilterBase(baseElem, bases.get(3), "text");
 		parent.appendChild(baseElem);
 
+		if(!list.isEnableSort()){
+			// check order
+			for(int i=0; i<list.size(); i++){
+				IImageFileInfo info = list.get(i);
+				info.setSortOrder(i);
+			}
+		}
+		
 		// <infos>
 		Element infosElem = mDocument.createElement("infos");
+		boolean forceWrite = false;
+		if(!list.isEnableSort()){
+			infosElem.setAttribute("sort", "false");
+			forceWrite = true;
+		}
 		for(int i=0; i<list.size(); i++){
-			writeInfo(infosElem, list.get(i));
+			writeInfo(infosElem, list.get(i), forceWrite);
 		}
 		parent.appendChild(infosElem);
 		
@@ -125,7 +138,7 @@ public class XmlWriter {
 		}
 		Element filterElem = mDocument.createElement("filter");
 		filterElem.setAttribute("pageType", pageType);
-		writeParam(filterElem, param);
+		writeParam(filterElem, param, -1);
 		parent.appendChild(filterElem);
 	}
 	
@@ -222,7 +235,7 @@ public class XmlWriter {
 		}
 	}
 	
-	private void writeInfo(Element parent, IImageFileInfo info){
+	private void writeInfo(Element parent, IImageFileInfo info, boolean forceWrite){
 		
 		if(parent == null){
 			parent = mRootElement;
@@ -240,7 +253,7 @@ public class XmlWriter {
 		}
 		
 		ImageFilterParam param = info.getFilterParam();
-		if(info.isModify() || param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE || !isEnable){
+		if(forceWrite || info.isModify() || param.isEdit() || param.getPageType() != Constant.PAGETYPE_AUTO || param.getSplitType() != SplitFilter.TYPE_NONE || !isEnable){
 		
 			if(param.getSplitType() == SplitFilter.TYPE_NONE || (param.getSplitType() != SplitFilter.TYPE_NONE && param.getSplitIndex() == 0)){
 				
@@ -310,7 +323,7 @@ public class XmlWriter {
 					disable += "," + i;
 				}
 				ImageFilterParam sparam = wrapInfo.getRelativeSplitInfoFilterParam(i);
-				writeParam(splitElem, sparam);
+				writeParam(splitElem, sparam, winfo.getSortOrder());
 			}
 			if(!disable.isEmpty()){
 				splitElem.setAttribute("disable", disable.substring(1));
@@ -320,7 +333,7 @@ public class XmlWriter {
 			if(!info.isEnable()){
 				splitElem.setAttribute("disable", "0");
 			}
-			writeParam(splitElem, param);
+			writeParam(splitElem, param, info.getSortOrder());
 		}
 		
 		parent.appendChild(splitElem);
@@ -335,7 +348,7 @@ public class XmlWriter {
 		return new String(sb);
 	}
 	
-	private void writeParam(Element parent, ImageFilterParam param){
+	private void writeParam(Element parent, ImageFilterParam param, int order){
 		
 		if(parent == null){
 			parent = mRootElement;
@@ -344,6 +357,9 @@ public class XmlWriter {
 		Element paramElem = mDocument.createElement("param");
 		
 		paramElem.setAttribute("index", Integer.toString(param.getSplitIndex()));
+		if(order >= 0){
+			paramElem.setAttribute("order", Integer.toString(order));
+		}
 		
 		if(param.isPreview()){
 			Element elem = mDocument.createElement("preview");
@@ -567,6 +583,12 @@ public class XmlWriter {
 				else if(name.equalsIgnoreCase("infos")){
 					if(list != null){
 						NodeList infosNodes = node.getChildNodes();
+						String sort = getAttributeValue(node.getAttributes(), "sort");
+						if(sort.equalsIgnoreCase("false")){
+							list.setEnableSort(false);
+						}else{
+							list.setEnableSort(true);
+						}
 						for(int n=0; n<infosNodes.getLength(); n++){
 							loadInfo(infosNodes.item(n), map);
 						}
@@ -772,7 +794,10 @@ public class XmlWriter {
 				NodeList nodes = splitNode.getChildNodes();
 				for(int i=0; i<nodes.getLength(); i++){
 					Node node = nodes.item(i);
-					loadParam(node, info.getFilterParam());
+					int order = loadParam(node, info.getFilterParam());
+					if(order >= 0){
+						info.setSortOrder(order);
+					}
 				}
 			}
 			else{
@@ -814,7 +839,10 @@ public class XmlWriter {
 				for(int i=0; i<nodes.getLength(); i++){
 					Node node = nodes.item(i);
 					ImageFileInfoSplitWrapper relWrapInfo = new ImageFileInfoSplitWrapper(info, i /*dummy*/);
-					loadParam(node, relWrapInfo.getFilterParam());
+					int order = loadParam(node, relWrapInfo.getFilterParam());
+					if(order >= 0){
+						relWrapInfo.setSortOrder(order);
+					}
 
 					if(first == null){
 						first = relWrapInfo;
@@ -840,9 +868,14 @@ public class XmlWriter {
 		return ar;
 	}
 	
-	private void loadParam(Node paramNode, ImageFilterParam param){
+	private int loadParam(Node paramNode, ImageFilterParam param){
+		int orderVal = -1;
 		if(paramNode.getNodeName().equalsIgnoreCase("param")){
 			NodeList nodes = paramNode.getChildNodes();
+			String order = getAttributeValue(paramNode.getAttributes(), "order");
+			if(order.length() > 0){
+				orderVal = Integer.parseInt(order);
+			}
 			for(int i=0; i<nodes.getLength(); i++){
 				Node node = nodes.item(i);
 				NamedNodeMap attrs = node.getAttributes();
@@ -998,6 +1031,7 @@ public class XmlWriter {
 				}
 			}
 		}
+		return orderVal;
 	}
 
 	

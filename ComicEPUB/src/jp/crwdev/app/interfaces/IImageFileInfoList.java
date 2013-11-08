@@ -38,6 +38,13 @@ public interface IImageFileInfoList {
 	boolean add(IImageFileInfo info);
 	
 	/**
+	 * 画像ファイル情報挿入
+	 * @param index
+	 * @param info
+	 */
+	void insert(int index, IImageFileInfo info);
+	
+	/**
 	 * 再構築
 	 * @return
 	 */
@@ -47,7 +54,18 @@ public interface IImageFileInfoList {
 	/**
 	 * ソート
 	 */
-	public void sort();
+	void sort();
+	
+	/**
+	 * ソート有効設定
+	 */
+	void setEnableSort(boolean enable);
+	
+	/**
+	 * ソート有効フラグ取得
+	 * @return
+	 */
+	boolean isEnableSort();
 	
 	/**
 	 * リリース

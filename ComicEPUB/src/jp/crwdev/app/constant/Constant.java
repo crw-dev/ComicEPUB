@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.SplitFilter;
+import jp.crwdev.app.interfaces.IImageFileInfo;
 
 public class Constant {
 
@@ -207,5 +209,21 @@ public class Constant {
 			}
 		}
 		return null;
+	}
+	
+	public static Object[] createRecord(IImageFileInfo info){
+		
+		ImageFilterParam param = info.getFilterParam();
+		String pageType = Constant.getPageTypeText(param.getPageType());
+		String rotate = Double.toString(param.getRotateAngle());
+		String position = param.getTranslateX() + "," + param.getTranslateY();
+		String width = Integer.toString(info.getWidth());
+		String height = Integer.toString(info.getHeight());
+		//String size = Long.toString(info.getSize());
+		String splitType = Constant.getSplitTypeText(param.getSplitType());
+		String pageSpread = param.getPageSpread();
+		String tocText = info.getTocText();
+		
+		return new String[]{info.getFileName(), pageType, pageSpread, splitType, tocText, rotate, position, width, height};
 	}
 }

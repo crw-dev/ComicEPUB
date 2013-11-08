@@ -13,6 +13,7 @@ import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DropMode;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -36,9 +37,11 @@ import jp.crwdev.app.imagefilter.PageCheckFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
+import jp.crwdev.app.interfaces.ISimpleCallback;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask.OnTaskObserver;
+import jp.crwdev.app.util.TableRowTransferHandler;
 
 
 public class ImageFileInfoTable extends JTable implements OnEventListener {
@@ -60,6 +63,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				return (column != 0);	// 0カラム目の編集禁止
 			}
 		};
+		
+		//this.setTransferHandler(new TableRowTransferHandler());
+		this.setDropMode(DropMode.INSERT_ROWS);
+		this.setDragEnabled(true);
 
 		setModel(mTableModel);
 		
@@ -136,6 +143,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				addData(list.get(i));
 			}
 		}
+		setTransferHandler(new TableRowTransferHandler(list, new ISimpleCallback(){
+			@Override
+			public void onCallback() {
+				mEventSender.setModified();
+			}
+		}));
 		startLoadFileInfoThread();
 		
 		// ThumbnailView
@@ -512,43 +525,18 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	}
 	
 	public void addData(IImageFileInfo info){
-		String[] record = createRecord(info);
+		Object[] record = Constant.createRecord(info);
 		mTableModel.addRow(record);
 	}
 	
 	public void updateData(int row, IImageFileInfo info){
-		String[] record = createRecord(info);
+		Object[] record = Constant.createRecord(info);
 		for(int col=0; col<record.length; col++){
 			mTableModel.setValueAt(record[col], row, col);
 		}
 	}
 	
-	private String[] createRecord(IImageFileInfo info){
-		
-//		TABLE_HEADER_ENTRYNAME,
-//		TABLE_HEADER_PAGETYPE,
-//		TABLE_HEADER_ROTATE,
-//		TABLE_HEADER_POSITION,
-//		TABLE_HEADER_WIDTH,
-//		TABLE_HEADER_HEIGHT,
-//		TABLE_HEADER_SIZE,
-//		TABLE_HEADER_SPLIT,
 
-		ImageFilterParam param = info.getFilterParam();
-		String pageType = Constant.getPageTypeText(param.getPageType());
-		String rotate = Double.toString(param.getRotateAngle());
-		String position = param.getTranslateX() + "," + param.getTranslateY();
-		String width = Integer.toString(info.getWidth());
-		String height = Integer.toString(info.getHeight());
-		//String size = Long.toString(info.getSize());
-		String splitType = Constant.getSplitTypeText(param.getSplitType());
-		String pageSpread = param.getPageSpread();
-		String tocText = info.getTocText();
-		
-		return new String[]{info.getFileName(), pageType, pageSpread, splitType, tocText, rotate, position, width, height};
-	}
-
-	
 	private void setEventListener(){
 		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -567,6 +555,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					int column = getTableHeader().columnAtPoint(e.getPoint());
 					if(column == Constant.TABLE_COLUMN_ENTRYNAME){
 						JPopupMenu popup = new JPopupMenu();
+						
 						JMenuItem item0 = new JMenuItem("サムネイルビュー表示切替");
 						item0.addActionListener(new ActionListener(){
 							@Override
@@ -575,6 +564,20 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							}
 						});
 						popup.add(item0);
+						
+						if(!mInfoList.isEnableSort()){
+							JMenuItem item1 = new JMenuItem("並び順リセット");
+							item1.addActionListener(new ActionListener(){
+								@Override
+								public void actionPerformed(ActionEvent arg0) {
+									mInfoList.setEnableSort(true);
+									renewalList();
+									mEventSender.setModified();
+								}
+							});
+							popup.add(item1);
+						}
+						
 						popup.show(e.getComponent(), e.getX(), e.getY());
 					}
 					else if(column == Constant.TABLE_COLUMN_PAGETYPE){

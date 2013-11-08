@@ -120,6 +120,17 @@ public interface IImageFileInfo {
 	boolean isModify();
 	
 	/**
+	 * 並び順設定
+	 */
+	void setSortOrder(int order);
+	
+	/**
+	 * 並び順取得
+	 * @return
+	 */
+	int getSortOrder();
+	
+	/**
 	 * リソース解放
 	 */
 	void release();
