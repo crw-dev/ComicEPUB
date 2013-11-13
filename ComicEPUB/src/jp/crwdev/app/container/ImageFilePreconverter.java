@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import jp.crwdev.app.BufferedImageIO;
+import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -68,6 +69,12 @@ public class ImageFilePreconverter implements IImageFileWriter {
 			}
 			
 			IImageFileInfo info = list.get(i);
+			
+			if(info.getFilterParam().getPageSpread().equals(Constant.PAGESPREAD_CENTER)){
+				// ignore centering image
+				continue;
+			}
+			
 			BufferedImage image = null;
 			
 			synchronized(info){

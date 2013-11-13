@@ -35,6 +35,11 @@ public class FixedSizeFilter implements IImageFilter {
 			return image;
 		}
 		
+		if(param.getPageSpread() == Constant.PAGESPREAD_CENTER){
+			// ignore centering page
+			return image;
+		}
+		
 		Dimension targetSize = param.getFixedSize();
 		if(targetSize.width == 0 || targetSize.height == 0){
 			return image;

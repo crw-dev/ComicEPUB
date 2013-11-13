@@ -47,8 +47,12 @@ public class TableRowTransferHandler extends TransferHandler {
 	public boolean canImport(TransferSupport info) {
 		JTable t = (JTable)info.getComponent();
 		boolean b = info.isDrop()&&info.isDataFlavorSupported(localObjectFlavor);
-		//XXX bug?
-		t.setCursor(b?DragSource.DefaultMoveDrop:DragSource.DefaultMoveNoDrop);
+		if(!info.isDataFlavorSupported(localObjectFlavor)){
+			t.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}else{
+			//XXX bug?
+			t.setCursor(b?DragSource.DefaultMoveDrop:DragSource.DefaultMoveNoDrop);
+		}
 		return b;
 	}
 	
