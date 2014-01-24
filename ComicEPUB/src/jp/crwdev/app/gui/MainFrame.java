@@ -32,6 +32,7 @@ import jp.crwdev.app.interfaces.IImageFileWriter.OnProgressListener;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.setting.XmlWriter;
 import jp.crwdev.app.util.FileDropTargetAdapter;
+import jp.crwdev.app.util.ImageCache;
 import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
 
@@ -45,6 +46,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	
 	private ImageFileInfoTable mTable;
 	private ImagePanel mImagePanel;
+	private FullscreenWindow mFullscreenWindow;
 	private SettingPanel mSettingPanel;
 	private ThumbnailView mThumbnailView;
 	
@@ -497,6 +499,29 @@ public class MainFrame extends JFrame implements OnEventListener {
 		 }
 	}
 	
+	private void beginFullscreen(){
+		mFullscreenWindow = new FullscreenWindow();
+		mFullscreenWindow.setEventObserver(mEventObserver);
+		if(ImageCache.enable){
+			ImageCache.getInstance().clear();
+		}
+		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, mFullscreenWindow);
+		mTable.setFullscreenWindow(mFullscreenWindow);
+		mFullscreenWindow.setImageFilterParam(mBaseFilterParams);
+		mTable.selectCurrentItem();
+	}
+	
+	private void endFullscreen(){
+		mFullscreenWindow.setVisible(false);
+		mFullscreenWindow.dispose();
+		mFullscreenWindow = null;
+		if(ImageCache.enable){
+			ImageCache.getInstance().clear();
+		}
+		mTable.setFullscreenWindow(null);
+		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, mImagePanel);
+	}
+	
 	@Override
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
@@ -519,6 +544,12 @@ public class MainFrame extends JFrame implements OnEventListener {
 			break;
 		case EventObserver.EventType_RequestSaveSetting:
 			saveSettingFileRequest();
+			break;
+		case EventObserver.EventType_BeginFullscreen:
+			beginFullscreen();
+			break;
+		case EventObserver.EventType_EndFullscreen:
+			endFullscreen();
 			break;
 		default:
 			break;

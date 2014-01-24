@@ -200,6 +200,12 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		mSortOrder = order;
 	}
 	
+	@Override
+	public boolean isBlankPage(){
+		return false;
+	}
+	
+	@Override
 	public int getSortOrder(){
 		return mSortOrder;
 	}

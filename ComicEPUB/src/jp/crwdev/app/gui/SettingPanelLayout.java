@@ -41,6 +41,7 @@ public class SettingPanelLayout extends JPanel {
 	protected JButton convertButton;
 	protected JButton cancelButton;
 	protected JButton packageConvertButton;
+	protected JButton fullscreenButton;
 	protected JLabel labelMessage;
 	protected JProgressBar progressBar;
 	
@@ -64,6 +65,13 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.NORTH, checkSimpleZoom, 3, SpringLayout.NORTH, checkPreview);
 		springLayout.putConstraint(SpringLayout.WEST, checkSimpleZoom, 3, SpringLayout.EAST, checkPreview);
 		add(checkSimpleZoom);
+		
+		fullscreenButton = new JButton("全画面");
+		springLayout.putConstraint(SpringLayout.NORTH, fullscreenButton, 3, SpringLayout.NORTH, checkSimpleZoom);
+		springLayout.putConstraint(SpringLayout.WEST, fullscreenButton, 3, SpringLayout.EAST, checkSimpleZoom);
+		add(fullscreenButton);
+		fullscreenButton.setVisible(false);
+		
 		
 		checkResize = new JCheckBox("画面サイズ合わせ");
 		springLayout.putConstraint(SpringLayout.WEST, checkResize, 3, SpringLayout.WEST, this);

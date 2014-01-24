@@ -36,6 +36,8 @@ public class EventObserver {
 	public static final int EventType_RequestSaveSetting = 16;	// no param
 	public static final int EventType_UpdateFileInfoList = 17;	// obj: IImageFileInfoList
 	public static final int EventType_ShowHide_ThumbnailView = 18; // no param
+	public static final int EventType_BeginFullscreen = 19;		// no param
+	public static final int EventType_EndFullscreen = 20;		// no param
 
 	/** イベントリスナ 4種類  */
 	private OnEventListener[] mListeners = new OnEventListener[5];

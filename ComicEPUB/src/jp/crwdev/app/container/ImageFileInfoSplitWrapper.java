@@ -203,8 +203,13 @@ public class ImageFileInfoSplitWrapper implements IImageFileInfo {
 		mSortOrder = order;
 	}
 	
+	@Override
 	public int getSortOrder(){
 		return mSortOrder;
 	}
 
+	@Override
+	public boolean isBlankPage(){
+		return mBaseInfo.isBlankPage();
+	}
 }

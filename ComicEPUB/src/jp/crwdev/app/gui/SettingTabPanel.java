@@ -206,7 +206,7 @@ public class SettingTabPanel extends JPanel {
 	
 		
 		spinGamma.setPreferredSize(new Dimension(40, 20));
-		spinGamma.setModel(new SpinnerNumberModel(1.6f, 0.0f, 3.0f, 0.1f));
+		spinGamma.setModel(new SpinnerNumberModel(1.6f, 0.0f, 30.0f, 0.1f));
 		
 		mOldSharpLevel = 1;
 		spinSharpness.setPreferredSize(new Dimension(40, 20));

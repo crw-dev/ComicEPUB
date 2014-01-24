@@ -131,6 +131,11 @@ public interface IImageFileInfo {
 	int getSortOrder();
 	
 	/**
+	 * 空白ページ
+	 */
+	boolean isBlankPage();
+	
+	/**
 	 * リソース解放
 	 */
 	void release();

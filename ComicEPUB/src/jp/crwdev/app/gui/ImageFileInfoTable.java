@@ -39,6 +39,8 @@ import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.ISimpleCallback;
 import jp.crwdev.app.setting.ImageFilterParamSet;
+import jp.crwdev.app.util.ImageCache;
+import jp.crwdev.app.util.ImageCache.ImageData;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask;
 import jp.crwdev.app.util.ImageFileInfoAsyncTask.OnTaskObserver;
 import jp.crwdev.app.util.TableRowTransferHandler;
@@ -48,6 +50,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 
 	private DefaultTableModel mTableModel = null;
 	private ImagePanel mImagePanel = null;
+	private FullscreenWindow mFullscreenWindow = null;
 	
 	private IImageFileInfoList mInfoList = null;
 	private ImageFilterParamSet mBaseFilterParams = null;
@@ -95,10 +98,16 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	public void setImagePanel(ImagePanel panel){
 		mImagePanel = panel;
 	}
+	public void setFullscreenWindow(FullscreenWindow window){
+		mFullscreenWindow = window;
+	}
 	
 	public void setImageFilterParam(ImageFilterParamSet baseParams){
 		synchronized(this){
 			mBaseFilterParams = baseParams;
+			if(ImageCache.enable){
+				ImageCache.getInstance().setImageFilterParam(baseParams);
+			}
 		}
 	}
 	
@@ -150,6 +159,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}));
 		startLoadFileInfoThread();
+		
+		ImageCache.getInstance().setImageFileInfoList(list);
 		
 		// ThumbnailView
 		mEventSender.sendEvent(EventObserver.EventTarget_Thumbnail,
@@ -215,9 +226,23 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	}
 	
 	private void onItemSelectedInternal(int index){
+		
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
 			IImageFileInfo info = mInfoList.get(index);
 			if(info != null){
+				if(ImageCache.enable){ //TODO
+					ImageData data = ImageCache.getInstance().getImageData(index);
+					BufferedImage image = data.getOriginalImage();
+					if(mFullscreenWindow != null){
+						mFullscreenWindow.setImage(image, info, index);
+					}
+					else if(mImagePanel != null){
+						mImagePanel.setImage(image, info, index);
+					}
+					ImageCache.getInstance().startRenderImage(index);
+				}
+				else{
+					
 				InputStream stream = info.getInputStream();
 				try {
 					BufferedImage image = null;
@@ -231,7 +256,10 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						}
 						image = info.getImage(preview);
 					}
-					if(mImagePanel != null){
+					if(mFullscreenWindow != null){
+						mFullscreenWindow.setImage(image, info, index);
+					}
+					else if(mImagePanel != null){
 						mImagePanel.setImage(image, info, index);
 					}
 				}catch(OutOfMemoryError e){
@@ -240,6 +268,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					return;
 				}
 				
+				}
 				int pageType = info.getFilterParam().getPageType();
 				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));
 			}
@@ -297,7 +326,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			while(mQueue.size() > 0){
 				mQueue.remove();
 			}
-			mQueue.push(index);
+			mQueue.addLast(index);
 			mThreadLock.notify();
 		}
 	}

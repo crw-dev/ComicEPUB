@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.container.BlankImageFileInfo;
 import jp.crwdev.app.imagefilter.MaximumSizeCheckFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
@@ -44,6 +45,8 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	private IImageFilter mBaseFilter = null;
 	/** 処理中断フラグ */
 	private boolean mIsCancel = false;
+	/** Blankページ挿入フラグ */
+	private boolean mIsInsertBlankPage = false;
 	
 	private String mTitle = "";
 	private String mTitleKana = "";
@@ -63,7 +66,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	 * @param bookType "book", "magazine", "comic"
 	 */
 	public EpubImageFileWriter(String title, String titleKana, String author, String authorKana, String bookType,
-			String seriesTitle, String seriesTitleKana, int seriesNumber){
+			String seriesTitle, String seriesTitleKana, int seriesNumber, boolean insertBlankPage){
 		mTitle = title;
 		mTitleKana = titleKana;
 		mAuthor = author;
@@ -72,6 +75,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		mSeriesTitle = seriesTitle;
 		mSeriesTitleKana = seriesTitleKana;
 		mSeriesNumber = seriesNumber;
+		mIsInsertBlankPage = insertBlankPage;
 	}
 	
 	@Override
@@ -107,6 +111,10 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			listener.onProgress(0, null);
 		}
 
+		if(mIsInsertBlankPage){
+			list = insertBlankPage(list);
+		}
+		
 		ZipOutputStream zipOut = null;
 		
 		String uuid = getUUID();
@@ -315,6 +323,11 @@ public class EpubImageFileWriter implements IImageFileWriter {
 				throw new Exception("user cancel");
 			}
 			
+			if(info.isBlankPage()){
+				sizeList.add(new Dimension(0, 0));
+				continue;
+			}
+			
 			String filename = getImageFileName(sizeList.size(), ".jpg");
 			
 			zipOut.putNextEntry(new ZipEntry(imageDir + filename));
@@ -331,16 +344,22 @@ public class EpubImageFileWriter implements IImageFileWriter {
 					else{
 						image = info.getImage(false);
 					}
-					if(mBaseFilter != null){
+					if(image != null && mBaseFilter != null){
 						image = mBaseFilter.filter(image, info.getFilterParam());
 					}
-					BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
+					if(image != null){
+						BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, zipOut);
+					}
 					
 					if(in != null){
 						in.close();
 					}
 					
-					sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
+					if(image != null){
+						sizeList.add(new Dimension(image.getWidth(), image.getHeight()));
+					}else{
+						sizeList.add(new Dimension(0, 0));
+					}
 				}
 
 			}catch(Exception ex){
@@ -359,8 +378,15 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	}
 	
 	private void writeXHtmlFiles(List<Dimension> list, ZipOutputStream zipOut) throws Exception {
-		
+
+		Dimension dim = new Dimension();
 		int size = list.size();
+		for(int i=0; i<size; i++){
+			Dimension d = list.get(i);
+			if(dim.width < d.width){ dim.width = d.width; }
+			if(dim.height < d.height){ dim.height = d.height; }
+		}
+		
 		for(int i=0; i<size; i++){
 			if(mIsCancel){
 				throw new Exception("user cancel");
@@ -374,7 +400,12 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			
 			PrintWriter out = new PrintWriter(new OutputStreamWriter(zipOut, "UTF-8"));
 			
-			out.write(getXhtml(imageSize, getImageFileName(i, ".jpg")));
+			if(imageSize.width == 0 || imageSize.height == 0){
+				out.write(getXhtml(dim, null));
+			}else{
+				out.write(getXhtml(imageSize, getImageFileName(i, ".jpg")));
+				dim.setSize(imageSize);
+			}
 			
 			out.flush();
 			
@@ -471,7 +502,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("</head>\n");
 		sb.append("<body>\n");
 		sb.append("<nav epub:type=\"toc\" id=\"toc\">\n");
-		sb.append("<h1>Navigation</h1>\n");
+		sb.append("<h1>目次</h1>\n");
 		sb.append("<ol>\n");
 		
 		
@@ -649,21 +680,30 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			if(!list.get(i).isEnable()){
 				continue;
 			}
-			String properties = "";
-			if(!getImageProperties(index).equals("")){
-				properties = " properties=\"" + getImageProperties(index) + "\"";
+			
+			if(!list.get(i).isBlankPage()){
+				String properties = "";
+				if(!getImageProperties(index).equals("")){
+					properties = " properties=\"" + getImageProperties(index) + "\"";
+				}
+				sb.append("<item media-type=\"" + getMimeType("jpg") + "\" id=\"" + getImageId(index) + "\" href=\"image/" + getImageFileName(index, ".jpg") + "\"" + properties + "/>\n");
 			}
-			sb.append("<item media-type=\"" + getMimeType("jpg") + "\" id=\"" + getImageId(index) + "\" href=\"image/" + getImageFileName(index, ".jpg") + "\"" + properties + "/>\n");
+			
 			index++;
 		}
 
 		sb.append("<!-- xhtml -->\n");
 		index = 0;
 		for(int i=0; i<list.size(); i++){
-			if(!list.get(i).isEnable()){
+			IImageFileInfo info = list.get(i);
+			if(!info.isEnable()){
 				continue;
 			}
-			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(index)+ "\" href=\"xhtml/" + getXhtmlFileName(index) + "\" properties=\"svg\" fallback=\"" + getImageId(index) + "\"/>\n");
+			String imageprop = "fallback=\"" + getImageId(index) + "\"";
+			if(info.isBlankPage()){
+				imageprop = "";
+			}
+			sb.append("<item media-type=\"application/xhtml+xml\" id=\"" + getXhtmlId(index)+ "\" href=\"xhtml/" + getXhtmlFileName(index) + "\" properties=\"svg\" " + imageprop + "/>\n");
 			index++;
 		}
 
@@ -680,6 +720,7 @@ public class EpubImageFileWriter implements IImageFileWriter {
 			}
 			String properties = "";
 			String curSpread = info.getFilterParam().getPageSpread();
+			System.out.println("info[" + i + "]=" + curSpread);
 			
 			//if(!getItemRefProperties(index).equals("")){
 			//	properties = " properties=\"" + getItemRefProperties(index) + "\"";
@@ -792,11 +833,15 @@ public class EpubImageFileWriter implements IImageFileWriter {
 		sb.append("<meta name=\"viewport\" content=\"width=" + size.width + ", height=" + size.height + "\"/>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
-		sb.append("<div class=\"main\">\n");
-		sb.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"100%\" height=\"100%\" viewBox=\"0 0 " + size.width + " " + size.height + "\">\n");
-		sb.append("<image width=\"" + size.width + "\" height=\"" + size.height + "\" xlink:href=\"../image/" + imageFilename + "\"/>\n");
-		sb.append("</svg>\n");
-		sb.append("</div>\n");
+//		if(imageFilename != null){
+			sb.append("<div class=\"main\">\n");
+			sb.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"100%\" height=\"100%\" viewBox=\"0 0 " + size.width + " " + size.height + "\">\n");
+			if(imageFilename != null){
+			sb.append("<image width=\"" + size.width + "\" height=\"" + size.height + "\" xlink:href=\"../image/" + imageFilename + "\"/>\n");
+			}
+			sb.append("</svg>\n");
+			sb.append("</div>\n");
+//		}
 		sb.append("</body>\n");
 
 		sb.append("</html>");
@@ -837,5 +882,71 @@ public class EpubImageFileWriter implements IImageFileWriter {
 	}
 	private String getXhtmlFileName(int index){
 		return getXhtmlId(index) + ".xhtml";
+	}
+	
+	
+	private IImageFileInfoList insertBlankPage(IImageFileInfoList orgList){
+		
+		CopyImageFileInfoList list = new CopyImageFileInfoList(orgList);
+		
+		String prevSpread = null;
+		
+		for(int i=0; i<list.size(); i++){
+			IImageFileInfo info = list.get(i);
+			if(!info.isEnable()){
+				continue;
+			}
+			String properties = "";
+			String curSpread = info.getFilterParam().getPageSpread();
+			
+			boolean inserted = false;
+			if(prevSpread != null){
+				
+				if(prevSpread.equals(Constant.PAGESPREAD_CENTER) || prevSpread.equals(Constant.PAGESPREAD_LEFT)){
+					if(curSpread.equals(Constant.PAGESPREAD_LEFT)){
+						list.insert(i, new BlankImageFileInfo());
+						System.out.println("i=" + i + " spread=auto");
+						i++;
+					}
+				}
+				else if(prevSpread.equals(Constant.PAGESPREAD_RIGHT)){
+					if(curSpread.equals(Constant.PAGESPREAD_RIGHT)){
+						list.insert(i, new BlankImageFileInfo());
+						System.out.println("i=" + i + " spread=auto");
+						i++;
+					}
+					else if(curSpread.equals(Constant.PAGESPREAD_CENTER)){
+						list.insert(i, new BlankImageFileInfo());
+						System.out.println("i=" + i + " spread=auto");
+						i++;
+					}
+				}
+				
+				if(curSpread.equals(Constant.PAGESPREAD_AUTO)){
+					if(prevSpread.equals(Constant.PAGESPREAD_CENTER)){
+						prevSpread = Constant.PAGESPREAD_RIGHT;
+					}
+					else if(prevSpread.equals(Constant.PAGESPREAD_LEFT)){
+						prevSpread = Constant.PAGESPREAD_RIGHT;
+					}
+					else if(prevSpread.equals(Constant.PAGESPREAD_RIGHT)){
+						prevSpread = Constant.PAGESPREAD_LEFT;
+					}
+				}else{
+					prevSpread = curSpread;
+				}
+			}
+			else{
+				if(curSpread.equals(Constant.PAGESPREAD_AUTO)){
+					prevSpread = Constant.PAGESPREAD_CENTER;
+				}else{
+					prevSpread = curSpread;
+				}
+			}
+			System.out.println("i=" + i + " spread=" + prevSpread);
+			
+		}
+		
+		return list;
 	}
 }

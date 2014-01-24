@@ -11,6 +11,7 @@ import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.pdf.PdfImageFileWriter;
 import jp.crwdev.app.container.zip.ZipImageFileWriter;
 import jp.crwdev.app.interfaces.IImageFileWriter;
+import jp.crwdev.app.util.InifileProperty;
 
 public class OutputSettingParam {
 
@@ -145,7 +146,7 @@ public class OutputSettingParam {
 		}
 		else if(mOutputFileType.equalsIgnoreCase("epub")){
 			return new EpubImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana(), getEpubType(),
-					getSeriesTitle(), getSeriesTitleKana(), getSeriesNumber());
+					getSeriesTitle(), getSeriesTitleKana(), getSeriesNumber(), InifileProperty.getInstance().isInsertBlankPage());
 		}
 		else if(mOutputFileType.equalsIgnoreCase("pdf")){
 			return new PdfImageFileWriter(getTitle(), getTitleKana(), getAuthor(), getAuthorKana());

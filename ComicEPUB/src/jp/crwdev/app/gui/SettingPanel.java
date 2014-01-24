@@ -29,7 +29,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	public SettingPanel(JFrame parent){
 		super(parent);
 		
-		mPreviewSetting.setComponents(this, checkPreview, checkSimpleZoom, checkResize, checkOutputResize);
+		mPreviewSetting.setComponents(this, checkPreview, checkSimpleZoom, checkResize, checkOutputResize, fullscreenButton);
 		
 		mSettingTab = this.tabbedPane;
 		
@@ -109,6 +109,10 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	
 	public OutputSettingParam getOutputSettingParam(){
 		return mOutputSetting.getOutputSettingParam();
+	}
+	
+	public void beginFullscreen(){
+		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginFullscreen, 0);
 	}
 	
 //	public boolean isCheckStatus(int checkboxId){

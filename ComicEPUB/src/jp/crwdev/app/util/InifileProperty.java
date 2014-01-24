@@ -25,6 +25,8 @@ public class InifileProperty {
 	private static final String PROP_OUTPUTDIR = "outputFolder";
 	private static final String PROP_IMAGESIZE = "imageSize";
 	private static final String PROP_JPEG_QUALITY = "jpegQuality";
+	private static final String PROP_INSERT_BLANKPAGE = "insertBlankPage";
+	private static final String PROP_ENABLE_FULLSCREEN = "enableFullScreen";
 	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
 	private static final String PROP_DEBUGWINDOW = "debugWindow";
 	
@@ -132,6 +134,36 @@ public class InifileProperty {
 			mIsModified = true;
 		}
 		
+		exist = false;
+		String insertBlank = mProp.getProperty(PROP_INSERT_BLANKPAGE);
+		if(insertBlank == null || insertBlank.isEmpty()){
+		}else{
+			if(!insertBlank.equalsIgnoreCase("false") && !insertBlank.equalsIgnoreCase("true")){
+				
+			}else{
+				exist = true;
+			}
+		}
+		if(!exist){
+			mProp.setProperty(PROP_INSERT_BLANKPAGE, "false");
+			mIsModified = true;
+		}
+		
+		exist = false;
+		String enableFullScreen = mProp.getProperty(PROP_ENABLE_FULLSCREEN);
+		if(enableFullScreen == null || enableFullScreen.isEmpty()){
+		}else{
+			if(!enableFullScreen.equalsIgnoreCase("false") && !enableFullScreen.equalsIgnoreCase("true")){
+				
+			}else{
+				exist = true;
+			}
+		}
+		if(!exist){
+			mProp.setProperty(PROP_ENABLE_FULLSCREEN, "true");
+			mIsModified = true;
+		}
+		
 		String ghostScriptPath = mProp.getProperty(PROP_GHOSTSCRIPT);
 		if(ghostScriptPath == null || ghostScriptPath.isEmpty()){
 			ghostScriptPath = "";
@@ -200,6 +232,24 @@ public class InifileProperty {
 	
 	public float getJpegQuality(){
 		return Float.parseFloat(mProp.getProperty(PROP_JPEG_QUALITY));
+	}
+	
+	public boolean isInsertBlankPage(){
+		String value = mProp.getProperty(PROP_INSERT_BLANKPAGE, "false");
+		if(value.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public boolean isEnableFullScreen(){
+		String value = mProp.getProperty(PROP_ENABLE_FULLSCREEN, "true");
+		if(value.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			return true;
+		}
 	}
 	
 	public String getGhostScriptPath(){
