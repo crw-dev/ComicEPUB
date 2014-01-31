@@ -53,6 +53,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private BufferedImage mPreviewZoomImage = null;
 	private Object mLockZoomImage = new Object();
 	
+	private int mPreviewMargin = 20;
+	
 	private IImageFileInfo mFileInfo = null;
 	private int mInfoIndex = 0;
 	private BufferedImage mOriginalImage = null;
@@ -94,9 +96,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			@Override
 			public void ancestorResized(HierarchyEvent arg0) {
 				if(!mIsOutputSizePreview){
-					mImageFilter.setPreviewSize(getWidth(), getHeight());
+					mImageFilter.setPreviewSize(getWidth() - mPreviewMargin, getHeight() - mPreviewMargin);
 					if(mCreateZoomImage){
-						mPreviewZoomFilter.setPreviewSize((int)(getWidth()*mZoomScale), (int)(getHeight()*mZoomScale));
+						mPreviewZoomFilter.setPreviewSize((int)(getWidth()*mZoomScale)-mPreviewMargin, (int)(getHeight()*mZoomScale)-mPreviewMargin);
 					}
 					System.out.println("width=" + getWidth() + " height=" + getHeight());
 				}
@@ -147,29 +149,90 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(!mIsPreviewMode && mIsZoomDrag){
 					if(mCreateZoomImage){
 						createZoomImage();
-						imageW = mPreviewZoomImage.getWidth();
-						imageH = mPreviewZoomImage.getHeight();
 					}
-					//TODO
-					float imageScale = mZoomScale;
-					if(imageW > w || imageH > h){
-					//	imageScale = 1.0f;
-					}
-					int dw = (int)(imageW * imageScale);
-					int dh = (int)(imageH * imageScale);
-					int dx = (w - dw)/2;
-					int dy = (h - dh)/2;
-					float scale = dw / (float)w;
-					int offsetx = mZoomPoint.x - w/2;
-					int offsety = mZoomPoint.y - h/2;
-					dx -= offsetx * scale;
-					dy -= offsety * scale;
 					
-					if(mCreateZoomImage){
-						g.drawImage(mPreviewZoomImage, dx, dy, dx+imageW, dy+imageH, 0, 0, imageW, imageH, null);
+					if(true){
+						synchronized(mLockZoomImage){
+							float scale = mZoomScale;
+							int mx = mZoomPoint.x;
+							int my = mZoomPoint.y;
+							int cx = w / 2;
+							int cy = h / 2;
+							int dw = (int)(imageW);
+							int dh = (int)(imageH);
+							int zw = (int)(dw * scale);
+							int zh = (int)(dh * scale);
+							
+							int pw = mPreviewZoomImage.getWidth();
+							int ph = mPreviewZoomImage.getHeight();
+							
+							if(mPreviewZoomImage != null){
+								if(zw < pw || zh < ph){
+									zw = pw;
+									zh = ph;
+								}
+							}
+							
+							float panX = (float)(mx - cx) / (float)dw;
+							float panY = (float)(my - cy) / (float)dh;
+							int zx = mx - (int)(zw * (0.5f + panX));
+							int zy = my - (int)(zh * (0.5f + panY));
+							
+							
+	//						if(zx > 0){
+	//							g.fillRect(0, 0, zx, h);
+	//						}
+	//						if(zx+zw < w){
+	//							g.fillRect(zx+zw, 0, w, h);
+	//						}
+	//						if(zy > 0){
+	//							g.fillRect(zx, 0, zw, zy);
+	//						}
+	//						if(zy+zh < h){
+	//							g.fillRect(zx, zy+zh, zw, h);
+	//						}
+							
+							if(mPreviewZoomImage != null){
+								if(zw != pw || zh != ph){
+									Graphics2D g2 = (Graphics2D)g;
+									g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+								}
+								g.drawImage(mPreviewZoomImage, zx, zy, zx+zw, zy+zh, 0, 0, pw, ph, null);
+							}else{
+								if(zw != imageW || zh != imageH){
+									Graphics2D g2 = (Graphics2D)g;
+									g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+								}
+								g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, imageW, imageH, null);
+							}
+						}
 					}
 					else{
-						g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+						
+						imageW = mPreviewZoomImage.getWidth();
+						imageH = mPreviewZoomImage.getHeight();
+						
+						//TODO
+						float imageScale = mZoomScale;
+						if(imageW > w || imageH > h){
+						//	imageScale = 1.0f;
+						}
+						int dw = (int)(imageW * imageScale);
+						int dh = (int)(imageH * imageScale);
+						int dx = (w - dw)/2;
+						int dy = (h - dh)/2;
+						float scale = dw / (float)w;
+						int offsetx = mZoomPoint.x - w/2;
+						int offsety = mZoomPoint.y - h/2;
+						dx -= offsetx * scale;
+						dy -= offsety * scale;
+						
+						if(mCreateZoomImage){
+							g.drawImage(mPreviewZoomImage, dx, dy, dx+imageW, dy+imageH, 0, 0, imageW, imageH, null);
+						}
+						else{
+							g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+						}
 					}
 				}
 				else{
@@ -210,15 +273,18 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	private void createZoomImage(){
 		if(mCreateZoomImage){
-			synchronized(mLockZoomImage){
-				if(ImageCache.enable){
-					if(mPreviewZoomImage == null){
-						ImageData data = ImageCache.getInstance().getImageData(mInfoIndex);
-						mPreviewZoomImage = data.getZoomImage(mPreviewZoomFilter);
+			if(ImageCache.enable){
+				if(mPreviewZoomImage == null){
+					ImageData data = ImageCache.getInstance().getImageData(mInfoIndex);
+					BufferedImage image = data.getZoomImage(mPreviewZoomFilter);
+					synchronized(mLockZoomImage){
+						mPreviewZoomImage = image;
 					}
-				}else{
-					if(mPreviewZoomImage == null){
-						BufferedImage filtered = mPreviewZoomFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+				}
+			}else{
+				if(mPreviewZoomImage == null){
+					BufferedImage filtered = mPreviewZoomFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+					synchronized(mLockZoomImage){
 						mPreviewZoomImage = filtered;
 					}
 				}
@@ -1058,7 +1124,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}else{
 			mPreviewSize.setSize(getWidth(), getHeight());
 		}
-		mImageFilter.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+		mImageFilter.setPreviewSize(mPreviewSize.width - mPreviewMargin, mPreviewSize.height - mPreviewMargin);
 	}
 	
 	public void setSimpleZoom(boolean simpleZoom){

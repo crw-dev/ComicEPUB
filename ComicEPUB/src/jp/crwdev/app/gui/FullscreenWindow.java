@@ -43,6 +43,9 @@ import jp.crwdev.app.util.ImageCache.ImageData;
 public class FullscreenWindow extends JFrame implements MouseListener, MouseMotionListener, OnEventListener {
 
 	public static boolean mEnableFullScreen = false;
+	public int windowWidth = 640;
+	public int windowHeight = 480;
+	public float mZoomScale = 1.75f;
 	
 	private GraphicsDevice mDevice;
 	private BufferStrategy mBufferStrategy;
@@ -119,10 +122,13 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			setUndecorated(true); // タイトルバー・ボーダー非表示
 			setIgnoreRepaint(true);
 			
-			//mScreenWidth = width/2;
-			//mScreenHeight = height/2;
-			mScreenWidth = width;
-			mScreenHeight = height;
+			if(InifileProperty.getInstance().isShowDebugWindow()){
+				mScreenWidth = windowWidth;
+				mScreenHeight = windowHeight;
+			}else{
+				mScreenWidth = width;
+				mScreenHeight = height;
+			}
 			
 			setBounds(0, 0, mScreenWidth, mScreenHeight);
 			
@@ -171,9 +177,9 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 
 	public void setImageFilterParam(ImageFilterParamSet params){
 		mImageFilter.setImageFilterParam(params);
-		mImageFilter.setPreviewSize(getWidth()+20, getHeight()+20);
+		mImageFilter.setPreviewSize(getWidth(), getHeight());
 		mPreviewZoomFilter.setImageFilterParam(params);
-		mPreviewZoomFilter.setPreviewSize((int)(getWidth()*1.75)+20, (int)(getHeight()*1.75)+20);
+		mPreviewZoomFilter.setPreviewSize((int)(getWidth()*mZoomScale), (int)(getHeight()*mZoomScale));
 	}
 
 	public void setImage(BufferedImage image, IImageFileInfo info, int rowIndex){
@@ -365,15 +371,25 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			if(mIsZoomDrag){
 				//createZoomImage();
 				
-				float scale = 1.75f;
+				float scale = mZoomScale;
 				int mx = mZoomPoint.x;
 				int my = mZoomPoint.y;
 				int cx = w / 2;
 				int cy = h / 2;
-				int dw = (int)(imageW*0.8);
-				int dh = (int)(imageH*0.8);
+				int dw = (int)(imageW);
+				int dh = (int)(imageH);
 				int zw = (int)(dw * scale);
 				int zh = (int)(dh * scale);
+				
+				int pw = mPreviewZoomImage.getWidth();
+				int ph = mPreviewZoomImage.getHeight();
+				
+				if(mPreviewZoomImage != null){
+					if(zw < pw || zh < ph){
+						zw = pw;
+						zh = ph;
+					}
+				}
 				
 				float panX = (float)(mx - cx) / (float)dw;
 				float panY = (float)(my - cy) / (float)dh;
@@ -395,12 +411,16 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				}
 				
 				if(mPreviewZoomImage != null){
-					int pw = mPreviewZoomImage.getWidth();
-					int ph = mPreviewZoomImage.getHeight();
-					
+					if(zw != pw || zh != ph){
+						Graphics2D g2 = (Graphics2D)g;
+						g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+					}
 					g.drawImage(mPreviewZoomImage, zx, zy, zx+zw, zy+zh, 0, 0, pw, ph, null);
 				}else{
-					
+					if(zw != imageW || zh != imageH){
+						Graphics2D g2 = (Graphics2D)g;
+						g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+					}
 					g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, imageW, imageH, null);
 				}
 			}

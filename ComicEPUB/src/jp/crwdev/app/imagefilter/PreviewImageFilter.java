@@ -39,9 +39,10 @@ public class PreviewImageFilter extends OutputImageFilter {
 	 */
 	public void setPreviewSize(int width, int height){
 		if(width <= 20 || height <= 20){
-			return;
+			width = 20;
+			height = 20;
 		}
-		mPreviewSize.setSize(width-20, height-20);
+		mPreviewSize.setSize(width, height);
 	}
 	
 //	/**

@@ -27,6 +27,7 @@ public class InifileProperty {
 	private static final String PROP_JPEG_QUALITY = "jpegQuality";
 	private static final String PROP_INSERT_BLANKPAGE = "insertBlankPage";
 	private static final String PROP_ENABLE_FULLSCREEN = "enableFullScreen";
+	private static final String PROP_ENABLE_IMAGECACHE = "enableImageCache";
 	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
 	private static final String PROP_DEBUGWINDOW = "debugWindow";
 	
@@ -145,7 +146,7 @@ public class InifileProperty {
 			}
 		}
 		if(!exist){
-			mProp.setProperty(PROP_INSERT_BLANKPAGE, "false");
+			mProp.setProperty(PROP_INSERT_BLANKPAGE, "true");
 			mIsModified = true;
 		}
 		
@@ -164,6 +165,21 @@ public class InifileProperty {
 			mIsModified = true;
 		}
 		
+		exist = false;
+		String enableImageCache = mProp.getProperty(PROP_ENABLE_IMAGECACHE);
+		if(enableImageCache == null || enableImageCache.isEmpty()){
+		}else{
+			if(!enableImageCache.equalsIgnoreCase("false") && !enableImageCache.equalsIgnoreCase("true")){
+				
+			}else{
+				exist = true;
+			}
+		}
+		if(!exist){
+			mProp.setProperty(PROP_ENABLE_IMAGECACHE, "false");
+			mIsModified = true;
+		}
+
 		String ghostScriptPath = mProp.getProperty(PROP_GHOSTSCRIPT);
 		if(ghostScriptPath == null || ghostScriptPath.isEmpty()){
 			ghostScriptPath = "";
@@ -235,7 +251,7 @@ public class InifileProperty {
 	}
 	
 	public boolean isInsertBlankPage(){
-		String value = mProp.getProperty(PROP_INSERT_BLANKPAGE, "false");
+		String value = mProp.getProperty(PROP_INSERT_BLANKPAGE, "true");
 		if(value.equalsIgnoreCase("false")){
 			return false;
 		}else{
@@ -245,6 +261,15 @@ public class InifileProperty {
 	
 	public boolean isEnableFullScreen(){
 		String value = mProp.getProperty(PROP_ENABLE_FULLSCREEN, "true");
+		if(value.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public boolean isEnableImageCache(){
+		String value = mProp.getProperty(PROP_ENABLE_IMAGECACHE, "false");
 		if(value.equalsIgnoreCase("false")){
 			return false;
 		}else{

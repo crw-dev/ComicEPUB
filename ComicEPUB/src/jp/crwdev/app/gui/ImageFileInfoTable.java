@@ -243,31 +243,31 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}
 				else{
 					
-				InputStream stream = info.getInputStream();
-				try {
-					BufferedImage image = null;
-					if(stream != null){
-						image = BufferedImageIO.read(stream, info.isJpeg());
-					}
-					else{
-						boolean preview = true;
-						if(mBaseFilterParams != null){
-							preview = mBaseFilterParams.isPreview();
+					InputStream stream = info.getInputStream();
+					try {
+						BufferedImage image = null;
+						if(stream != null){
+							image = BufferedImageIO.read(stream, info.isJpeg());
 						}
-						image = info.getImage(preview);
+						else{
+							boolean preview = true;
+							if(mBaseFilterParams != null){
+								preview = mBaseFilterParams.isPreview();
+							}
+							image = info.getImage(preview);
+						}
+						if(mFullscreenWindow != null){
+							mFullscreenWindow.setImage(image, info, index);
+						}
+						else if(mImagePanel != null){
+							mImagePanel.setImage(image, info, index);
+						}
+					}catch(OutOfMemoryError e){
+						mEventSender.setProgressMessage(e.getMessage());
+						e.printStackTrace();
+						return;
 					}
-					if(mFullscreenWindow != null){
-						mFullscreenWindow.setImage(image, info, index);
-					}
-					else if(mImagePanel != null){
-						mImagePanel.setImage(image, info, index);
-					}
-				}catch(OutOfMemoryError e){
-					mEventSender.setProgressMessage(e.getMessage());
-					e.printStackTrace();
-					return;
-				}
-				
+					
 				}
 				int pageType = info.getFilterParam().getPageType();
 				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));

@@ -15,7 +15,7 @@ import jp.crwdev.app.setting.ImageFilterParamSet;
 
 public class ImageCache {
 
-	public static boolean enable = true;
+	public static boolean enable = false;
 	private static ImageCache mInstance;
 	
 	public static ImageCache getInstance(){
@@ -152,6 +152,10 @@ public class ImageCache {
 	}
 	private void removeImage(){
 		mTempMap.clear();
+		outputCacheLog();
+	}
+	
+	private void outputCacheLog(){
 		StringBuffer sb = new StringBuffer("ImageCache ");
 		for(ImageData image : mImageMap.values()){
 			sb.append("[page=" + image.getPage() + " ");
@@ -168,6 +172,7 @@ public class ImageCache {
 		}
 		DebugWindow.log(sb.toString());
 	}
+	
 	private ImageData loadOriginalImage(int targetPage){
 		int size = mFileInfoList.size();
 		if(targetPage < 0 || size <= targetPage){
@@ -185,6 +190,7 @@ public class ImageCache {
 			data.getOriginalImage();
 			mImageMap.put(targetPage, data);
 			DebugWindow.log("loadOriginalImage(" + targetPage + ") end");
+			outputCacheLog();
 			return data;
 		}
 		return mImageMap.get(targetPage);
@@ -263,6 +269,7 @@ public class ImageCache {
 					mDisplayImage = filtered;
 				}
 				DebugWindow.log("getDisplayImage(" + mPage + ") end");
+				outputCacheLog();
 			}
 			return mDisplayImage;
 		}
@@ -277,6 +284,7 @@ public class ImageCache {
 					mZoomImage = filtered;
 				}
 				DebugWindow.log("getZoomImage(" + mPage + ") end");
+				outputCacheLog();
 			}
 			return mZoomImage;
 		}
