@@ -158,6 +158,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							int my = mZoomPoint.y;
 							int cx = w / 2;
 							int cy = h / 2;
+							mx += (mx - cx);
+							my += (my - cy);
 							int dw = (int)(imageW);
 							int dh = (int)(imageH);
 							int zw = (int)(dw * scale);
