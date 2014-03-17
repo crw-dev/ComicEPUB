@@ -6,18 +6,30 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.itextpdf.text.Chapter;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.SimpleBookmark;
 
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.constant.Constant;
@@ -90,6 +102,8 @@ public class PdfImageFileWriter implements IImageFileWriter {
 			int size = list.size();
 			float progressOffset = 100 / (float)size;
 			
+			int index = 0;
+			
 			for(int i=0; i<size; i++){
 				if(mIsCancel){
 					return false;
@@ -147,6 +161,16 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				Image jpeg2pdfImage = Image.getInstance(file.getAbsolutePath());
 				document.add(jpeg2pdfImage);
 				
+				// TOC
+				String tocText = info.getTocText();
+				if(tocText != null && tocText.length() > 0){
+					addTocOutline(tocText, index + 1);
+				}
+				else if(index == 0){
+					addTocOutline("表紙", index + 1);
+				}
+				index++;
+				
 				if(!file.delete()){
 					file.deleteOnExit();
 				}
@@ -156,17 +180,23 @@ public class PdfImageFileWriter implements IImageFileWriter {
 				}
 			}
 			
+			
 			document.close();
 			document = null;
 			writer.close();
 			writer = null;
 			
+			
+			ArrayList<HashMap<String, Object>> outlines = getTocOutline();
+			
 			PdfReader reader = new PdfReader(tempFile.getAbsolutePath());
 			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(mOutputFile.getAbsoluteFile()));
+			stamp.setOutlines(outlines);
 			stamp.addViewerPreference(PdfName.DIRECTION, PdfName.R2L);	// 右綴じ
 			stamp.close();
 			stamp = null;
-
+			reader.close();
+			
 		} catch (Exception e){
 			e.printStackTrace();
 			return false;
@@ -191,6 +221,25 @@ public class PdfImageFileWriter implements IImageFileWriter {
 		}
 
 		return true;
+	}
+	
+	private ArrayList<HashMap<String, Object>> mTocOutline = new ArrayList<HashMap<String, Object>>();
+
+	private void addTocOutline(String title, int page){
+		// Reference http://itextpdf.com/examples/iia.php?id=140
+		if(mTocOutline == null){
+			mTocOutline = new ArrayList<HashMap<String, Object>>();
+		}
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("Title", title);
+		map.put("Action", "GoTo");
+		map.put("Page", String.format("%d Fit", page));
+		mTocOutline.add(map);
+	}
+	private ArrayList<HashMap<String, Object>> getTocOutline(){
+		ArrayList<HashMap<String, Object>> outline = mTocOutline;
+		mTocOutline = null;
+		return outline;
 	}
 
 	@Override

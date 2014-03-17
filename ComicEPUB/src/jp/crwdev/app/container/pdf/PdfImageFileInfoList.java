@@ -153,8 +153,8 @@ public class PdfImageFileInfoList extends ImageFileInfoList {
 	@Override
 	public void release(){
 		if(mPdfDocument != null){
-			mPdfDocument.dispose();
-			mPdfDocument = null;
+//			mPdfDocument.dispose();
+//			mPdfDocument = null;
 		}
 	}
 }
