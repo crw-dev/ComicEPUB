@@ -6,17 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
 import java.io.File;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -138,6 +131,7 @@ public class SettingComponent {
 		//addToComponent(parent);
 	}
 	
+	@SuppressWarnings("unused")
 	private void addToComponent(JComponent parent){
 		
 		filterResize.setSelected(true);
@@ -312,7 +306,6 @@ public class SettingComponent {
 		layout.putConstraint(SpringLayout.NORTH, outputAuthor, 3, SpringLayout.SOUTH, outputTitle);
 		layout.putConstraint(SpringLayout.NORTH, outputAuthorKana, 0, SpringLayout.NORTH, outputAuthor);
 		
-		//TODO
 //		outputTitle.addFocusListener(new DefaultTextFocusListener("タイトル", outputTitle));
 //		outputTitleKana.addFocusListener(new DefaultTextFocusListener("タイトルカナ", outputTitleKana));
 //		outputAuthor.addFocusListener(new DefaultTextFocusListener("作者名", outputAuthor));
@@ -913,6 +906,7 @@ public class SettingComponent {
 	 * @author USER
 	 *
 	 */
+	@SuppressWarnings("serial")
 	private class DefaultTextField extends JTextField implements FocusListener {
 		
 		private String mDefaultText = "";
@@ -969,6 +963,7 @@ public class SettingComponent {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private class DefaultTextFocusListener implements FocusListener {
 
 		private String mDefaultText = "";

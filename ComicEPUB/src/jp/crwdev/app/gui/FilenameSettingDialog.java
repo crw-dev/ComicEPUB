@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+@SuppressWarnings("serial")
 public class FilenameSettingDialog extends JDialog {
 	
 	/** OKボタン押下フラグ */

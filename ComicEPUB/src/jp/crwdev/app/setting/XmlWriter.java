@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -77,13 +76,10 @@ public class XmlWriter {
 			transformer.transform(source, result);
 			
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -146,8 +142,6 @@ public class XmlWriter {
 		if(parent == null){
 			parent = mRootElement;
 		}
-
-		//TODO:
 		
 		parent.setAttribute("fileType", output.getFileType());
 		parent.setAttribute("bookType", output.getEpubType());
@@ -302,7 +296,6 @@ public class XmlWriter {
 		
 		splitElem.setAttribute("type", Integer.toString(splitType));
 		
-		//TODO: attribute of vline, hline
 		float[] v = param.getSplitOffsetV();
 		float[] h = param.getSplitOffsetH();
 		if(v != null && h != null && v.length >= 2 && h.length >= 2){
@@ -654,7 +647,7 @@ public class XmlWriter {
 	
 	private void loadOutput(Node outputNode, OutputSettingParam output){
 		if(outputNode.getNodeName().equalsIgnoreCase("output")){
-			//TODO:
+			
 			NamedNodeMap outputAttrs = outputNode.getAttributes();
 			String fileType = getAttributeValue(outputAttrs, "fileType");
 			if(fileType.isEmpty()){
@@ -806,7 +799,6 @@ public class XmlWriter {
 				
 				NodeList nodes = splitNode.getChildNodes();
 				
-				//TODO: vline hline
 				float[] v = null;
 				float[] h = null;
 				if(!vline.isEmpty() && !hline.isEmpty()){

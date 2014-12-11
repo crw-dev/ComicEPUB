@@ -44,7 +44,6 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	 * 基本データの読み込み
 	 * @throws Exception getFullPath(),getInputStream()の実装必須
 	 */
-	@SuppressWarnings({ "unchecked" })
 	protected void loadBasicParams() throws Exception{
 		String suffix = getSuffix(getFullPath());
 
@@ -141,9 +140,9 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		
 		String suffix = getSuffix(getFullPath());
 
-		Iterator readers = ImageIO.getImageReadersBySuffix(suffix);
+		Iterator<ImageReader> readers = ImageIO.getImageReadersBySuffix(suffix);
 		if (readers.hasNext()) {
-            ImageReader reader = (ImageReader)readers.next();
+            ImageReader reader = readers.next();
 			try {
 				InputStream in = getInputStream();
 				ImageInputStream stream = ImageIO.createImageInputStream(in);

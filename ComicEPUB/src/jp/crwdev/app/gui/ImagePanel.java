@@ -17,7 +17,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
@@ -38,10 +37,9 @@ import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageCache;
-import jp.crwdev.app.util.QueueingThread;
 import jp.crwdev.app.util.ImageCache.ImageData;
-import jp.crwdev.app.util.QueueingThread.IQueueProcess;
 
+@SuppressWarnings("serial")
 public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
 	
 	private PreviewImageFilter mImageFilter = new PreviewImageFilter();
@@ -151,89 +149,60 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						createZoomImage();
 					}
 					
-					if(true){
-						synchronized(mLockZoomImage){
-							float scale = mZoomScale;
-							int mx = mZoomPoint.x;
-							int my = mZoomPoint.y;
-							int cx = w / 2;
-							int cy = h / 2;
-							mx += (mx - cx);
-							my += (my - cy);
-							int dw = (int)(imageW);
-							int dh = (int)(imageH);
-							int zw = (int)(dw * scale);
-							int zh = (int)(dh * scale);
-							
-							int pw = mPreviewZoomImage.getWidth();
-							int ph = mPreviewZoomImage.getHeight();
-							
-							if(mPreviewZoomImage != null){
-								if(zw < pw || zh < ph){
-									zw = pw;
-									zh = ph;
-								}
-							}
-							
-							float panX = (float)(mx - cx) / (float)dw;
-							float panY = (float)(my - cy) / (float)dh;
-							int zx = mx - (int)(zw * (0.5f + panX));
-							int zy = my - (int)(zh * (0.5f + panY));
-							
-							
-	//						if(zx > 0){
-	//							g.fillRect(0, 0, zx, h);
-	//						}
-	//						if(zx+zw < w){
-	//							g.fillRect(zx+zw, 0, w, h);
-	//						}
-	//						if(zy > 0){
-	//							g.fillRect(zx, 0, zw, zy);
-	//						}
-	//						if(zy+zh < h){
-	//							g.fillRect(zx, zy+zh, zw, h);
-	//						}
-							
-							if(mPreviewZoomImage != null){
-								if(zw != pw || zh != ph){
-									Graphics2D g2 = (Graphics2D)g;
-									g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-								}
-								g.drawImage(mPreviewZoomImage, zx, zy, zx+zw, zy+zh, 0, 0, pw, ph, null);
-							}else{
-								if(zw != imageW || zh != imageH){
-									Graphics2D g2 = (Graphics2D)g;
-									g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-								}
-								g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, imageW, imageH, null);
+					synchronized(mLockZoomImage){
+						float scale = mZoomScale;
+						int mx = mZoomPoint.x;
+						int my = mZoomPoint.y;
+						int cx = w / 2;
+						int cy = h / 2;
+						mx += (mx - cx);
+						my += (my - cy);
+						int dw = (int)(imageW);
+						int dh = (int)(imageH);
+						int zw = (int)(dw * scale);
+						int zh = (int)(dh * scale);
+						
+						int pw = mPreviewZoomImage.getWidth();
+						int ph = mPreviewZoomImage.getHeight();
+						
+						if(mPreviewZoomImage != null){
+							if(zw < pw || zh < ph){
+								zw = pw;
+								zh = ph;
 							}
 						}
-					}
-					else{
 						
-						imageW = mPreviewZoomImage.getWidth();
-						imageH = mPreviewZoomImage.getHeight();
+						float panX = (float)(mx - cx) / (float)dw;
+						float panY = (float)(my - cy) / (float)dh;
+						int zx = mx - (int)(zw * (0.5f + panX));
+						int zy = my - (int)(zh * (0.5f + panY));
 						
-						//TODO
-						float imageScale = mZoomScale;
-						if(imageW > w || imageH > h){
-						//	imageScale = 1.0f;
-						}
-						int dw = (int)(imageW * imageScale);
-						int dh = (int)(imageH * imageScale);
-						int dx = (w - dw)/2;
-						int dy = (h - dh)/2;
-						float scale = dw / (float)w;
-						int offsetx = mZoomPoint.x - w/2;
-						int offsety = mZoomPoint.y - h/2;
-						dx -= offsetx * scale;
-						dy -= offsety * scale;
 						
-						if(mCreateZoomImage){
-							g.drawImage(mPreviewZoomImage, dx, dy, dx+imageW, dy+imageH, 0, 0, imageW, imageH, null);
-						}
-						else{
-							g.drawImage(mDisplayImage, dx, dy, dx+dw, dy+dh, 0, 0, imageW, imageH, null);
+//						if(zx > 0){
+//							g.fillRect(0, 0, zx, h);
+//						}
+//						if(zx+zw < w){
+//							g.fillRect(zx+zw, 0, w, h);
+//						}
+//						if(zy > 0){
+//							g.fillRect(zx, 0, zw, zy);
+//						}
+//						if(zy+zh < h){
+//							g.fillRect(zx, zy+zh, zw, h);
+//						}
+						
+						if(mPreviewZoomImage != null){
+						if(zw != pw || zh != ph){
+								Graphics2D g2 = (Graphics2D)g;
+								g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+							}
+							g.drawImage(mPreviewZoomImage, zx, zy, zx+zw, zy+zh, 0, 0, pw, ph, null);
+						}else{
+							if(zw != imageW || zh != imageH){
+								Graphics2D g2 = (Graphics2D)g;
+								g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+							}
+							g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, imageW, imageH, null);
 						}
 					}
 				}
@@ -319,6 +288,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		return rect;
 	}
 	
+	@SuppressWarnings("unused")
 	private float getScale(){
 		if(mOriginalImage != null && mDisplayImage != null){
 			//SplitModeの場合は表示イメージの幅がオリジナルの半分になってしまうため、ここでは高さを元にスケールを計算する
@@ -329,6 +299,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		return 1.0f;
 	}
+	
 	private float getScaleX(float ow){
 		if(mDisplayImage != null){
 			float dw = (float)mDisplayImage.getWidth();
@@ -372,7 +343,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		
 	}
 	
-	private QueueingThread mZoomThread = null;
+//	private QueueingThread mZoomThread = null;
 	
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
@@ -430,7 +401,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 								try {
 									mThreadLock.wait();
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -855,7 +825,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			long when = e.getWhen();
 			System.out.println("rotation=" + rotation + " when=" + when);
 			
-			//TODO
 			ImageFilterParam param = mFileInfo.getFilterParam();
 			param.setRotate(true);
 			double angle = 0.1 * rotation;
@@ -1063,7 +1032,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		popup.add(areaMenu);
 		
 
-		boolean isSplited = false;
+//		boolean isSplited = false;
 		if(mFileInfo instanceof ImageFileInfoSplitWrapper){
 			JMenuItem splitMenu = new JMenuItem("分割解除");
 			splitMenu.addActionListener(new ActionListener(){

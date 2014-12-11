@@ -78,13 +78,13 @@ public class SplitLineSet implements ILineHandle {
 	
 	@Override
 	public void fixPosition(boolean fixed) {
-		// TODO Auto-generated method stub
+		// NOP
 
 	}
 
 	@Override
 	public void getHandleOffset(Dimension offset) {
-		// TODO Auto-generated method stub
+		// NOP
 
 	}
 
@@ -105,7 +105,6 @@ public class SplitLineSet implements ILineHandle {
 
 	@Override
 	public boolean isFixed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -192,6 +191,7 @@ public class SplitLineSet implements ILineHandle {
 
 	private final LineHandleComparator mComparator = new LineHandleComparator();
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		
@@ -238,6 +238,7 @@ public class SplitLineSet implements ILineHandle {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private class LineHandleComparator implements Comparator {
 
 		@Override

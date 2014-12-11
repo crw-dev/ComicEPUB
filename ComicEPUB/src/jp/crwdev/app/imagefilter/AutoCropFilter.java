@@ -95,6 +95,7 @@ public class AutoCropFilter implements IImageFilter {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private Rectangle getAutoCropRect(BufferedImage image, int leftMargin, int topMargin, int rightMargin, int bottomMargin){
 		Rectangle rect = new Rectangle();
 	
@@ -298,6 +299,7 @@ public class AutoCropFilter implements IImageFilter {
 
 	
 	private int deleteCountLeft(BufferedImage image, int max){
+		@SuppressWarnings("unused")
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -335,6 +337,7 @@ public class AutoCropFilter implements IImageFilter {
 
 	private int deleteCountTop(BufferedImage image, int max){
 		int width = image.getWidth();
+		@SuppressWarnings("unused")
 		int height = image.getHeight();
 		
 		int first = -1;

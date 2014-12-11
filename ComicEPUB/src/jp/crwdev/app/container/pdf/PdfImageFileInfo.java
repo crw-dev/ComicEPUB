@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Date;
 
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.PdfImageObject;
@@ -213,7 +212,6 @@ public class PdfImageFileInfo extends ImageFileInfoBase implements GhostscriptUt
 
 	@Override
 	public void release() {
-		// TODO Auto-generated method stub
 
 	}
 

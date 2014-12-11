@@ -3,12 +3,8 @@
 
 import java.awt.Dimension;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
 
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
@@ -16,6 +12,7 @@ import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 
+@SuppressWarnings("serial")
 public class SettingPanel extends SettingPanelLayout implements OnEventListener {
 
 	//private SettingComponent mComponent = new SettingComponent(this);
@@ -128,7 +125,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	}
 	
 	private void applyFilterParamSet(ImageFilterParamSet params, boolean enableOnly){
-		//TODO:
+		
 		ImageFilterParam baseParam = params.get(0);
 		if(baseParam != null){
 			mPreviewSetting.setPreview(baseParam.isPreview());
@@ -140,12 +137,12 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 	}
 	
 	private void applyFilterParam(int filterIndex, ImageFilterParam param, boolean enableOnly){
-		//TODO:
+		
 		mSettingTabPanels[filterIndex].setImageFilterParam(param, enableOnly);
 	}
 	
 	private void onFileInfoModified(){
-		//TODO:
+		
 		boolean isUnificationTextPage = mSettingTabPanels[ImageFilterParamSet.FILTER_INDEX_TEXT].isUnification();
 		if(isUnificationTextPage){
 			updateSettingValues();

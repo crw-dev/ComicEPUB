@@ -208,6 +208,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		return list;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void sort() {
 		if(mEnableSort){

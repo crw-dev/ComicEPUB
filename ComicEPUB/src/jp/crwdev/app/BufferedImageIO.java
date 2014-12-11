@@ -75,10 +75,10 @@ public class BufferedImageIO {
 	
 	
 	public static boolean write(BufferedImage image, String format, float quality, OutputStream out){
-		Iterator writers = ImageIO.getImageWritersByFormatName(format);
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(format);
 		if (writers.hasNext()) {
 			try {
-	            ImageWriter writer = (ImageWriter)writers.next();
+	            ImageWriter writer = writers.next();
 				ImageOutputStream stream = ImageIO.createImageOutputStream(out);
 	            writer.setOutput(stream);
 	            

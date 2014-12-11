@@ -1,15 +1,11 @@
 package jp.crwdev.app.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -17,7 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -25,6 +20,7 @@ import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.util.InifileProperty;
 
 
+@SuppressWarnings("serial")
 public class OutputSettingPanel extends JPanel {
 
 	private boolean mIsInputFileName = false;

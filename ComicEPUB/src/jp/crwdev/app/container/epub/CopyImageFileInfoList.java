@@ -1,7 +1,6 @@
 package jp.crwdev.app.container.epub;
 
 import jp.crwdev.app.container.ImageFileInfoList;
-import jp.crwdev.app.container.folder.FolderImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 
 public class CopyImageFileInfoList extends ImageFileInfoList {

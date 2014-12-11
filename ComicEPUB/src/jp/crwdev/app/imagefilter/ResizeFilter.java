@@ -15,8 +15,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.mortennobel.imagescaling.ResampleOp;
 
@@ -44,6 +42,7 @@ public class ResizeFilter implements IImageFilter {
 		return mResizedScaleH;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		if(param == null || !param.isResize()){

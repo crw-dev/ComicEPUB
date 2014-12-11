@@ -2,34 +2,20 @@ package jp.crwdev.app.container.pdf;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import javax.imageio.ImageIO;
 
-import com.itextpdf.text.Chapter;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.SimpleBookmark;
 
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.constant.Constant;
@@ -49,9 +35,13 @@ public class PdfImageFileWriter implements IImageFileWriter {
 	private boolean mIsCancel = false;
 	
 	private String mTitle = "";
-	private String mTitleKana = "";
 	private String mAuthor = "";
+	
+	@SuppressWarnings("unused")
+	private String mTitleKana = "";
+	@SuppressWarnings("unused")
 	private String mAuthorKana = "";
+	@SuppressWarnings("unused")
 	private String mBookType = "book";
 	
 	/**

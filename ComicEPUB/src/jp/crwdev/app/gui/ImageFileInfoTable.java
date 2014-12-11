@@ -46,6 +46,7 @@ import jp.crwdev.app.util.ImageFileInfoAsyncTask.OnTaskObserver;
 import jp.crwdev.app.util.TableRowTransferHandler;
 
 
+@SuppressWarnings("serial")
 public class ImageFileInfoTable extends JTable implements OnEventListener {
 
 	private DefaultTableModel mTableModel = null;
@@ -169,7 +170,6 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	
 	private void startLoadFileInfoThread(){
 		// FileInfoの読み込まれていない情報をスレッドで順次更新する
-		//TODO
 		ImageFileInfoAsyncTask task = new ImageFileInfoAsyncTask(mInfoList, new OnTaskObserver(){
 			@Override
 			public void onStart() {
@@ -230,7 +230,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
 			IImageFileInfo info = mInfoList.get(index);
 			if(info != null){
-				if(ImageCache.enable){ //TODO
+				if(ImageCache.enable){
 					ImageData data = ImageCache.getInstance().getImageData(index);
 					BufferedImage image = data.getOriginalImage();
 					if(mFullscreenWindow != null){
@@ -291,7 +291,6 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								try {
 									mThreadLock.wait();
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -367,7 +366,6 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						// PageType変更有り
 						param.setPageType(pageType);
 						
-						//TODO
 						// FileInfo更新通知
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 						mEventSender.setModified();
@@ -381,7 +379,6 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						// PageSpread変更有り
 						param.setPageSpread(value);
 						
-						//TODO
 						// FileInfo更新通知
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 						mEventSender.setModified();
@@ -405,7 +402,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						// SplitType変更有り
 						param.setSplitType(splitType);
 						update = true;
-						//TODO:
+
 						renewalList();
 						selectItem(selected);
 						return;

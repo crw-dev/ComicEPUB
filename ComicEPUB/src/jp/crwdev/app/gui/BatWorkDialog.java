@@ -2,7 +2,6 @@ package jp.crwdev.app.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,22 +24,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
-import jp.crwdev.app.imagefilter.AutoCropFilter;
-import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
-import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -51,6 +45,7 @@ import jp.crwdev.app.util.FileListDropTargetAdapter;
 import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.FileListDropTargetAdapter.OnDropFilesListener;
 
+@SuppressWarnings("serial")
 public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
@@ -179,6 +174,7 @@ public class BatWorkDialog extends JDialog implements OnDropFilesListener {
 				return (column > 1);	// 0,1カラム目の編集禁止
 			}
 			
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Class getColumnClass(int col){
 		        return getValueAt(0, col).getClass();

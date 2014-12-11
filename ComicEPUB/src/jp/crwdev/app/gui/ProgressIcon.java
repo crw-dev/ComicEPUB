@@ -23,6 +23,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+@SuppressWarnings("serial")
 public class ProgressIcon extends JComponent implements Icon {
 
 	private Timer mTimer;
@@ -30,7 +31,6 @@ public class ProgressIcon extends JComponent implements Icon {
 	private final Stroke mStroke = new BasicStroke(2.0f);
 	private final int ICON_SIZE=32;
 	private boolean mIsRunning = false;
-	private TimerTask mTask = null;
 
 	public ProgressIcon() {
 		super();
@@ -50,7 +50,7 @@ public class ProgressIcon extends JComponent implements Icon {
 		if(mTimer == null){
 			mTimer = new Timer();
 			setVisible(true);
-			mTimer.schedule(mTask = new TimerTask(){
+			mTimer.schedule(new TimerTask(){
 				@Override
 				public void run() {
 					mList.add(mList.remove(0));

@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.interfaces.IImageFilter;
 
 public class SplitFilter implements IImageFilter {
@@ -40,18 +39,18 @@ public class SplitFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		if(splitType == SplitFilter.TYPE_CUSTOM){
-			//TODO
+			
 			float[] v = param.getSplitOffsetV();
 			float[] h = param.getSplitOffsetH();
 			
-			int size = (v.length-1)*(h.length-1);
+			//int size = (v.length-1)*(h.length-1);
 			int splitIndex = param.getSplitIndex();
 			
 			int xIndex = (v.length-1) - splitIndex % (v.length-1);
 			int yIndex = splitIndex / (v.length-1);
 			
-			int x = (int)(width * (v[xIndex] + 0.5f));
-			int y = (int)(height * (h[yIndex] + 0.5f));
+			//int x = (int)(width * (v[xIndex] + 0.5f));
+			//int y = (int)(height * (h[yIndex] + 0.5f));
 			
 			width = (int)((v[xIndex+1] - v[xIndex]) * width);
 			height = (int)((h[yIndex+1] - h[yIndex]) * height);
@@ -113,11 +112,11 @@ public class SplitFilter implements IImageFilter {
 		int height = image.getHeight();
 		
 		if(splitType == SplitFilter.TYPE_CUSTOM){
-			//TODO
+			
 			float[] v = param.getSplitOffsetV();
 			float[] h = param.getSplitOffsetH();
 			
-			int size = (v.length-1)*(h.length-1);
+			//int size = (v.length-1)*(h.length-1);
 			//int splitIndex = param.getSplitIndex();
 			
 			int xIndex = (v.length-2) - splitIndex % (v.length-1);

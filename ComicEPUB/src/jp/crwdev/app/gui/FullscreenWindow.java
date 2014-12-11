@@ -1,7 +1,6 @@
 package jp.crwdev.app.gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,10 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -31,8 +28,6 @@ import javax.swing.KeyStroke;
 import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
-import jp.crwdev.app.imagefilter.AddSpaceFilter;
-import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
@@ -40,6 +35,7 @@ import jp.crwdev.app.util.ImageCache;
 import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.ImageCache.ImageData;
 
+@SuppressWarnings("serial")
 public class FullscreenWindow extends JFrame implements MouseListener, MouseMotionListener, OnEventListener {
 
 	public static boolean mEnableFullScreen = false;
@@ -166,8 +162,6 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 	private int mInfoIndex = 0;
 	private BufferedImage mOriginalImage = null;
 	private BufferedImage mDisplayImage = null;
-	private Point ptLeftTop = null;
-	private Point ptRightBottom = null;
 	private boolean mIsZoomDrag = false;
 	private Point mZoomPoint = new Point();
 	private EventObserver mEventSender = null;
@@ -188,16 +182,12 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		mOriginalImage = image;
 		mFileInfo = info;
 		mInfoIndex = rowIndex;
-		ptLeftTop = null;
-		ptRightBottom = null;
 		if(mOriginalImage != null){
 			updateDisplayImage(true);
 		}
 	}
 	
 	public void updateDisplayImage(boolean async){
-		ptLeftTop = null;
-		ptRightBottom = null;
 		if(mOriginalImage == null){
 			return;
 		}
@@ -225,7 +215,6 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 								try {
 									mThreadLock.wait();
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -265,15 +254,16 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		}
 	}
 	
-	private void finalizeThread(){
-		if(mThread != null){
-			mThreadFinish = true;
-			synchronized(mThreadLock){
-				mThreadLock.notify();
-			}
-			mThread = null;
-		}
-	}
+//	private void finalizeThread(){
+//		if(mThread != null){
+//			mThreadFinish = true;
+//			synchronized(mThreadLock){
+//				mThreadLock.notify();
+//			}
+//			mThread = null;
+//		}
+//	}
+	
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
 			try {
@@ -520,13 +510,11 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -559,7 +547,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
 		case EventObserver.EventType_PreviewSize:
-			Dimension size = (Dimension)obj;
+			//Dimension size = (Dimension)obj;
 			//setOutputSizePreview(arg1 == 1, size.width, size.height);
 			break;
 		default:

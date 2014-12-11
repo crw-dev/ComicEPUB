@@ -2,9 +2,6 @@ package jp.crwdev.app.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -19,10 +16,10 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 
+@SuppressWarnings("serial")
 public class SettingTabPanel extends JPanel {
 
 	private int mFilterIndex = ImageFilterParamSet.FILTER_INDEX_BASIC;
@@ -519,7 +516,7 @@ public class SettingTabPanel extends JPanel {
 		param.setEnable(isEnable);
 		param.setBlur(isBlur);
 		param.setSharpness(isSharpness);
-		//TODO: blur/shapness value
+		
 		param.setSharpnessPixels((Integer)spinSharpness.getValue());
 		param.setContrast(isContrast);
 		param.setGamma(isGamma);

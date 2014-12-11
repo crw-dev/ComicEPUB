@@ -4,16 +4,14 @@
 package jp.crwdev.app.imagefilter;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.util.Date;
 
-import com.mortennobel.imagescaling.ImageUtils;
 
 import jp.crwdev.app.interfaces.IImageFilter;
 
 public class GrayscaleFilter implements IImageFilter {
 
+	@SuppressWarnings("unused")
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 		if(param == null || !param.isGrayscale()){
@@ -45,19 +43,19 @@ public class GrayscaleFilter implements IImageFilter {
     	long starttime = startDate.getTime();
     	
     	if(false){
-	    	int width = image.getWidth();
+    		int width = image.getWidth();
 			int height = image.getHeight();
-		    for( int y = 0; y < height; y ++ ) {
-		        for( int x = 0; x < width; x ++ ) {
-		        	int rgb = image.getRGB(x, y);
-		        	int r = (rgb >> 16) & 0xff;
-		        	int g = (rgb >> 8) & 0xff;
-		        	int b = rgb & 0xff;
-		        	int n = (((int)( r*Rparam + g*Gparam + b*Bparam )) >> 10);
-		        	int gray = ((n << 16) | (n << 8) | n);
-		        	dest.setRGB(x, y, gray);
-		        }
-		    }
+			for( int y = 0; y < height; y ++ ) {
+				for( int x = 0; x < width; x ++ ) {
+					int rgb = image.getRGB(x, y);
+					int r = (rgb >> 16) & 0xff;
+					int g = (rgb >> 8) & 0xff;
+					int b = rgb & 0xff;
+					int n = (((int)( r*Rparam + g*Gparam + b*Bparam )) >> 10);
+					int gray = ((n << 16) | (n << 8) | n);
+					dest.setRGB(x, y, gray);
+				}
+			}
     	}
     	else{
     		// スレッドで並列処理させる

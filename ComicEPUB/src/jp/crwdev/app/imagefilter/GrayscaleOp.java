@@ -1,6 +1,5 @@
 package jp.crwdev.app.imagefilter;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -50,6 +49,7 @@ public class GrayscaleOp implements BufferedImageOp {
 		}
 
 		int nrChannels = ImageUtils.nrChannels(srcImg);
+		@SuppressWarnings("unused")
 		int srcWidth = srcImg.getWidth();
 		int srcHeight = srcImg.getHeight();
 		

@@ -1,8 +1,5 @@
 package jp.crwdev.app.gui;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -16,9 +13,9 @@ import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import javax.swing.DefaultComboBoxModel;
 
 
+@SuppressWarnings("serial")
 public class SettingPanelLayout extends JPanel {
 	protected DefaultTextField textTitle;
 	protected DefaultTextField textAuthor;
@@ -267,6 +264,7 @@ public class SettingPanelLayout extends JPanel {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private class DefaultTextFocusListener implements FocusListener {
 
 		private String mDefaultText = "";

@@ -40,12 +40,13 @@ public class FileListDropTargetAdapter extends DropTargetAdapter {
 		
 		try {
 			// ドロップされたファイル一覧のリストを取得する．
+			@SuppressWarnings("unchecked")
 			List<File> list = (List<File>) trans.getTransferData(DataFlavor.javaFileListFlavor);
 			
 			// リストからファイルを一つ一つ取得する．
 			for (File file : list) {
 				// ファイルパスを取得する．
-				String fileName = file.getAbsolutePath();
+				//String fileName = file.getAbsolutePath();
 				
 				File settingFile = Constant.getSettingFile(file);
 				if(settingFile != null){

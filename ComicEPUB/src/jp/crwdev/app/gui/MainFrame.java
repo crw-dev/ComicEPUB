@@ -36,6 +36,7 @@ import jp.crwdev.app.util.ImageCache;
 import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.FileDropTargetAdapter.OnDropListener;
 
+@SuppressWarnings("serial")
 public class MainFrame extends JFrame implements OnEventListener {
 
 	private boolean mIsSettingChanged = false;
@@ -215,7 +216,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 							
 							File settingFile = new File(settingFilePath);
 							if(settingFile.exists()){
-								//TODO: implement setting file reader/writer
+								
 								XmlWriter loader = new XmlWriter();
 								loader.openLoadSettingFile(mSettingFilePath);
 								//param = new ImageFilterParam();
@@ -330,7 +331,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 		else{
 			String dirname = inputFile.getParent();
 			String filename = inputFile.getName();
-			//TODO:
+			
 			int dotIndex = filename.lastIndexOf(".");
 			if(dotIndex >= 0){
 				filename = filename.substring(0, dotIndex);
@@ -503,7 +504,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 		mFullscreenWindow = new FullscreenWindow();
 		mFullscreenWindow.setEventObserver(mEventObserver);
 		if(ImageCache.enable){
-			ImageCache.getInstance().clear();
+			ImageCache.getInstance();
+			ImageCache.clear();
 		}
 		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, mFullscreenWindow);
 		mTable.setFullscreenWindow(mFullscreenWindow);
@@ -516,7 +518,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 		mFullscreenWindow.dispose();
 		mFullscreenWindow = null;
 		if(ImageCache.enable){
-			ImageCache.getInstance().clear();
+			ImageCache.getInstance();
+			ImageCache.clear();
 		}
 		mTable.setFullscreenWindow(null);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, mImagePanel);

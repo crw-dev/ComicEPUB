@@ -1,16 +1,15 @@
 package jp.crwdev.app.gui;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class PreviewSettingPanel extends JPanel {
 
 	private JCheckBox checkPreview = new JCheckBox("編集モード");

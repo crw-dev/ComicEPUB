@@ -2,12 +2,12 @@ package jp.crwdev.app.setting;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 
 
+@SuppressWarnings("serial")
 public class ImageFilterParamSet extends ArrayList<ImageFilterParam> {
 	
 	public static final int FILTER_INDEX_BASIC = 0;

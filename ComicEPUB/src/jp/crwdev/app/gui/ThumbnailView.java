@@ -40,14 +40,15 @@ import jp.crwdev.app.imagefilter.ResizeFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 
+@SuppressWarnings("serial")
 public class ThumbnailView extends JFrame implements OnEventListener{
 	
-	private JScrollPane mScrollPane;
+//	private JScrollPane mScrollPane;
 	private DefaultListModel mModel;
 	private JList mList;
 	private IImageFileInfoList mInfoList;
 	private ImageFileInfoTable mInfoTable;
-	private boolean mWindowSizeMax = false;
+//	private boolean mWindowSizeMax = false;
 
 	private ThumbnailLoadThread mThread = new ThumbnailLoadThread();
 	
@@ -57,19 +58,6 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 		setBounds(new Rectangle(200, 200, 120*8+20, 150));
 		//setViewSize(mWindowSizeMax);
 		
-//		try {
-//			mImage = BufferedImageIO.read(new FileInputStream("C:\\04_001\\P00027.jpg"), true);
-//			ImageFilterParam param = new ImageFilterParam();
-//			param.setResize(true);
-//			param.setResizeDimension(120, 120);
-//			ResizeFilter filter = new ResizeFilter();
-//			mImage = filter.filter(mImage, param);
-//			
-//		} catch (FileNotFoundException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		
 		
 		mModel = new DefaultListModel();
 		mList = new JList(mModel);
@@ -95,7 +83,7 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 		
 		JScrollPane scroll = new JScrollPane(mList, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll.setWheelScrollingEnabled(true);
-		mScrollPane = scroll;
+//		mScrollPane = scroll;
 		//scroll.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
 		SpringLayout layout = new SpringLayout();
@@ -209,7 +197,7 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 				ex.printStackTrace();
 			}
 		
-		mWindowSizeMax = maximum;
+//		mWindowSizeMax = maximum;
 		
 		setBounds(width - screenSize.width, screenSize.height-150, screenSize.width, 150);
 //		setSize(screenSize.width, 150);
@@ -290,7 +278,6 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 						}
 					}
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -376,14 +363,10 @@ public class ThumbnailView extends JFrame implements OnEventListener{
 	}
 
 	public class ThumbnailRenderer implements ListCellRenderer {
-
-		private BufferedImage mThumbnail;
-		private IImageFileInfo mInfo;
 		
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
-			// TODO Auto-generated method stub
 			
 			JPanel panel;
 			if(value instanceof IImageFileInfo){

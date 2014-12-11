@@ -4,8 +4,6 @@ import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
-import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.activation.ActivationDataFlavor;
 import javax.activation.DataHandler;
@@ -19,6 +17,7 @@ import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.ISimpleCallback;
 
+@SuppressWarnings("serial")
 public class TableRowTransferHandler extends TransferHandler {
 	private int[] rows    = null;
 	private int addIndex  = -1; //Location where items were added

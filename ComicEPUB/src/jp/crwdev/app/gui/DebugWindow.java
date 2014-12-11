@@ -1,18 +1,14 @@
 package jp.crwdev.app.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JViewport;
 
 
+@SuppressWarnings("serial")
 public class DebugWindow extends JFrame {
 
 	private static DebugWindow mInstance;

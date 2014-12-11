@@ -93,7 +93,6 @@ public class ImageCache {
 								try {
 									mThreadLock.wait();
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -206,8 +205,8 @@ public class ImageCache {
 		
 		private int mPage;
 		private IImageFileInfo mInfo;
-		private PreviewImageFilter mImageFilter = new PreviewImageFilter();
-		private PreviewImageFilter mPreviewZoomFilter = new PreviewImageFilter();
+		//private PreviewImageFilter mImageFilter = new PreviewImageFilter();
+		//private PreviewImageFilter mPreviewZoomFilter = new PreviewImageFilter();
 
 		public ImageData(int page, IImageFileInfo info){
 			mPage = page;
@@ -240,7 +239,7 @@ public class ImageCache {
 						image = BufferedImageIO.read(stream, mInfo.isJpeg());
 					}
 					else{
-						boolean preview = true;
+						//boolean preview = true;
 						image = mInfo.getImage(true);
 					}
 					
