@@ -18,6 +18,7 @@ import javax.swing.event.ChangeListener;
 
 import jp.crwdev.app.OutputSettingParam;
 import jp.crwdev.app.util.InifileProperty;
+import jp.crwdev.app.util.PopupMenuMouseListener;
 
 
 @SuppressWarnings("serial")
@@ -93,6 +94,16 @@ public class OutputSettingPanel extends JPanel {
 	
 	private void initialize(){
 
+		// ポップアップメニュー設定
+		PopupMenuMouseListener popupListener = new PopupMenuMouseListener();
+		outputSeriesTitle.addMouseListener(popupListener);
+		outputSeriesTitleKana.addMouseListener(popupListener);
+		outputSeriesNumber.addMouseListener(popupListener);
+		outputTitle.addMouseListener(popupListener);
+		outputTitleKana.addMouseListener(popupListener);
+		outputAuthor.addMouseListener(popupListener);
+		outputAuthorKana.addMouseListener(popupListener);
+		outputFolder.addMouseListener(popupListener);
 		
 		String defaultFolder = InifileProperty.getInstance().getOutputFolder();
 		if(!defaultFolder.isEmpty()){
@@ -195,7 +206,7 @@ public class OutputSettingPanel extends JPanel {
 				mParent.updateSettingValues();
 			}
 		});
-		checkFixedSize.setToolTipText("全ページ同じサイズで出力します。");
+		checkFixedSize.setToolTipText("全ページ同じサイズで出力します。(表紙除く)");
 	}
 	
 	public OutputSettingParam getOutputSettingParam(){

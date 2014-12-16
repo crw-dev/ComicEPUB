@@ -63,6 +63,10 @@ public class ImageFilterParam implements Cloneable {
 		mSplitType = SplitFilter.TYPE_NONE;
 		mSplitIndex = 0;
 		mPageSpread = Constant.PAGESPREAD_AUTO;
+		mColorPageAutoCropThreshold = 0;
+		mTextPageAutoCropThreshold = 0;
+		mPictPageAutoCropThreshold = 0;
+		mFullPageAutoCropThreshold = 0;
 		
 		mPageType = Constant.PAGETYPE_AUTO;
 		mConvertPageType = Constant.PAGETYPE_AUTO;
@@ -105,6 +109,10 @@ public class ImageFilterParam implements Cloneable {
 		dest.mPictPageCropTop = src.getPictPageCropTop();
 		dest.mPictPageCropRight = src.getPictPageCropRight();
 		dest.mPictPageCropBottom = src.getPictPageCropBottom();
+		dest.mColorPageAutoCropThreshold = src.getColorPageAutoCropThreshold();
+		dest.mTextPageAutoCropThreshold = src.getTextPageAutoCropThreshold();
+		dest.mPictPageAutoCropThreshold = src.getPictPageAutoCropThreshold();
+		dest.mFullPageAutoCropThreshold = src.getFullPageAutoCropThreshold();
 		dest.mIsResize = src.isResize();
 		dest.mResizeDimension = src.getResizeDimension();
 		dest.mFixedSize = src.getFixedSize();
@@ -175,6 +183,10 @@ public class ImageFilterParam implements Cloneable {
 	protected int mFullPageCropTop;
 	protected int mFullPageCropRight;
 	protected int mFullPageCropBottom;
+	protected int mColorPageAutoCropThreshold;
+	protected int mTextPageAutoCropThreshold;
+	protected int mPictPageAutoCropThreshold;
+	protected int mFullPageAutoCropThreshold;
 	protected boolean mIsTranslate;
 	protected int mTranslateX;
 	protected int mTranslateY;
@@ -221,6 +233,22 @@ public class ImageFilterParam implements Cloneable {
 	
 	public boolean isFullPageAutoCrop() {
 		return mIsFullPageAutoCrop;
+	}
+
+	public int getColorPageAutoCropThreshold() {
+		return mColorPageAutoCropThreshold;
+	}
+	
+	public int getPictPageAutoCropThreshold() {
+		return mPictPageAutoCropThreshold;
+	}
+	
+	public int getTextPageAutoCropThreshold() {
+		return mTextPageAutoCropThreshold;
+	}
+	
+	public int getFullPageAutoCropThreshold() {
+		return mFullPageAutoCropThreshold;
 	}
 
 	public boolean isColorPageCrop() {
@@ -482,6 +510,22 @@ public class ImageFilterParam implements Cloneable {
 		mIsFullPageAutoCrop = enable;
 	}
 
+	public void setColorPageAutoCropThreshold(int cropThreshold) {
+		mColorPageAutoCropThreshold = cropThreshold;
+	}
+	
+	public void setPictPageAutoCropThreshold(int cropThreshold) {
+		mPictPageAutoCropThreshold = cropThreshold;
+	}
+	
+	public void setTextPageAutoCropThreshold(int cropThreshold) {
+		mTextPageAutoCropThreshold = cropThreshold;
+	}
+	
+	public void setFullPageAutoCropThreshold(int cropThreshold) {
+		mFullPageAutoCropThreshold = cropThreshold;
+	}
+
 	public void setFullPageCrop(boolean enable) {
 		mIsFullPageCrop = enable;
 	}
@@ -724,6 +768,7 @@ public class ImageFilterParam implements Cloneable {
 			dest.mColorPageCropTop = update.getColorPageCropTop();
 			dest.mColorPageCropRight = update.getColorPageCropRight();
 			dest.mColorPageCropBottom = update.getColorPageCropBottom();
+			dest.mColorPageAutoCropThreshold = update.getColorPageAutoCropThreshold();
 		}
 		if(update.isTextPageCrop()){
 			dest.mIsTextPageCrop = true;
@@ -733,6 +778,7 @@ public class ImageFilterParam implements Cloneable {
 			dest.mTextPageCropTop = update.getTextPageCropTop();
 			dest.mTextPageCropRight = update.getTextPageCropRight();
 			dest.mTextPageCropBottom = update.getTextPageCropBottom();
+			dest.mTextPageAutoCropThreshold = update.getTextPageAutoCropThreshold();
 		}
 		if(update.isPictPageCrop()){
 			dest.mIsPictPageCrop = true;
@@ -742,6 +788,7 @@ public class ImageFilterParam implements Cloneable {
 			dest.mPictPageCropTop = update.getPictPageCropTop();
 			dest.mPictPageCropRight = update.getPictPageCropRight();
 			dest.mPictPageCropBottom = update.getPictPageCropBottom();
+			dest.mPictPageAutoCropThreshold = update.getPictPageAutoCropThreshold();
 		}
 		if(update.isResize()){
 			dest.mIsResize = true;
@@ -778,6 +825,7 @@ public class ImageFilterParam implements Cloneable {
 			dest.mFullPageCropTop = update.getFullPageCropTop();
 			dest.mFullPageCropRight = update.getFullPageCropRight();
 			dest.mFullPageCropBottom = update.getFullPageCropBottom();
+			dest.mFullPageAutoCropThreshold = update.getFullPageAutoCropThreshold();
 		}
 		if(update.isTranslate()){
 			dest.mIsTranslate = true;

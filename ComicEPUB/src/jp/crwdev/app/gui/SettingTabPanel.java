@@ -47,6 +47,7 @@ public class SettingTabPanel extends JPanel {
 	public JSpinner spinCropRight = new JSpinner();
 	public JSpinner spinCropTop = new JSpinner();
 	public JSpinner spinCropBottom = new JSpinner();
+	public JSpinner spinCropThreshold = new JSpinner();
 
 	// Slider
 	public JSlider sliderContrast = new JSlider();
@@ -166,6 +167,7 @@ public class SettingTabPanel extends JPanel {
 		checkPanel.add(spinCropRight);
 		checkPanel.add(spinCropBottom);
 		checkPanel.add(checkAutoCrop);
+		checkPanel.add(spinCropThreshold);
 		
 		layout1.putConstraint(SpringLayout.WEST, checkCrop, 0, SpringLayout.WEST, checkPanel);
 		layout1.putConstraint(SpringLayout.NORTH, checkCrop, 0, SpringLayout.SOUTH, labelBrightness);
@@ -185,6 +187,9 @@ public class SettingTabPanel extends JPanel {
 		layout1.putConstraint(SpringLayout.WEST, checkAutoCrop, 3, SpringLayout.EAST, checkCrop);
 		layout1.putConstraint(SpringLayout.NORTH, checkAutoCrop, 0, SpringLayout.NORTH, checkCrop);
 		
+		layout1.putConstraint(SpringLayout.WEST, spinCropThreshold, 5, SpringLayout.EAST, spinCropRight);
+		layout1.putConstraint(SpringLayout.NORTH, spinCropThreshold, 0, SpringLayout.NORTH, spinCropRight);
+		
 		add(checkPanel);
 
 
@@ -200,6 +205,9 @@ public class SettingTabPanel extends JPanel {
 		spinCropRight.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
 		spinCropBottom.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
 
+		spinCropThreshold.setPreferredSize(new Dimension(50, 20));
+		spinCropThreshold.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+		spinCropThreshold.setToolTipText("自動余白除去時の白色判定閾値を指定します。");
 	
 		
 		spinGamma.setPreferredSize(new Dimension(40, 20));
@@ -307,6 +315,7 @@ public class SettingTabPanel extends JPanel {
 		spinCropRight.addChangeListener(listener);
 		spinCropTop.addChangeListener(listener);
 		spinCropBottom.addChangeListener(listener);
+		spinCropThreshold.addChangeListener(listener);
 		
 	}
 	
@@ -435,6 +444,7 @@ public class SettingTabPanel extends JPanel {
 				spinCropRight.setValue(param.getColorPageCropRight());
 				spinCropTop.setValue(param.getColorPageCropTop());
 				spinCropBottom.setValue(param.getColorPageCropBottom());
+				spinCropThreshold.setValue(param.getColorPageAutoCropThreshold());
 				if(checkCrop.isSelected()){
 					update = true;
 				}
@@ -446,6 +456,7 @@ public class SettingTabPanel extends JPanel {
 				spinCropRight.setValue(param.getPictPageCropRight());
 				spinCropTop.setValue(param.getPictPageCropTop());
 				spinCropBottom.setValue(param.getPictPageCropBottom());
+				spinCropThreshold.setValue(param.getPictPageAutoCropThreshold());
 				if(checkCrop.isSelected()){
 					update = true;
 				}
@@ -457,6 +468,7 @@ public class SettingTabPanel extends JPanel {
 				spinCropRight.setValue(param.getTextPageCropRight());
 				spinCropTop.setValue(param.getTextPageCropTop());
 				spinCropBottom.setValue(param.getTextPageCropBottom());
+				spinCropThreshold.setValue(param.getTextPageAutoCropThreshold());
 				if(checkCrop.isSelected()){
 					update = true;
 				}
@@ -469,6 +481,7 @@ public class SettingTabPanel extends JPanel {
 				spinCropRight.setValue(param.getFullPageCropRight());
 				spinCropTop.setValue(param.getFullPageCropTop());
 				spinCropBottom.setValue(param.getFullPageCropBottom());
+				spinCropThreshold.setValue(param.getFullPageAutoCropThreshold());
 				if(checkCrop.isSelected()){
 					update = true;
 				}
@@ -502,6 +515,7 @@ public class SettingTabPanel extends JPanel {
 		int cropRight = (Integer)spinCropRight.getValue();
 		int cropTop = (Integer)spinCropTop.getValue();
 		int cropBottom = (Integer)spinCropBottom.getValue();
+		int cropThreshold = (Integer)spinCropThreshold.getValue();
 			
 			
 		double gamma = getGammaValue() / 10;
@@ -524,22 +538,26 @@ public class SettingTabPanel extends JPanel {
 		switch(mFilterIndex){
 		case ImageFilterParamSet.FILTER_INDEX_COLOR:
 			param.setColorPageAutoCrop(isAutoCrop);
+			param.setColorPageAutoCropThreshold(cropThreshold);
 			param.setColorPageCrop(isAutoCrop ? false : isCrop);
 			param.setColorPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_PICT:
 			param.setPictPageAutoCrop(isAutoCrop);
+			param.setPictPageAutoCropThreshold(cropThreshold);
 			param.setPictPageCrop(isAutoCrop ? false : isCrop);
 			param.setPictPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_TEXT:
 			param.setTextPageAutoCrop(isAutoCrop);
+			param.setTextPageAutoCropThreshold(cropThreshold);
 			param.setTextPageCrop(isAutoCrop ? false : isCrop);
 			param.setTextPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;
 		case ImageFilterParamSet.FILTER_INDEX_BASIC:
 		default:
 			param.setFullPageAutoCrop(isAutoCrop);
+			param.setFullPageAutoCropThreshold(cropThreshold);
 			param.setFullPageCrop(isAutoCrop ? false : isCrop);
 			param.setFullPageCrop(cropLeft, cropTop, cropRight, cropBottom);
 			break;

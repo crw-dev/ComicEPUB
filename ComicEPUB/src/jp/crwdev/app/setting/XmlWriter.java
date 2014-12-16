@@ -389,6 +389,7 @@ public class XmlWriter {
 			elem.setAttribute("t", Integer.toString(param.getColorPageCropTop()));
 			elem.setAttribute("r", Integer.toString(param.getColorPageCropRight()));
 			elem.setAttribute("b", Integer.toString(param.getColorPageCropBottom()));
+			elem.setAttribute("threshold", Integer.toString(param.getColorPageAutoCropThreshold()));
 			paramElem.appendChild(elem);
 		}
 		if(param.isPictPageAutoCrop()){
@@ -398,6 +399,7 @@ public class XmlWriter {
 			elem.setAttribute("t", Integer.toString(param.getPictPageCropTop()));
 			elem.setAttribute("r", Integer.toString(param.getPictPageCropRight()));
 			elem.setAttribute("b", Integer.toString(param.getPictPageCropBottom()));
+			elem.setAttribute("threshold", Integer.toString(param.getPictPageAutoCropThreshold()));
 			paramElem.appendChild(elem);
 		}
 		if(param.isTextPageAutoCrop()){
@@ -407,6 +409,7 @@ public class XmlWriter {
 			elem.setAttribute("t", Integer.toString(param.getTextPageCropTop()));
 			elem.setAttribute("r", Integer.toString(param.getTextPageCropRight()));
 			elem.setAttribute("b", Integer.toString(param.getTextPageCropBottom()));
+			elem.setAttribute("threshold", Integer.toString(param.getTextPageAutoCropThreshold()));
 			paramElem.appendChild(elem);
 		}
 		if(param.isFullPageAutoCrop()){
@@ -416,6 +419,7 @@ public class XmlWriter {
 			elem.setAttribute("t", Integer.toString(param.getFullPageCropTop()));
 			elem.setAttribute("r", Integer.toString(param.getFullPageCropRight()));
 			elem.setAttribute("b", Integer.toString(param.getFullPageCropBottom()));
+			elem.setAttribute("threshold", Integer.toString(param.getFullPageAutoCropThreshold()));
 			paramElem.appendChild(elem);
 		}
 		if(param.isFullPageCrop()){
@@ -939,8 +943,10 @@ public class XmlWriter {
 					String r = getAttributeValue(attrs, "r");
 					String t = getAttributeValue(attrs, "t");
 					String b = getAttributeValue(attrs, "b");
+					String threshold = getAttributeValue(attrs, "threshold", "0");
 					String enable = node.getFirstChild().getNodeValue();
 					param.setColorPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setColorPageAutoCropThreshold(Integer.parseInt(threshold));
 					param.setColorPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("pictAutoCrop")){
@@ -948,8 +954,10 @@ public class XmlWriter {
 					String r = getAttributeValue(attrs, "r");
 					String t = getAttributeValue(attrs, "t");
 					String b = getAttributeValue(attrs, "b");
+					String threshold = getAttributeValue(attrs, "threshold", "0");
 					String enable = node.getFirstChild().getNodeValue();
 					param.setPictPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setPictPageAutoCropThreshold(Integer.parseInt(threshold));
 					param.setPictPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("textAutoCrop")){
@@ -957,8 +965,10 @@ public class XmlWriter {
 					String r = getAttributeValue(attrs, "r");
 					String t = getAttributeValue(attrs, "t");
 					String b = getAttributeValue(attrs, "b");
+					String threshold = getAttributeValue(attrs, "threshold", "0");
 					String enable = node.getFirstChild().getNodeValue();
 					param.setTextPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setTextPageAutoCropThreshold(Integer.parseInt(threshold));
 					param.setTextPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("fullAutoCrop")){
@@ -966,8 +976,10 @@ public class XmlWriter {
 					String r = getAttributeValue(attrs, "r");
 					String t = getAttributeValue(attrs, "t");
 					String b = getAttributeValue(attrs, "b");
+					String threshold = getAttributeValue(attrs, "threshold", "0");
 					String enable = node.getFirstChild().getNodeValue();
 					param.setFullPageAutoCrop(Boolean.parseBoolean(enable));
+					param.setFullPageAutoCropThreshold(Integer.parseInt(threshold));
 					param.setFullPageCrop(Integer.parseInt(l), Integer.parseInt(t), Integer.parseInt(r), Integer.parseInt(b));					
 				}
 				else if(name.equalsIgnoreCase("blur")){
@@ -1033,6 +1045,15 @@ public class XmlWriter {
 			return node.getNodeValue();
 		} else {
 			return "";
+		}
+	}
+	
+	private String getAttributeValue(NamedNodeMap attrs, String name, String defaultValue){
+		Node node = attrs.getNamedItem(name);
+		if(node != null){
+			return node.getNodeValue();
+		} else {
+			return defaultValue;
 		}
 	}
 	

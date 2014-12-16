@@ -254,9 +254,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 			}else{
 				if(mPreviewZoomImage == null){
-					BufferedImage filtered = mPreviewZoomFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
-					synchronized(mLockZoomImage){
-						mPreviewZoomImage = filtered;
+					synchronized(mImageFilter){
+						BufferedImage filtered = mPreviewZoomFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+						synchronized(mLockZoomImage){
+							mPreviewZoomImage = filtered;
+						}
 					}
 				}
 			}
@@ -344,6 +346,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 //	private QueueingThread mZoomThread = null;
+	public Object mLockRender = new Object();
 	
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
@@ -363,8 +366,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					}
 				}
 				else{
-					BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
-					mDisplayImage = filtered;
+					synchronized(mImageFilter){
+						BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
+						mDisplayImage = filtered;
+					}
 					mPreviewZoomImage = null;
 					
 					if(mCreateZoomImage && !mIsPreviewMode){
@@ -385,6 +390,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		repaint();
 		//System.out.println("updateDisplayInternal()");
 	}
+	
 	
 	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
 	private Object mThreadLock = new Object();

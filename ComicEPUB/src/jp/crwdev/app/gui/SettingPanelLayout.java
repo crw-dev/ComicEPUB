@@ -75,7 +75,7 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.NORTH, checkResize, 0, SpringLayout.SOUTH, checkPreview);
 		add(checkResize);
 
-		checkOutputResize = new JCheckBox("出力サイズで表示");
+		checkOutputResize = new JCheckBox("出力サイズ表示");
 		springLayout.putConstraint(SpringLayout.WEST, checkOutputResize, 6, SpringLayout.EAST, checkResize);
 		springLayout.putConstraint(SpringLayout.SOUTH, checkOutputResize, 0, SpringLayout.SOUTH, checkResize);
 		add(checkOutputResize);

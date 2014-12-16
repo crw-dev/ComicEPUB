@@ -18,6 +18,8 @@ public class AutoCropFilter implements IImageFilter {
 	private static final int mNoiseLimit = 8;  // ノイズ許容pixel数
 	private static final int mRelapseLimit = 6;	// ノイズじゃないと判断したときに戻る最大pixel数
 	
+	private int mWhiteColorThreshold = 0x40;
+	
 	@Override
 	public BufferedImage filter(BufferedImage image, ImageFilterParam param) {
 	
@@ -45,18 +47,21 @@ public class AutoCropFilter implements IImageFilter {
 			top = param.getColorPageCropTop();
 			right = param.getColorPageCropRight();
 			bottom = param.getColorPageCropBottom();
+			mWhiteColorThreshold = param.getColorPageAutoCropThreshold();
 			break;
 		case Constant.PAGETYPE_PICT:
 			left = param.getPictPageCropLeft();
 			top = param.getPictPageCropTop();
 			right = param.getPictPageCropRight();
 			bottom = param.getPictPageCropBottom();
+			mWhiteColorThreshold = param.getPictPageAutoCropThreshold();
 			break;
 		case Constant.PAGETYPE_TEXT:
 			left = param.getTextPageCropLeft();
 			top = param.getTextPageCropTop();
 			right = param.getTextPageCropRight();
 			bottom = param.getTextPageCropBottom();
+			mWhiteColorThreshold = param.getTextPageAutoCropThreshold();
 			break;
 		case Constant.PAGETYPE_AUTO:
 		default:
@@ -64,7 +69,11 @@ public class AutoCropFilter implements IImageFilter {
 			top = param.getFullPageCropTop();
 			right = param.getFullPageCropRight();
 			bottom = param.getFullPageCropBottom();
+			mWhiteColorThreshold = param.getFullPageAutoCropThreshold();
 			break;
+		}
+		if(mWhiteColorThreshold == 0){
+			mWhiteColorThreshold = 0x40;
 		}
 		if(left == 0 && right == 0 && top == 0 && bottom == 0){
 			left = mDefaultCropMargin;
@@ -449,7 +458,7 @@ public class AutoCropFilter implements IImageFilter {
 		int r = (color >> 16) & 0xff;
 		int g = (color >> 8) & 0xff;
 		int b = color & 0xff;
-		if(r >= 0x40 && g >= 0x40 && b >= 0x40){
+		if(r >= mWhiteColorThreshold && g >= mWhiteColorThreshold && b >= mWhiteColorThreshold){
 			return true;
 		}
 		return false;
