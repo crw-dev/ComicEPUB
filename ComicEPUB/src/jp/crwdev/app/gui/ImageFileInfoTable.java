@@ -462,6 +462,17 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		}
 	}
 	
+	private void updateTextPageAuto(){
+		int size = mInfoList.size();
+		for(int row=0; row<size; row++){
+			IImageFileInfo info = mInfoList.get(row);
+			if(info.getFilterParam().getPageType() == Constant.PAGETYPE_AUTO){
+				info.getFilterParam().setPageType(Constant.PAGETYPE_TEXT);
+				mTableModel.setValueAt(Constant.TEXT_PAGETYPE_TEXT, row, Constant.TABLE_COLUMN_PAGETYPE);
+			}
+		}
+	}
+	
 	private void updatePicturePageCheckAll(){
 		if(mInfoList == null){
 			return;
@@ -496,23 +507,26 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					}
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();
-					if(mBaseFilterParams != null){
-						synchronized(this){
-							filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
+					if(filterParam.isEnable()){
+						
+						if(mBaseFilterParams != null){
+							synchronized(this){
+								filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
+							}
 						}
-					}
-					try {
-						boolean whitePage = checker.isWhiteImage(image, filterParam, true);
-						if(!whitePage){
-							info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
-							mTableModel.setValueAt(disableValue, index, 1);
+						try {
+							boolean whitePage = checker.isWhiteImage(image, filterParam, true);
+							if(!whitePage){
+								info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
+								mTableModel.setValueAt(disableValue, index, 1);
+							}
+						}catch(Exception e){
+							mEventSender.setProgressMessage(e.getMessage());
+						}catch(OutOfMemoryError e){
+							mEventSender.setProgressMessage(e.getMessage());
 						}
-					}catch(Exception e){
-						mEventSender.setProgressMessage(e.getMessage());
-					}catch(OutOfMemoryError e){
-						mEventSender.setProgressMessage(e.getMessage());
-					}
 					
+					}
 				}
 			}
 		});
@@ -611,6 +625,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						JMenuItem item0 = new JMenuItem("一括クリア");
 						JMenuItem item1 = new JMenuItem("一括挿絵");
 						JMenuItem item2 = new JMenuItem("一括本文");
+						JMenuItem item4 = new JMenuItem("未設定を一括本文");
 						JMenuItem item3 = new JMenuItem("挿絵チェック");
 						item0.addActionListener(new ActionListener(){
 							@Override
@@ -636,9 +651,16 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								updatePicturePageCheckAll();
 							}
 						});
+						item4.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								updateTextPageAuto();
+							}
+						});
 						popup.add(item0);
 						popup.add(item1);
 						popup.add(item2);
+						popup.add(item4);
 						popup.add(item3);
 						popup.show(e.getComponent(), e.getX(), e.getY());
 					}

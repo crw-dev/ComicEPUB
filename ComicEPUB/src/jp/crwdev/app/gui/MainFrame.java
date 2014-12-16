@@ -238,6 +238,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 								// 全体設定を反映
 								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
 								
+								mIsSettingChanged = false;	// D&Dでの変更は未変更扱いとする
+								
 								updateBaseFilterParam(params);
 							}
 
