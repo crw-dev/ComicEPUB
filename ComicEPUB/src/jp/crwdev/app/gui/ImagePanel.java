@@ -9,8 +9,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -87,23 +87,41 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
-		addHierarchyBoundsListener(new HierarchyBoundsListener(){
+		addComponentListener(new ComponentListener(){
+
 			@Override
-			public void ancestorMoved(HierarchyEvent arg0) {
+			public void componentResized(ComponentEvent e) {
+				onAncestorResized();
+				updateDisplayImage(true);
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				// NOP
 			}
 			@Override
-			public void ancestorResized(HierarchyEvent arg0) {
-				if(!mIsOutputSizePreview){
-					mImageFilter.setPreviewSize(getWidth() - mPreviewMargin, getHeight() - mPreviewMargin);
-					if(mCreateZoomImage){
-						mPreviewZoomFilter.setPreviewSize((int)(getWidth()*mZoomScale)-mPreviewMargin, (int)(getHeight()*mZoomScale)-mPreviewMargin);
-					}
-					System.out.println("width=" + getWidth() + " height=" + getHeight());
-				}
-			}           
-        });
+			public void componentShown(ComponentEvent e) {
+				// NOP
+			}
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				// NOP
+			}
+			
+		});
+		
 	}
 	
+	public void onAncestorResized(){
+		if(!mIsOutputSizePreview){
+			mImageFilter.setPreviewSize(getWidth() - mPreviewMargin, getHeight() - mPreviewMargin);
+			if(mCreateZoomImage){
+				mPreviewZoomFilter.setPreviewSize((int)(getWidth()*mZoomScale)-mPreviewMargin, (int)(getHeight()*mZoomScale)-mPreviewMargin);
+			}
+			System.out.println("width=" + getWidth() + " height=" + getHeight());
+		}
+	}
+
 	public void finalize(){
 		finalizeThread();
 	}
@@ -463,6 +481,19 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		
+		if(javax.swing.SwingUtilities.isLeftMouseButton(e) && e.getClickCount() >= 2){
+			int width = this.getWidth();
+			int x = e.getX();
+			
+			if(x > width - 100){
+				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ShowSettingPanel, 0);
+				mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_ShowSettingPanel, 0);
+				updateDisplayImage(true);
+			}
+			
+		}
+		
 		if(mFileInfo == null){
 			return;
 		}

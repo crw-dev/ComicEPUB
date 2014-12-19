@@ -2,6 +2,8 @@
 
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -13,7 +15,7 @@ import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 
 @SuppressWarnings("serial")
-public class SettingPanel extends SettingPanelLayout implements OnEventListener {
+public class SettingPanel extends SettingPanelLayout implements OnEventListener, MouseListener {
 
 	//private SettingComponent mComponent = new SettingComponent(this);
 	
@@ -43,6 +45,7 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 										checkOutputResize, packageConvertButton, checkFixedSize, parent);
 		mProgressPanel.setComponents(this, labelMessage, progressBar, cancelButton);
 		
+		this.addMouseListener(this);
 //		//SpringLayout layout = new SpringLayout();
 //		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 //		//setLayout(layout);
@@ -206,9 +209,60 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener 
 				mSettingTab.setSelectedIndex(arg1);
 			}
 			break;
+		case EventObserver.EventType_ShowSettingPanel:
+			showSettingPanel(true);
+			break;
 		default:
 			break;
 		}
+	}
+
+
+	public void showSettingPanel(boolean show){
+		if(show == false && mDefaultSize == null){
+			mDefaultSize = this.getPreferredSize();
+			this.setPreferredSize(new Dimension(1, (int)mDefaultSize.getHeight()));
+			this.updateUI();
+		}
+		else if(show == true && mDefaultSize != null){
+			this.setPreferredSize(mDefaultSize);
+			mDefaultSize = null;
+			this.updateUI();
+		}
+	}
+	
+	private Dimension mDefaultSize = null;
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		
+		if(e.getClickCount() >= 2){
+			showSettingPanel(false);
+		}
+	}
+
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// NOP
+	}
+
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// NOP
+	}
+
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// NOP
+	}
+
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// NOP
 	}
 	
 }
