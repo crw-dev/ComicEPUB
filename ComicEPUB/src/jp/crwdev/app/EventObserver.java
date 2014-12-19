@@ -39,6 +39,7 @@ public class EventObserver {
 	public static final int EventType_BeginFullscreen = 19;		// no param
 	public static final int EventType_EndFullscreen = 20;		// no param
 	public static final int EventType_ShowSettingPanel = 21;		// no param
+	public static final int EventType_BeginConvertOne = 22;		// arg1: index, obj: outputFolder
 
 	/** イベントリスナ 4種類  */
 	private OnEventListener[] mListeners = new OnEventListener[5];

@@ -18,8 +18,10 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.LinkedList;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -37,6 +39,7 @@ import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageCache;
+import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.ImageCache.ImageData;
 
 @SuppressWarnings("serial")
@@ -1121,8 +1124,36 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 //			popup.add(splitMenu2);
 //		}
 
+		JMenuItem item9 = new JMenuItem("単一ページ変換");
+		item9.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				showOutputFolderDialog();
+			}
+		});
 		
+		popup.add(item9);
+
 		popup.show(this, x, y);
+	}
+
+	private void showOutputFolderDialog(){
+		JFileChooser filechooser = new JFileChooser();
+		filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		String desktopFolder = System.getProperty("user.home") + "/Desktop";
+		File defaultFolder = new File(desktopFolder);//InifileProperty.getInstance().getOutputFolder());
+		if(defaultFolder.exists() && defaultFolder.isDirectory()){
+			filechooser.setSelectedFile(defaultFolder);
+		}
+		filechooser.setDialogTitle("保存先フォルダ選択");
+		int selected = filechooser.showOpenDialog(getParent());
+		if(selected == JFileChooser.APPROVE_OPTION){
+			 File file = filechooser.getSelectedFile();
+			 String path = file.getAbsolutePath();
+			 
+			 mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginConvertOne, mInfoIndex, path);
+		}
 	}
 
 	public void setOutputSizePreview(boolean enable, int width, int height){

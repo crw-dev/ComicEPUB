@@ -130,6 +130,70 @@ public class FolderImageFileWriter implements IImageFileWriter {
 		return true;
 	}
 
+	public boolean write(IImageFileInfo info) {
+		
+		mIsCancel = false;
+		
+		BufferedImage image = null;
+		
+		synchronized(info){
+			//if(!info.isEnable()){
+			//	continue;
+			//}
+			
+			InputStream in = info.getInputStream();
+			
+			if(in != null){
+				image = BufferedImageIO.read(in, info.isJpeg());
+			}
+			else{
+				image = info.getImage(false);
+			}
+			if(mBaseFilter != null){
+				image = mBaseFilter.filter(image, info.getFilterParam());
+			}
+			
+			try {
+				if(in != null){
+					in.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		String filename = getUniqueFileName(mOutputFolder);
+		
+		if(filename == null){
+			return false;
+		}
+		
+		File file = new File(filename);
+		try {
+			FileOutputStream outStream = new FileOutputStream(file);
+			
+			BufferedImageIO.write(image, "jpeg", Constant.jpegQuality, outStream);
+			
+			outStream.flush();
+			outStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private String getUniqueFileName(File outputFolder){
+		try {
+			File tmpFile = File.createTempFile("image", ".jpg", outputFolder);
+			return tmpFile.getAbsolutePath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	@Override
 	public void close() {
 		if(mIsCancel){

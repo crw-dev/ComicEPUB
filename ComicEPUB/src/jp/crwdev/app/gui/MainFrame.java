@@ -21,10 +21,12 @@ import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.container.ImageFileInfoList;
 import jp.crwdev.app.container.ImageFilePreconverter;
 import jp.crwdev.app.container.ImageFileScanner;
+import jp.crwdev.app.container.folder.FolderImageFileWriter;
 import jp.crwdev.app.container.pdf.GhostscriptUtil;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
+import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
 import jp.crwdev.app.interfaces.IImageFileWriter;
@@ -491,6 +493,111 @@ public class MainFrame extends JFrame implements OnEventListener {
 		}.start();
 	}
 	
+	private void beginConvertOne(int index, String outputFolder){
+		
+		final int f_index = index;
+		final String f_outputFolder = outputFolder;
+		
+		new Thread(){
+			@Override
+			public void run(){
+				try {
+					//　ファイルリストを取得
+					IImageFileInfoList list = mTable.getImageFileInfoList();
+					if(list == null || list.size() == 0){
+						return;
+					}
+					
+					if(f_index < 0 || list.size() <= f_index){
+						return;
+					}
+					
+					IImageFileInfo info = list.get(f_index);
+					
+					mEventObserver.startProgress();
+
+					// 基本変換パラメータ取得
+					ImageFilterParamSet params = mSettingPanel.getImageFilterParamSet();
+					
+					// 出力設定を取得
+					OutputSettingParam outSetting = mSettingPanel.getOutputSettingParam();
+					
+					params.setPreview(false);
+					
+					// 出力サイズを設定
+					Dimension size = outSetting.getImageSize();
+					if(size == null || (size.width == 0 || size.height == 0)){
+						params.setResize(false);
+					}else{
+						params.setResize(true);
+						params.setResizeDimension(size);
+					}
+					
+					if(outSetting.isFixedSize()){
+						// 固定出力サイズチェック
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "画像サイズチェック中...");
+						OutputImageFilter preconvertFilter = new OutputImageFilter(params, false);
+						ImageFilePreconverter checker = new ImageFilePreconverter(preconvertFilter);
+						checker.write(list, null);
+						Dimension unionSize = checker.getUnionSize();
+						params.setFixedSize(unionSize);
+					}
+					
+					// 基本出力フィルタを生成
+					OutputImageFilter imageFilter = new OutputImageFilter(params, outSetting.isFixedSize());
+					
+					// 出力設定からImageFileWriterを生成
+					FolderImageFileWriter writer = new FolderImageFileWriter();
+					writer.setImageFilter(imageFilter);
+					
+					// 出力ファイル(フォルダ)パスを作成
+					File dir = new File(f_outputFolder);
+					if(!dir.exists()){
+						if(!dir.mkdirs()){
+							throw new Exception("can't create output folder.");
+						}
+					}
+					
+					// 出力フォルダオープン
+					if(writer.open(dir.getAbsolutePath())){
+						synchronized(mLock){
+							mFileWriter = writer; // ここからCancel可能
+						}
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "start");
+						// 出力処理開始
+						boolean result = writer.write(info);
+						// 出力終了
+						synchronized(mLock){
+							mFileWriter = null;
+						}
+						writer.close();
+						
+						if(result){
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "finish.");
+						}else{
+							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "convert failed.");
+						}
+					}
+					else{
+						throw new Exception("can't open output file.");
+					}
+					
+				} catch(Exception e) {
+					
+					e.printStackTrace();
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, "" + e.getMessage());
+					
+				} finally {
+					synchronized(mLock){
+						mFileWriter = null;
+					}
+					mEventObserver.stopProgress();
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FinishConvert, 0);
+				}
+			}
+		}.start();
+	}
+	
 	private void saveSettingFileRequest(){
 		 if(mSettingFilePath != null){
 			 if(mIsSettingChanged){
@@ -539,6 +646,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 			break;
 		case EventObserver.EventType_BeginConvert:
 			beginConvert();
+			break;
+		case EventObserver.EventType_BeginConvertOne:
+			beginConvertOne(arg1, (String)obj);
 			break;
 		case EventObserver.EventType_CancelConvert:
 			synchronized(mLock){
