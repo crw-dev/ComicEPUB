@@ -12,10 +12,10 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class PreviewSettingPanel extends JPanel {
 
-	private JCheckBox checkPreview = new JCheckBox("編集モード");
+	private JCheckBox checkPreview;
 	private JCheckBox checkSimpleZoom;
-	private JCheckBox checkResize = new JCheckBox("リサイズ");
-	private JCheckBox checkOutputResize = new JCheckBox("出力サイズ");
+	private JCheckBox checkResize;
+	private JCheckBox checkOutputResize;
 	private JButton fullscreenButton = null;
 
 	private SettingPanel mParent = null;
@@ -46,7 +46,7 @@ public class PreviewSettingPanel extends JPanel {
 		checkOutputResize.setSelected(false);
 		
 		checkPreview.setToolTipText("編集モードをOFFにすると出力結果のプレビューが表示されます。");
-		checkSimpleZoom.setToolTipText("ズーム用の画像を作成しません。");
+		checkSimpleZoom.setToolTipText("画像サイズがウインドウサイズより小さい場合拡大表示します。(編集モードOFF時)");
 		checkResize.setToolTipText("ウインドウサイズに合わせて画像サイズを変更します。");
 		checkOutputResize.setToolTipText("出力サイズで画像を表示します。(※リサイズより優先)");
 		

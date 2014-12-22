@@ -35,11 +35,11 @@ import jp.crwdev.app.container.ImageFileInfoSplitWrapper;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
+import jp.crwdev.app.imagefilter.ResizeFilter;
 import jp.crwdev.app.imagefilter.SplitFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageCache;
-import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.ImageCache.ImageData;
 
 @SuppressWarnings("serial")
@@ -53,6 +53,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private PreviewImageFilter mPreviewZoomFilter = new PreviewImageFilter();
 	private BufferedImage mPreviewZoomImage = null;
 	private Object mLockZoomImage = new Object();
+	
+	private boolean mFitZoom = false;
 	
 	private int mPreviewMargin = 20;
 	
@@ -165,7 +167,39 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			else{
 				
-				if(!mIsPreviewMode && mIsZoomDrag){
+				if(!mIsPreviewMode && !mIsZoomDrag){
+					if(mFitZoom){
+						int width = w - mPreviewMargin;
+						int height = h - mPreviewMargin;
+						int ow = mDisplayImage.getWidth();
+						int oh = mDisplayImage.getHeight();
+						if(width > ow && height > oh){
+							int scale = 1;
+							do{
+								scale *= 2;
+							}while(!(ow * scale >= width && oh * scale >= height));
+							
+							Dimension size = ResizeFilter.getResizeDimension(ow*scale, oh*scale, width, height);
+							int zw = size.width;
+							int zh = size.height;
+							int zx = width / 2 - zw / 2 + mPreviewMargin / 2;
+							int zy = height / 2 - zh / 2 + mPreviewMargin / 2;
+							Graphics2D g2 = (Graphics2D)g;
+							g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+							g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, ow, oh, null);
+							
+							mImageArea.setBounds(zx, zy, zx+zw, zy+zh);
+						}
+						else{
+							g.drawImage(mDisplayImage, x, y, this);
+						}
+					}
+					else{
+						g.drawImage(mDisplayImage, x, y, this);
+					}
+					
+				}
+				else if(!mIsPreviewMode && mIsZoomDrag){
 					if(mCreateZoomImage){
 						createZoomImage();
 					}
@@ -213,7 +247,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 //						}
 						
 						if(mPreviewZoomImage != null){
-						if(zw != pw || zh != ph){
+							if(zw != pw || zh != ph){
 								Graphics2D g2 = (Graphics2D)g;
 								g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 							}
@@ -1167,7 +1201,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	public void setSimpleZoom(boolean simpleZoom){
-		mCreateZoomImage = !simpleZoom;
+		//mCreateZoomImage = !simpleZoom;
+		mFitZoom = simpleZoom;
 		if(mCreateZoomImage){
 			mPreviewZoomImage = null;
 		}

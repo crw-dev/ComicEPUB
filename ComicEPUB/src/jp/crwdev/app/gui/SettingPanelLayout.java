@@ -58,7 +58,7 @@ public class SettingPanelLayout extends JPanel {
 		springLayout.putConstraint(SpringLayout.WEST, checkPreview, 3, SpringLayout.WEST, this);
 		add(checkPreview);
 		
-		checkSimpleZoom = new JCheckBox("簡易ズーム");
+		checkSimpleZoom = new JCheckBox("拡大プレビュー");
 		springLayout.putConstraint(SpringLayout.NORTH, checkSimpleZoom, 3, SpringLayout.NORTH, checkPreview);
 		springLayout.putConstraint(SpringLayout.WEST, checkSimpleZoom, 3, SpringLayout.EAST, checkPreview);
 		add(checkSimpleZoom);
