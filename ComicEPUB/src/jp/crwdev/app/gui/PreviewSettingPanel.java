@@ -40,13 +40,13 @@ public class PreviewSettingPanel extends JPanel {
 	
 	private void initialize(){
 	
-		checkPreview.setSelected(true);
+		checkPreview.setSelected(false);
 		checkSimpleZoom.setSelected(false);
 		checkResize.setSelected(true);
 		checkOutputResize.setSelected(false);
 		
-		checkPreview.setToolTipText("編集モードをOFFにすると出力結果のプレビューが表示されます。");
-		checkSimpleZoom.setToolTipText("画像サイズがウインドウサイズより小さい場合拡大表示します。(編集モードOFF時)");
+		checkPreview.setToolTipText("プレビューモードをONにすると出力結果のプレビューが表示されます。");
+		checkSimpleZoom.setToolTipText("画像サイズがウインドウサイズより小さい場合拡大表示します。(プレビューモードON時)");
 		checkResize.setToolTipText("ウインドウサイズに合わせて画像サイズを変更します。");
 		checkOutputResize.setToolTipText("出力サイズで画像を表示します。(※リサイズより優先)");
 		

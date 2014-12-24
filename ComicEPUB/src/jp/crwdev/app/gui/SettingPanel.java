@@ -17,8 +17,6 @@ import jp.crwdev.app.setting.ImageFilterParamSet;
 @SuppressWarnings("serial")
 public class SettingPanel extends SettingPanelLayout implements OnEventListener, MouseListener {
 
-	//private SettingComponent mComponent = new SettingComponent(this);
-	
 	private PreviewSettingPanel mPreviewSetting = new PreviewSettingPanel();
 	private JTabbedPane mSettingTab;
 	private SettingTabPanel[] mSettingTabPanels = new SettingTabPanel[4];
@@ -82,7 +80,12 @@ public class SettingPanel extends SettingPanelLayout implements OnEventListener,
 		for(int i=0; i<4; i++){
 			params.set(i, mSettingTabPanels[i].getImageFilterParam());
 		}
-		params.setPreview(preview);
+		
+		//XXX ※注意！！
+		// SettingパネルのPreviewは編集操作後の画面イメージの事だが
+		// FilterのPreviewは編集中の状態を表示した画像イメージの事なので扱いが逆。なのでここで反転する
+		params.setPreview(!preview);
+		
 		params.setResize(resize);
 		params.setSimpleZoom(simpleZoom);
 		

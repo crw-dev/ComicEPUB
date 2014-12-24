@@ -211,6 +211,10 @@ public class ImageFilterParam implements Cloneable {
 		return mIsEnable;
 	}
 	
+	/**
+	 * 編集操作(Crop枠など)のプレビュー状態を返す。(設定パネルのプレビューモードとは逆の値)
+	 * @return
+	 */
 	public boolean isPreview() {
 		return mIsPreview;
 	}

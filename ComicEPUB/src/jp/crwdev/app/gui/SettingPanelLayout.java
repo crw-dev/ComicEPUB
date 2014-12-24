@@ -53,7 +53,7 @@ public class SettingPanelLayout extends JPanel {
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		
-		checkPreview = new JCheckBox("編集モード");
+		checkPreview = new JCheckBox("プレビューモード");
 		springLayout.putConstraint(SpringLayout.NORTH, checkPreview, 3, SpringLayout.NORTH, this);
 		springLayout.putConstraint(SpringLayout.WEST, checkPreview, 3, SpringLayout.WEST, this);
 		add(checkPreview);

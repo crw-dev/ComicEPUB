@@ -75,7 +75,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	
 	private LineHandleSet guideLineHandle = new LineHandleSet();
 	
-	private boolean mIsPreviewMode = false;
+	private boolean mIsEditMode = false;
 	private boolean mIsZoomDrag = false;
 	private Point mZoomPoint = new Point();
 	private Rectangle mImageArea = new Rectangle();
@@ -141,7 +141,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		if(mCreateZoomImage){
 			mPreviewZoomFilter.setImageFilterParam(params);
 		}
-		mIsPreviewMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
+		mIsEditMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
 		//updateDisplayImage();
 	}
 	
@@ -167,7 +167,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			}
 			else{
 				
-				if(!mIsPreviewMode && !mIsZoomDrag){
+				if(!mIsEditMode && !mIsZoomDrag){
 					if(mFitZoom){
 						int width = w - mPreviewMargin;
 						int height = h - mPreviewMargin;
@@ -199,7 +199,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					}
 					
 				}
-				else if(!mIsPreviewMode && mIsZoomDrag){
+				else if(!mIsEditMode && mIsZoomDrag){
 					if(mCreateZoomImage){
 						createZoomImage();
 					}
@@ -285,7 +285,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					System.out.println("rad=" + angle);
 				}
 	
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					//guideLineHandle.setScale((float)mImageFilter.getResizedScaleW(), (float)mImageFilter.getResizedScaleH());
 					guideLineHandle.paint(g, w, h, imageW, imageH);
 				}
@@ -411,7 +411,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					mDisplayImage = data.getDisplayImage(mImageFilter, true);
 					mPreviewZoomImage = null;
 					
-					if(mCreateZoomImage && !mIsPreviewMode){
+					if(mCreateZoomImage && !mIsEditMode){
 						new Thread(){
 							@Override
 							public void run(){
@@ -427,7 +427,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					}
 					mPreviewZoomImage = null;
 					
-					if(mCreateZoomImage && !mIsPreviewMode){
+					if(mCreateZoomImage && !mIsEditMode){
 						
 						new Thread(){
 							@Override
@@ -560,7 +560,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				return;
 			}
 			if(mImageArea.contains(x, y)){
-				if(!mIsPreviewMode){
+				if(!mIsEditMode){
 					if(e.getClickCount() >= 2){
 						mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginFullscreen, 0);
 					}
@@ -581,7 +581,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			splitLineHandle.mouseEntered(e);
 		}
 		else{
-			if(mIsPreviewMode){
+			if(mIsEditMode){
 				guideLineHandle.mouseEntered(e);
 			}
 		}
@@ -593,7 +593,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			splitLineHandle.mouseExited(e);
 		}
 		else{
-			if(mIsPreviewMode){
+			if(mIsEditMode){
 				guideLineHandle.mouseExited(e);
 			}
 		}
@@ -610,7 +610,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int x = e.getX();
 			int y = e.getY();
 			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					guideLineHandle.mousePressed(e);
 					if(guideLineHandle.isDragHandle()){
 						return;
@@ -622,7 +622,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 			}
 			else{
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					guideLineHandle.mousePressed(e);
 					if(guideLineHandle.isDragHandle()){
 						
@@ -676,7 +676,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		else{
 			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					boolean handle = guideLineHandle.isDragHandle();
 					guideLineHandle.mouseReleased(e);
 					if(handle){
@@ -697,7 +697,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 			}
 			else {
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					boolean isDragged = guideLineHandle.isDragHandle();
 					if(!isDragged){
 						setCropRect();
@@ -825,7 +825,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int x = e.getX();
 			int y = e.getY();
 			if(javax.swing.SwingUtilities.isRightMouseButton(e)){
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					guideLineHandle.mouseDragged(e);
 					if(guideLineHandle.isDragHandle()){
 						repaint();
@@ -838,7 +838,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				}
 			}
 			else{
-				if(mIsPreviewMode){
+				if(mIsEditMode){
 					guideLineHandle.mouseDragged(e);
 					if(guideLineHandle.isDragHandle()){
 						
@@ -879,7 +879,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			splitLineHandle.mouseMoved(e);
 		}
 		else{
-			if(mIsPreviewMode){
+			if(mIsEditMode){
 				guideLineHandle.mouseMoved(e);
 			}
 		}
