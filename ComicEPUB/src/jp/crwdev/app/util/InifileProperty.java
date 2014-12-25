@@ -28,6 +28,7 @@ public class InifileProperty {
 	private static final String PROP_INSERT_BLANKPAGE = "insertBlankPage";
 	private static final String PROP_ENABLE_FULLSCREEN = "enableFullScreen";
 	private static final String PROP_ENABLE_IMAGECACHE = "enableImageCache";
+	private static final String PROP_ENABLE_FOLDERLIST = "enableFolderList";
 	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
 	private static final String PROP_DEBUGWINDOW = "debugWindow";
 	
@@ -187,6 +188,22 @@ public class InifileProperty {
 			mIsModified = true;
 		}
 		
+		
+		exist = false;
+		String enableFolderList = mProp.getProperty(PROP_ENABLE_FOLDERLIST);
+		if(enableFolderList == null || enableFolderList.isEmpty()){
+		}else{
+			if(!enableFolderList.equalsIgnoreCase("false") && !enableFolderList.equalsIgnoreCase("true")){
+				
+			}else{
+				exist = true;
+			}
+		}
+		if(!exist){
+			mProp.setProperty(PROP_ENABLE_FOLDERLIST, "false");
+			mIsModified = true;
+		}
+
 	}
 	
 	public String getOutputFolder(){
@@ -277,6 +294,15 @@ public class InifileProperty {
 		}
 	}
 	
+	public boolean isEnableFolderList(){
+		String value = mProp.getProperty(PROP_ENABLE_FOLDERLIST, "false");
+		if(value.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			return true;
+		}
+	}
+
 	public String getGhostScriptPath(){
 		return mProp.getProperty(PROP_GHOSTSCRIPT);
 	}

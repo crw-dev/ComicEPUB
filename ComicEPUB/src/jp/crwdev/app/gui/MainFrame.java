@@ -1,6 +1,7 @@
 ﻿package jp.crwdev.app.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.dnd.DropTarget;
@@ -133,22 +134,40 @@ public class MainFrame extends JFrame implements OnEventListener {
 		
 		Container p = getContentPane();
 		
+		//enableFolderList==true時に有効
+		final FileListTable filelistTable = new FileListTable();
+		
+		Component tableComponent = scrollTable;
+		
+		if(InifileProperty.getInstance().isEnableFolderList()){
+			
+			JScrollPane scrollTable2 = new JScrollPane(filelistTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			scrollTable2.setPreferredSize(new Dimension(200, 200));
+			JSplitPane spl_scrollTable = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollTable, scrollTable2);
+			spl_scrollTable.setDividerSize(5);
+			spl_scrollTable.setDividerLocation(600);
+			
+			tableComponent = spl_scrollTable;
+		}
+		
 		layout.putConstraint(SpringLayout.NORTH, scrollTable, 3, SpringLayout.NORTH, p);
 		layout.putConstraint(SpringLayout.SOUTH, scrollTable, 3, SpringLayout.SOUTH, p);
 		layout.putConstraint(SpringLayout.WEST, scrollTable, 3, SpringLayout.WEST, p);
 		
 		layout.putConstraint(SpringLayout.NORTH, imagePanel, 3, SpringLayout.NORTH, p);
 		layout.putConstraint(SpringLayout.SOUTH, imagePanel, 3, SpringLayout.SOUTH, p);
-		layout.putConstraint(SpringLayout.WEST, imagePanel, 3, SpringLayout.EAST, scrollTable);
+		layout.putConstraint(SpringLayout.WEST, imagePanel, 3, SpringLayout.EAST, tableComponent);
 		layout.putConstraint(SpringLayout.EAST, imagePanel, -5, SpringLayout.WEST, settingPanel);
 		
 		layout.putConstraint(SpringLayout.NORTH, settingPanel, 3, SpringLayout.NORTH, p);
 		layout.putConstraint(SpringLayout.SOUTH, settingPanel, -3, SpringLayout.SOUTH, p);
 		layout.putConstraint(SpringLayout.EAST, settingPanel, -5, SpringLayout.EAST, p);
 		
+		
 		table.setEventObserver(mEventObserver);
 		imagePanel.setEventObserver(mEventObserver);
 		settingPanel.setEventObserver(mEventObserver);
+		filelistTable.setEventObserver(mEventObserver);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Table, table);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Panel, imagePanel);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Setting, settingPanel);
@@ -156,7 +175,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 		mEventObserver.setEventListener(EventObserver.EventTarget_Thumbnail, mThumbnailView);
 		
 		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, imagePanel);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableComponent, imagePanel);
 		splitPane.setDividerSize(5);
 		add(splitPane);
 		
@@ -182,79 +201,88 @@ public class MainFrame extends JFrame implements OnEventListener {
 		new DropTarget(this, new FileDropTargetAdapter(new OnDropListener(){
 			@Override
 			public void onDrop(String filepath) {
-				final String filePath = filepath;
-				new Thread(){
-					public void run(){
-						
-						mEventObserver.startProgress();
-						try {
-							if(mCurrentFile != null){
-								mCurrentFile.close();
-								mCurrentFile = null;
-								if(mIsSettingChanged){
-									int ret = showSettingSaveConfirmDialog();
-									if(ret == JOptionPane.YES_OPTION){
-										saveSettingFile(mSettingFilePath);
-									}
-								}
-							}
-							
-							mIsSettingChanged = false;
-							
-							IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
-							mCurrentFile = scanner;
-							
-							IImageFileInfoList list = scanner.getImageFileInfoList();
-							
-							String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
-							mSettingFilePath = settingFilePath;
-							
-							OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
-							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
-							
-							
-							//ImageFilterParam param = null;
-							ImageFilterParamSet params = null;
-							
-							File settingFile = new File(settingFilePath);
-							if(settingFile.exists()){
-								
-								XmlWriter loader = new XmlWriter();
-								loader.openLoadSettingFile(mSettingFilePath);
-								//param = new ImageFilterParam();
-								params = new ImageFilterParamSet();
-								// listに変更を反映する
-								loader.loadSetting(outputParam, params, list);
-								
-							}
-							// 出力設定を設定画面に反映
-							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
-		
-							list.sort();
-							mTable.setImageFileInfoList(list);
-							//if(mThumbnailView != null){
-							//	mThumbnailView.setImageFileInfoList(list);
-							//}
-							
-							if(params != null){
-								// 全体設定を反映
-								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
-								
-								mIsSettingChanged = false;	// D&Dでの変更は未変更扱いとする
-								
-								updateBaseFilterParam(params);
-							}
-
-					
-						}catch(Exception e){
-							e.printStackTrace();
-						}
-
-						mEventObserver.stopProgress();
-						
-						mTable.selectItem(0);
-					}
-				}.start();
+				
+				openFile(filepath);
+				
+				if(InifileProperty.getInstance().isEnableFolderList()){
+					filelistTable.scanFolder(filepath);
+				}
+				
+//				final String filePath = filepath;
+//				
+//				
+//				new Thread(){
+//					public void run(){
+//						
+//						mEventObserver.startProgress();
+//						try {
+//							if(mCurrentFile != null){
+//								mCurrentFile.close();
+//								mCurrentFile = null;
+//								if(mIsSettingChanged){
+//									int ret = showSettingSaveConfirmDialog();
+//									if(ret == JOptionPane.YES_OPTION){
+//										saveSettingFile(mSettingFilePath);
+//									}
+//								}
+//							}
+//							
+//							mIsSettingChanged = false;
+//							
+//							IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
+//							mCurrentFile = scanner;
+//							
+//							IImageFileInfoList list = scanner.getImageFileInfoList();
+//							
+//							String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
+//							mSettingFilePath = settingFilePath;
+//							
+//							OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
+//							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
+//							
+//							
+//							//ImageFilterParam param = null;
+//							ImageFilterParamSet params = null;
+//							
+//							File settingFile = new File(settingFilePath);
+//							if(settingFile.exists()){
+//								
+//								XmlWriter loader = new XmlWriter();
+//								loader.openLoadSettingFile(mSettingFilePath);
+//								//param = new ImageFilterParam();
+//								params = new ImageFilterParamSet();
+//								// listに変更を反映する
+//								loader.loadSetting(outputParam, params, list);
+//								
+//							}
+//							// 出力設定を設定画面に反映
+//							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
+//		
+//							list.sort();
+//							mTable.setImageFileInfoList(list);
+//							//if(mThumbnailView != null){
+//							//	mThumbnailView.setImageFileInfoList(list);
+//							//}
+//							
+//							if(params != null){
+//								// 全体設定を反映
+//								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
+//								
+//								mIsSettingChanged = false;	// D&Dでの変更は未変更扱いとする
+//								
+//								updateBaseFilterParam(params);
+//							}
+//
+//					
+//						}catch(Exception e){
+//							e.printStackTrace();
+//						}
+//
+//						mEventObserver.stopProgress();
+//						
+//						mTable.selectItem(0);
+//					}
+//				}.start();
 			}
 	     }));
 	     
@@ -262,6 +290,89 @@ public class MainFrame extends JFrame implements OnEventListener {
 	     //device.setFullScreenWindow(this);
 	}
 	
+	
+	public void openFile(String filepath){
+		
+		if(mCurrentFile != null && mCurrentFile.getOpenFilePath().equals(filepath)){
+			return;	// ignore same file
+		}
+		
+		final String filePath = filepath;
+		
+		new Thread(){
+			public void run(){
+				
+				mEventObserver.startProgress();
+				try {
+					if(mCurrentFile != null){
+						mCurrentFile.close();
+						mCurrentFile = null;
+						if(mIsSettingChanged){
+							int ret = showSettingSaveConfirmDialog();
+							if(ret == JOptionPane.YES_OPTION){
+								saveSettingFile(mSettingFilePath);
+							}
+						}
+					}
+					
+					mIsSettingChanged = false;
+					
+					IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
+					mCurrentFile = scanner;
+					
+					IImageFileInfoList list = scanner.getImageFileInfoList();
+					
+					String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
+					mSettingFilePath = settingFilePath;
+					
+					OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
+					setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
+					
+					
+					//ImageFilterParam param = null;
+					ImageFilterParamSet params = null;
+					
+					File settingFile = new File(settingFilePath);
+					if(settingFile.exists()){
+						
+						XmlWriter loader = new XmlWriter();
+						loader.openLoadSettingFile(mSettingFilePath);
+						//param = new ImageFilterParam();
+						params = new ImageFilterParamSet();
+						// listに変更を反映する
+						loader.loadSetting(outputParam, params, list);
+						
+					}
+					// 出力設定を設定画面に反映
+					mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
+
+					list.sort();
+					mTable.setImageFileInfoList(list);
+					//if(mThumbnailView != null){
+					//	mThumbnailView.setImageFileInfoList(list);
+					//}
+					
+					if(params != null){
+						// 全体設定を反映
+						mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
+						
+						mIsSettingChanged = false;	// D&Dでの変更は未変更扱いとする
+						
+						updateBaseFilterParam(params);
+					}
+
+			
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+
+				mEventObserver.stopProgress();
+				
+				mTable.selectItem(0);
+			}
+		}.start();
+		
+	}
 	
 	/**
 	 * 入力ファイル名から出力ファイル名を自動設定　"[作者名]タイトル.zip"
@@ -665,6 +776,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 			break;
 		case EventObserver.EventType_EndFullscreen:
 			endFullscreen();
+			break;
+		case EventObserver.EventType_OpenFile:
+			openFile((String)obj);
 			break;
 		default:
 			break;

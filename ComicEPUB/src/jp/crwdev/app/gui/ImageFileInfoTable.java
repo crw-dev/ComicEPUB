@@ -585,7 +585,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					return;
 				}
 				int selected = getSelectedRow();
-				onItemSelected(selected);
+				if(selected >= 0){
+					onItemSelected(selected);
+				}
 			}
 		});
 			

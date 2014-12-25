@@ -17,6 +17,13 @@ public class Constant {
 		SUPPORT_INPUT_PREFIX.add("pdf");
 	}
 	
+	public static final List<String> SUPPORT_IMAGE_PREFIX = new ArrayList<String>();
+	static{
+		SUPPORT_IMAGE_PREFIX.add("jpg");
+		SUPPORT_IMAGE_PREFIX.add("png");
+		SUPPORT_IMAGE_PREFIX.add("bmp");
+	}
+	
 	public static float jpegQuality = 0.8f;
 
 	public static final int PAGETYPE_AUTO = 0;
@@ -79,6 +86,17 @@ public class Constant {
 		TABLE_HEADER_POSITION,
 		TABLE_HEADER_WIDTH,
 		TABLE_HEADER_HEIGHT,
+	};
+	
+	public static final String TABLE_HEADER_FILELIST_FILENAME = "ファイル/フォルダ名";
+	public static final String TABLE_HEADER_FILELIST_FILEPATH = "パス";
+	
+	public static final int TABLE_HEADER_FILELIST_COLUMN_FILENAME = 0;
+	public static final int TABLE_HEADER_FILELIST_COLUMN_FILEPATH = 1;
+	
+	public static final String[] TABLE_HEADER_FILELIST_COLUMNS = new String[]{
+		TABLE_HEADER_FILELIST_FILENAME,
+		TABLE_HEADER_FILELIST_FILEPATH,
 	};
 	
 	
