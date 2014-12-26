@@ -53,6 +53,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 	private FullscreenWindow mFullscreenWindow;
 	private SettingPanel mSettingPanel;
 	private ThumbnailView mThumbnailView;
+	private FileListTable mFileListTable;
 	
 	//private ImageFilterParam mBaseFilterParam = new ImageFilterParam();	// global setting
 	private ImageFilterParamSet mBaseFilterParams = new ImageFilterParamSet();
@@ -87,6 +88,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 				}
 				InifileProperty.getInstance().save();
 				GhostscriptUtil.getInstance().close();
+				if(mFileListTable != null){
+					mFileListTable.saveList();
+				}
 			}
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -136,6 +140,8 @@ public class MainFrame extends JFrame implements OnEventListener {
 		
 		//enableFolderList==true時に有効
 		final FileListTable filelistTable = new FileListTable();
+		mFileListTable = filelistTable;
+		mFileListTable.loadList();
 		
 		Component tableComponent = scrollTable;
 		

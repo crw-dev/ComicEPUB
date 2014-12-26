@@ -88,13 +88,16 @@ public class Constant {
 		TABLE_HEADER_HEIGHT,
 	};
 	
+	public static final String TABLE_HEADER_FILELIST_LOCK = "保存";
 	public static final String TABLE_HEADER_FILELIST_FILENAME = "ファイル/フォルダ名";
 	public static final String TABLE_HEADER_FILELIST_FILEPATH = "パス";
 	
-	public static final int TABLE_HEADER_FILELIST_COLUMN_FILENAME = 0;
-	public static final int TABLE_HEADER_FILELIST_COLUMN_FILEPATH = 1;
+	public static final int TABLE_HEADER_FILELIST_COLUMN_LOCK = 0;
+	public static final int TABLE_HEADER_FILELIST_COLUMN_FILENAME = 1;
+	public static final int TABLE_HEADER_FILELIST_COLUMN_FILEPATH = 2;
 	
 	public static final String[] TABLE_HEADER_FILELIST_COLUMNS = new String[]{
+		TABLE_HEADER_FILELIST_LOCK,
 		TABLE_HEADER_FILELIST_FILENAME,
 		TABLE_HEADER_FILELIST_FILEPATH,
 	};

@@ -2,6 +2,7 @@ package jp.crwdev.app.gui;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -12,6 +13,8 @@ import javax.swing.table.TableColumn;
 
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.constant.Constant;
+import jp.crwdev.app.setting.FileListItem;
+import jp.crwdev.app.util.SerializeArrayUtil;
 
 @SuppressWarnings("serial")
 public class FileListTable extends JTable {
@@ -27,6 +30,7 @@ public class FileListTable extends JTable {
 
 	public FileListTable(){
 		initialize();
+		
 	}
 	
 	
@@ -35,7 +39,13 @@ public class FileListTable extends JTable {
 		mTableModel = new DefaultTableModel(Constant.TABLE_HEADER_FILELIST_COLUMNS, 0){
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false;	// 編集禁止
+				return (column == 0);	// 編集禁止
+			}
+			
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
+			public Class getColumnClass(int col){
+				return getValueAt(0, col).getClass();
 			}
 		};
 		
@@ -46,7 +56,12 @@ public class FileListTable extends JTable {
 
 		for(int i=0; i<Constant.TABLE_HEADER_FILELIST_COLUMNS.length; i++){
 			TableColumn col = getColumnModel().getColumn( i );
-			col.setMinWidth(200);
+			if(i == 0){
+				col.setMinWidth(20);
+				col.setMaxWidth(40);
+			}else{
+				col.setMinWidth(200);
+			}
 		}
 
 		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -71,9 +86,43 @@ public class FileListTable extends JTable {
 		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_OpenFile, (Object)filepath);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void loadList(){
+		ArrayList<FileListItem> list = SerializeArrayUtil.load("filelist.dat");
+		if(list != null){
+			for(FileListItem item : list){
+				addData(true, item.getName(), item.getPath());
+			}
+		}
+	}
+	
+	public void saveList(){
+		ArrayList<FileListItem> list = getLockedFileItem();
+		SerializeArrayUtil.save("filelist.dat", list);
+	}
 	
 	public void clearData(){
+		
+		ArrayList<FileListItem> items = getLockedFileItem();
+		
 		mTableModel.setRowCount(0);
+		
+		for(FileListItem item : items){
+			addData(true, item.getName(), item.getPath());
+		}
+	}
+	
+	private ArrayList<FileListItem> getLockedFileItem(){
+		ArrayList<FileListItem> items = new ArrayList<FileListItem>();
+		for(int i=0; i<mTableModel.getRowCount(); i++){
+			Boolean lock = (Boolean)mTableModel.getValueAt(i, Constant.TABLE_HEADER_FILELIST_COLUMN_LOCK);
+			if(lock){
+				String name = (String)mTableModel.getValueAt(i, Constant.TABLE_HEADER_FILELIST_COLUMN_FILENAME);
+				String path = (String)mTableModel.getValueAt(i, Constant.TABLE_HEADER_FILELIST_COLUMN_FILEPATH);
+				items.add(new FileListItem(name, path));
+			}
+		}
+		return items;
 	}
 	
 	private Thread mThread = null;
@@ -124,7 +173,7 @@ public class FileListTable extends JTable {
 							
 						});
 						if(result != null && result.length > 0){
-							addData(file.getAbsolutePath());
+							addData(false, file.getAbsolutePath());
 						}
 					}
 					else if(file.isFile()){
@@ -132,7 +181,7 @@ public class FileListTable extends JTable {
 						if(name.length() >= 3){
 							String suffix = name.substring(name.length()-3);
 							if(Constant.SUPPORT_INPUT_PREFIX.contains(suffix)){
-								addData(file.getAbsolutePath());
+								addData(false, file.getAbsolutePath());
 							}
 						}
 					}
@@ -142,31 +191,33 @@ public class FileListTable extends JTable {
 		mThread.start();
 	}
 	
-	public void addData(String filepath){
+	public void addData(boolean lock, String filepath){
 		File file = new File(filepath);
 		if(file.exists()){
-			addData(file.getName(), file.getAbsolutePath());
+			addData(lock, file.getName(), file.getAbsolutePath());
 		}
 	}
 	
-	public void addData(String filename, String path){
+	public void addData(boolean lock, String filename, String path){
 		int updateRow = -1;
+		Boolean lockValue = new Boolean(lock);
 		for(int row = 0; row < mTableModel.getRowCount(); row++){
 			if(path.equals(mTableModel.getValueAt(row, Constant.TABLE_HEADER_FILELIST_COLUMN_FILEPATH))){
 				updateRow = row;
+				lockValue = (Boolean)mTableModel.getValueAt(row, Constant.TABLE_HEADER_FILELIST_COLUMN_LOCK);
 				break;
 			}
 		}
-		Object[] record = new Object[]{ filename, path };
+		Object[] record = new Object[]{ lockValue, filename, path };
 		if(updateRow >= 0){
-			updateData(updateRow, filename, path);
+			updateData(updateRow, lockValue, filename, path);
 		}else{
 			mTableModel.addRow(record);
 		}
 	}
 	
-	public void updateData(int row, String filename, String path){
-		Object[] record = new Object[]{ filename, path };
+	public void updateData(int row, boolean lock, String filename, String path){
+		Object[] record = new Object[]{ new Boolean(lock), filename, path };
 		for(int col=0; col<record.length; col++){
 			mTableModel.setValueAt(record[col], row, col);
 		}
