@@ -11,7 +11,7 @@ public class ImageFilterParam implements Cloneable {
 	public ImageFilterParam(ImageFilterParam base){
 		copyParams(base, this);
 	}
-	
+
 
 	public ImageFilterParam(){
 		mIsEnable = false;
@@ -67,11 +67,11 @@ public class ImageFilterParam implements Cloneable {
 		mTextPageAutoCropThreshold = 0;
 		mPictPageAutoCropThreshold = 0;
 		mFullPageAutoCropThreshold = 0;
-		
+
 		mPageType = Constant.PAGETYPE_AUTO;
 		mConvertPageType = Constant.PAGETYPE_AUTO;
 	}
-	
+
 	@Override
 	public ImageFilterParam clone(){
 		ImageFilterParam p;
@@ -83,8 +83,8 @@ public class ImageFilterParam implements Cloneable {
 		copyParams(this, p);
 	    return p;
 	}
-	
-	
+
+
 
 	private void copyParams(ImageFilterParam src, ImageFilterParam dest){
 		dest.mIsEnable = src.isEnable();
@@ -141,7 +141,7 @@ public class ImageFilterParam implements Cloneable {
 		dest.mSplitIndex = src.getSplitIndex();
 		dest.mPageSpread = src.getPageSpread();
 	}
-	
+
 	protected boolean mIsEnable;
 	protected boolean mIsPreview;
 	protected boolean mIsDrawCropAreaInPreview;
@@ -197,20 +197,20 @@ public class ImageFilterParam implements Cloneable {
 	protected float[] mSplitOffsetV;
 	protected float[] mSplitOffsetH;
 	protected String mPageSpread;
-	
+
 	protected boolean mIsUnificationTextPage = false;
 	//protected static Dimension mUnificationTextPageSize = new Dimension(0, 0);
-	
+
 	// Dynamic
 	protected int mPageType;
 	protected int mConvertPageType;
-	
-	
+
+
 
 	public boolean isEnable() {
 		return mIsEnable;
 	}
-	
+
 	/**
 	 * 編集操作(Crop枠など)のプレビュー状態を返す。(設定パネルのプレビューモードとは逆の値)
 	 * @return
@@ -226,15 +226,15 @@ public class ImageFilterParam implements Cloneable {
 	public boolean isColorPageAutoCrop() {
 		return mIsColorPageAutoCrop;
 	}
-	
+
 	public boolean isPictPageAutoCrop() {
 		return mIsPictPageAutoCrop;
 	}
-	
+
 	public boolean isTextPageAutoCrop() {
 		return mIsTextPageAutoCrop;
 	}
-	
+
 	public boolean isFullPageAutoCrop() {
 		return mIsFullPageAutoCrop;
 	}
@@ -242,15 +242,15 @@ public class ImageFilterParam implements Cloneable {
 	public int getColorPageAutoCropThreshold() {
 		return mColorPageAutoCropThreshold;
 	}
-	
+
 	public int getPictPageAutoCropThreshold() {
 		return mPictPageAutoCropThreshold;
 	}
-	
+
 	public int getTextPageAutoCropThreshold() {
 		return mTextPageAutoCropThreshold;
 	}
-	
+
 	public int getFullPageAutoCropThreshold() {
 		return mFullPageAutoCropThreshold;
 	}
@@ -322,11 +322,11 @@ public class ImageFilterParam implements Cloneable {
 	public Dimension getResizeDimension() {
 		return mResizeDimension;
 	}
-	
+
 	public Dimension getFixedSize() {
 		return mFixedSize;
 	}
-	
+
 	public boolean isGrayscale() {
 		return mIsGrayscale;
 	}
@@ -338,11 +338,11 @@ public class ImageFilterParam implements Cloneable {
 	public double getGamma() {
 		return mGamma;
 	}
-	
+
 	public boolean isBlur() {
 		return mIsBlur;
 	}
-	
+
 	public float getBlurPixels() {
 		return mBlurPixels;
 	}
@@ -350,7 +350,7 @@ public class ImageFilterParam implements Cloneable {
 	public boolean isSharpness() {
 		return mIsSharpness;
 	}
-	
+
 	public float getSharpnessPixels() {
 		return mSharpnessPixels;
 	}
@@ -358,11 +358,11 @@ public class ImageFilterParam implements Cloneable {
 	public boolean isContrast() {
 		return mIsContrast;
 	}
-	
+
 	public float getContrast() {
 		return mContrast;
 	}
-	
+
 	public float getBrightness() {
 		return mBrightness;
 	}
@@ -398,15 +398,15 @@ public class ImageFilterParam implements Cloneable {
 	public double getRotateAngle() {
 		return mRotateAngle;
 	}
-	
+
 	public boolean isTranslate() {
 		return mIsTranslate;
 	}
-	
+
 	public int getTranslateX() {
 		return mTranslateX;
 	}
-	
+
 	public int getTranslateY() {
 		return mTranslateY;
 	}
@@ -414,26 +414,26 @@ public class ImageFilterParam implements Cloneable {
 	public int getSplitType() {
 		return mSplitType;
 	}
-	
+
 	public int getSplitIndex() {
 		return mSplitIndex;
 	}
-	
+
 	public String getPageSpread(){
 		return mPageSpread;
 	}
-	
+
 	public boolean isUnificationTextPage() {
 		return mIsUnificationTextPage;
 	}
-	
+
 	//public static Dimension getUnificationTextPageSize() {
 	//	return mUnificationTextPageSize;
 	//}
 
-	
+
 	// Dynamic
-	
+
 	public int getPageType() {
 		return mPageType;
 	}
@@ -441,11 +441,11 @@ public class ImageFilterParam implements Cloneable {
 	public void setPageType(int pageType) {
 		mPageType = pageType;
 	}
-	
+
 	public void setRotate(boolean enable){
 		mIsRotate = enable;
 	}
-	
+
 	public void setRotateAngle(double angle){
 		mRotateAngle = angle;
 	}
@@ -469,11 +469,11 @@ public class ImageFilterParam implements Cloneable {
 	public void setContrast(float scale) {
 		mContrast = scale;
 	}
-	
+
 	public void setBlur(boolean enable) {
 		mIsBlur = enable;
 	}
-	
+
 	public void setBlurPixels(float pixels){
 		mBlurPixels = pixels;
 	}
@@ -481,7 +481,7 @@ public class ImageFilterParam implements Cloneable {
 	public void setSharpness(boolean enable) {
 		mIsSharpness = enable;
 	}
-	
+
 	public void setSharpnessPixels(float pixels){
 		mSharpnessPixels = pixels;
 	}
@@ -497,19 +497,19 @@ public class ImageFilterParam implements Cloneable {
 	public void setEqualize(boolean enable) {
 		mIsEqualize = enable;
 	}
-	
+
 	public void setColorPageAutoCrop(boolean enable) {
 		mIsColorPageAutoCrop = enable;
 	}
-	
+
 	public void setPictPageAutoCrop(boolean enable) {
 		mIsPictPageAutoCrop = enable;
 	}
-	
+
 	public void setTextPageAutoCrop(boolean enable) {
 		mIsTextPageAutoCrop = enable;
 	}
-	
+
 	public void setFullPageAutoCrop(boolean enable) {
 		mIsFullPageAutoCrop = enable;
 	}
@@ -517,15 +517,15 @@ public class ImageFilterParam implements Cloneable {
 	public void setColorPageAutoCropThreshold(int cropThreshold) {
 		mColorPageAutoCropThreshold = cropThreshold;
 	}
-	
+
 	public void setPictPageAutoCropThreshold(int cropThreshold) {
 		mPictPageAutoCropThreshold = cropThreshold;
 	}
-	
+
 	public void setTextPageAutoCropThreshold(int cropThreshold) {
 		mTextPageAutoCropThreshold = cropThreshold;
 	}
-	
+
 	public void setFullPageAutoCropThreshold(int cropThreshold) {
 		mFullPageAutoCropThreshold = cropThreshold;
 	}
@@ -595,7 +595,7 @@ public class ImageFilterParam implements Cloneable {
 		mPictPageCropRight = right;
 		mPictPageCropBottom = bottom;
 	}
-	
+
 	public void setPreview(boolean enable) {
 		mIsPreview = enable;
 	}
@@ -619,7 +619,7 @@ public class ImageFilterParam implements Cloneable {
 	public void setSplitType(int splitType) {
 		setSplitType(splitType, null, null);
 	}
-	
+
 	public void setSplitType(int splitType, float[] v, float[] h){
 		mSplitType = splitType;
 		if(v != null){
@@ -629,15 +629,15 @@ public class ImageFilterParam implements Cloneable {
 			mSplitOffsetH = h;
 		}
 	}
-	
+
 	public void setSplitIndex(int index){
 		mSplitIndex = index;
 	}
-	
+
 	public float[] getSplitOffsetV(){
 		return mSplitOffsetV;
 	}
-	
+
 	public float[] getSplitOffsetH(){
 		return mSplitOffsetH;
 	}
@@ -667,7 +667,7 @@ public class ImageFilterParam implements Cloneable {
 		mTextPageCropTop = top;
 		mTextPageCropRight = right;
 		mTextPageCropBottom = bottom;
-	}	
+	}
 
 	public void setColorPageCrop(boolean enable) {
 		mIsColorPageCrop = enable;
@@ -694,7 +694,7 @@ public class ImageFilterParam implements Cloneable {
 		mColorPageCropTop = top;
 		mColorPageCropRight = right;
 		mColorPageCropBottom = bottom;
-	}	
+	}
 
 	public void setTranslate(boolean enable) {
 		mIsTranslate = enable;
@@ -707,19 +707,19 @@ public class ImageFilterParam implements Cloneable {
 	public void setTranslateY(int y) {
 		mTranslateY = y;
 	}
-	
+
 	public void setPageSpread(String spread){
 		mPageSpread = spread;
 	}
-	
+
 	public void setUnificationTextPage(boolean enable) {
 		mIsUnificationTextPage = enable;
 	}
-	
+
 	//public static void setUnificationTextPageSize(Dimension size) {
 	//	mUnificationTextPageSize.setSize(size);
 	//}
-	
+
 	//public static void setUnificationTextPageSize(int width, int height) {
 	//	mUnificationTextPageSize.setSize(width, height);
 	//}
@@ -732,14 +732,14 @@ public class ImageFilterParam implements Cloneable {
 	public ImageFilterParam createMergedFilterParam(ImageFilterParam update){
 		return createMergedFilterParam(this, update);
 	}
-	
+
 	public static ImageFilterParam createMergedFilterParam(ImageFilterParam base, ImageFilterParam update){
 		if(base == null || update == null){
 			return new ImageFilterParam(base);
 		}
-		
+
 		// 有効なパラメータのみ上書きする
-		
+
 		ImageFilterParam dest = new ImageFilterParam(base);
 		if(update.isEnable()){
 			dest.mIsEnable = true;
@@ -763,7 +763,7 @@ public class ImageFilterParam implements Cloneable {
 		if(update.isFullPageAutoCrop()){
 			dest.mIsFullPageAutoCrop = true;
 		}
-		
+
 		if(update.isColorPageCrop()){
 			dest.mIsColorPageCrop = true;
 		}
@@ -849,11 +849,11 @@ public class ImageFilterParam implements Cloneable {
 		if(update.isUnificationTextPage()){
 			dest.mIsUnificationTextPage = true;
 		}
-		
+
 		dest.mPageType = update.getPageType();
-		
+
 		dest.mPageSpread = update.getPageSpread();
-		
+
 		return dest;
 	}
 }

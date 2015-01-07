@@ -52,14 +52,14 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 	private DefaultTableModel mTableModel = null;
 	private ImagePanel mImagePanel = null;
 	private FullscreenWindow mFullscreenWindow = null;
-	
+
 	private IImageFileInfoList mInfoList = null;
 	private ImageFilterParamSet mBaseFilterParams = null;
-	
+
 	public ImageFileInfoTable(){
 		initialize();
 	}
-	
+
 	private void initialize(){
 		mTableModel = new DefaultTableModel(Constant.TABLE_HEADER_COLUMNS, 0){
 			@Override
@@ -67,16 +67,16 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				return (column != 0);	// 0カラム目の編集禁止
 			}
 		};
-		
+
 		//this.setTransferHandler(new TableRowTransferHandler());
 		this.setDropMode(DropMode.INSERT_ROWS);
 		this.setDragEnabled(true);
 
 		setModel(mTableModel);
-		
+
 		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
+
 		for(int i=0; i<Constant.TABLE_HEADER_COLUMNS.length; i++){
 	        TableColumn col = getColumnModel().getColumn( i );
 	        col.setMinWidth(50);
@@ -84,25 +84,25 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		}
 
 		setEventListener();
-		
+
 	}
-	
+
 	public void finalize(){
 		finalizeThread();
 	}
-	
+
 	private EventObserver mEventSender = null;
 	public void setEventObserver(EventObserver observer){
 		mEventSender = observer;
 	}
-	
+
 	public void setImagePanel(ImagePanel panel){
 		mImagePanel = panel;
 	}
 	public void setFullscreenWindow(FullscreenWindow window){
 		mFullscreenWindow = window;
 	}
-	
+
 	public void setImageFilterParam(ImageFilterParamSet baseParams){
 		synchronized(this){
 			mBaseFilterParams = baseParams;
@@ -111,7 +111,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}
 	}
-	
+
 	@Override
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
@@ -140,7 +140,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		}
 		return c;
 	}
-	
+
 	public void setImageFileInfoList(IImageFileInfoList list){
 		if(mInfoList != null){
 			mInfoList.release();
@@ -160,14 +160,14 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}));
 		startLoadFileInfoThread();
-		
+
 		ImageCache.getInstance().setImageFileInfoList(list);
-		
+
 		// ThumbnailView
 		mEventSender.sendEvent(EventObserver.EventTarget_Thumbnail,
 				EventObserver.EventType_UpdateFileInfoList, 0, 0, list);
 	}
-	
+
 	private void startLoadFileInfoThread(){
 		// FileInfoの読み込まれていない情報をスレッドで順次更新する
 		ImageFileInfoAsyncTask task = new ImageFileInfoAsyncTask(mInfoList, new OnTaskObserver(){
@@ -184,9 +184,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 			@Override
 			public void onProcess(int index, int total, IImageFileInfo info) {
-				
+
 				mEventSender.setProgressMessage(String.format("%d / %d", (index+1), total));
-				
+
 				try {
 					info.update();
 				}catch(Exception e){
@@ -194,18 +194,18 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}catch(OutOfMemoryError e){
 					e.printStackTrace();
 				}
-				
+
 				mTableModel.setValueAt(Integer.toString(info.getWidth()), index, Constant.TABLE_COLUMN_WIDTH);
 				mTableModel.setValueAt(Integer.toString(info.getHeight()), index, Constant.TABLE_COLUMN_HEIGHT);
 			}
 		});
 		task.start();
 	}
-	
+
 	public IImageFileInfoList getImageFileInfoList(){
 		return mInfoList;
 	}
-	
+
 	private int getPageTypeToFilterIndex(int pageType){
 		switch(pageType){
 		case Constant.PAGETYPE_COLOR:
@@ -222,11 +222,11 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 
 	// Table Event
 	private void onItemSelected(int index){
-		selectItem(index);
+		selectItem(index, true);
 	}
-	
-	private void onItemSelectedInternal(int index){
-		
+
+	private void onItemSelectedInternal(int index, boolean updatePanel){
+
 		if(mInfoList != null && 0 <= index && index < mInfoList.size()){
 			IImageFileInfo info = mInfoList.get(index);
 			if(info != null){
@@ -242,7 +242,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					ImageCache.getInstance().startRenderImage(index);
 				}
 				else{
-					
+
 					InputStream stream = info.getInputStream();
 					try {
 						BufferedImage image = null;
@@ -267,19 +267,23 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						e.printStackTrace();
 						return;
 					}
-					
+
 				}
-				int pageType = info.getFilterParam().getPageType();
-				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));
+
+				if(updatePanel){
+					int pageType = info.getFilterParam().getPageType();
+					mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_SelectTab, getPageTypeToFilterIndex(pageType));
+				}
 			}
 		}
 	}
-	
+
 	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
 	private Object mThreadLock = new Object();
 	private Thread mThread = null;
+	private boolean mIsUpdatePanel = false;
 	private boolean mThreadFinish = false;
-	public void selectItem(int index){
+	public void selectItem(int index, boolean updatePanel){
 		if(mThread == null){
 			mThread = new Thread(){
 				@Override
@@ -301,7 +305,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						try{
 							boolean loop = true;
 							while(loop && !mThreadFinish){
-								onItemSelectedInternal(index);
+								onItemSelectedInternal(index, mIsUpdatePanel);
 								synchronized(mQueue){
 									loop = !mQueue.isEmpty();
 									if(loop){
@@ -325,11 +329,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			while(mQueue.size() > 0){
 				mQueue.remove();
 			}
+			mIsUpdatePanel = updatePanel;
 			mQueue.addLast(index);
 			mThreadLock.notify();
 		}
 	}
-	
+
 	private void finalizeThread(){
 		if(mThread != null){
 			mThreadFinish = true;
@@ -339,14 +344,14 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			mThread = null;
 		}
 	}
-	
-	
-	public void selectCurrentItem(){
+
+
+	public void selectCurrentItem(boolean updatePanel){
 		int selected = getSelectedRow();
 		if(selected < 0){
 			selected = 0;
 		}
-		selectItem(selected);
+		selectItem(selected, updatePanel);
 //		onItemSelected(selected);
 	}
 
@@ -365,12 +370,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					if(pageType != param.getPageType()){
 						// PageType変更有り
 						param.setPageType(pageType);
-						
+
 						// FileInfo更新通知
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 						mEventSender.setModified();
 
-						selectCurrentItem();
+						selectCurrentItem(true);
 						update = true;
 					}
 				}
@@ -378,12 +383,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					if(value != param.getPageSpread()){
 						// PageSpread変更有り
 						param.setPageSpread(value);
-						
+
 						// FileInfo更新通知
 						mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_FileInfoModified, 0);
 						mEventSender.setModified();
 
-						selectCurrentItem();
+						selectCurrentItem(true);
 						update = true;
 					}
 				}
@@ -404,7 +409,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 						update = true;
 
 						renewalList();
-						selectItem(selected);
+						selectItem(selected, true);
 						return;
 					}
 				}
@@ -421,8 +426,8 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}
 	}
-	
-	
+
+
 	// Popup Menu
 	private void updateSplitTypeAll(int splitType){
 		int size = mInfoList.size();
@@ -434,25 +439,25 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		}
 		renewalList();
 	}
-	
+
 	private void updateUncheckPageAll(){
 		int size = mInfoList.size();
 		for(int row=0; row<size; row++){
 			IImageFileInfo info = mInfoList.get(row);
 			info.getFilterParam().setPageType(Constant.PAGETYPE_AUTO);
 			mTableModel.setValueAt(Constant.TEXT_PAGETYPE_AUTO, row, Constant.TABLE_COLUMN_PAGETYPE);
-		}		
+		}
 	}
-	
+
 	private void updatePicturePageAll(){
 		int size = mInfoList.size();
 		for(int row=0; row<size; row++){
 			IImageFileInfo info = mInfoList.get(row);
 			info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
 			mTableModel.setValueAt(Constant.TEXT_PAGETYPE_PICT, row, Constant.TABLE_COLUMN_PAGETYPE);
-		}		
+		}
 	}
-	
+
 	private void updateTextPageAll(){
 		int size = mInfoList.size();
 		for(int row=0; row<size; row++){
@@ -461,7 +466,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			mTableModel.setValueAt(Constant.TEXT_PAGETYPE_TEXT, row, Constant.TABLE_COLUMN_PAGETYPE);
 		}
 	}
-	
+
 	private void updateTextPageAuto(){
 		int size = mInfoList.size();
 		for(int row=0; row<size; row++){
@@ -472,12 +477,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 		}
 	}
-	
+
 	private void updatePicturePageCheckAll(){
 		if(mInfoList == null){
 			return;
 		}
-		
+
 		ImageFileInfoAsyncTask task = new ImageFileInfoAsyncTask(mInfoList, new OnTaskObserver(){
 			@Override
 			public void onStart() {
@@ -491,9 +496,9 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			}
 			@Override
 			public void onProcess(int index, int total, IImageFileInfo info) {
-				
+
 				mEventSender.setProgressMessage(String.format("%d / %d", (index+1), total));
-				
+
 				String disableValue = Constant.TEXT_PAGETYPE_PICT;
 				int pageType = info.getFilterParam().getPageType();
 				if(pageType != Constant.PAGETYPE_PICT){
@@ -507,26 +512,24 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 					}
 					PageCheckFilter checker = new PageCheckFilter(true);
 					ImageFilterParam filterParam = info.getFilterParam();
-					if(filterParam.isEnable()){
-						
-						if(mBaseFilterParams != null){
-							synchronized(this){
-								filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
-							}
+
+					if(mBaseFilterParams != null){
+						synchronized(this){
+							filterParam = mBaseFilterParams.get(ImageFilterParamSet.FILTER_INDEX_TEXT).createMergedFilterParam(filterParam);
 						}
-						try {
-							boolean whitePage = checker.isWhiteImage(image, filterParam, true);
-							if(!whitePage){
-								info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
-								mTableModel.setValueAt(disableValue, index, 1);
-							}
-						}catch(Exception e){
-							mEventSender.setProgressMessage(e.getMessage());
-						}catch(OutOfMemoryError e){
-							mEventSender.setProgressMessage(e.getMessage());
-						}
-					
 					}
+					try {
+						boolean whitePage = checker.isWhiteImage(image, filterParam, true);
+						if(!whitePage){
+							info.getFilterParam().setPageType(Constant.PAGETYPE_PICT);
+							mTableModel.setValueAt(disableValue, index, 1);
+						}
+					}catch(Exception e){
+						mEventSender.setProgressMessage(e.getMessage());
+					}catch(OutOfMemoryError e){
+						mEventSender.setProgressMessage(e.getMessage());
+					}
+
 				}
 			}
 		});
@@ -558,24 +561,24 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 		}
 		*/
 	}
-	
-	
+
+
 	public void clearData(){
 		mTableModel.setRowCount(0);
 	}
-	
+
 	public void addData(IImageFileInfo info){
 		Object[] record = Constant.createRecord(info);
 		mTableModel.addRow(record);
 	}
-	
+
 	public void updateData(int row, IImageFileInfo info){
 		Object[] record = Constant.createRecord(info);
 		for(int col=0; col<record.length; col++){
 			mTableModel.setValueAt(record[col], row, col);
 		}
 	}
-	
+
 
 	private void setEventListener(){
 		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -590,14 +593,14 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}
 			}
 		});
-			
+
 		getTableHeader().addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e) {
 				if(javax.swing.SwingUtilities.isRightMouseButton(e)){
 					int column = getTableHeader().columnAtPoint(e.getPoint());
 					if(column == Constant.TABLE_COLUMN_ENTRYNAME){
 						JPopupMenu popup = new JPopupMenu();
-						
+
 						JMenuItem item0 = new JMenuItem("サムネイルビュー表示切替");
 						item0.addActionListener(new ActionListener(){
 							@Override
@@ -606,7 +609,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							}
 						});
 						popup.add(item0);
-						
+
 						if(!mInfoList.isEnableSort()){
 							JMenuItem item1 = new JMenuItem("並び順リセット");
 							item1.addActionListener(new ActionListener(){
@@ -619,7 +622,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 							});
 							popup.add(item1);
 						}
-						
+
 						popup.show(e.getComponent(), e.getX(), e.getY());
 					}
 					else if(column == Constant.TABLE_COLUMN_PAGETYPE){
@@ -729,7 +732,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}
 			}
 		});
-		
+
 		final JTable table = this;
 		this.addMouseListener(new MouseAdapter(){
 			@Override
@@ -752,7 +755,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -772,7 +775,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -793,7 +796,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -814,7 +817,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -835,7 +838,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -856,7 +859,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 								}
 								//listIndex++;
 							}
-							
+
 							renewalList();
 							//int selected = table.getSelectedRow();
 							//deleteItem(selected);
@@ -873,7 +876,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}
 			}
 		});
-		
+
 		mTableModel.addTableModelListener(new TableModelListener(){
 			@Override
 			public void tableChanged(TableModelEvent event) {
@@ -885,7 +888,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				}
 			}
 		});
-		
+
 		// PageType Column
 		JComboBox pageBox = new JComboBox(new String[] {
 				Constant.TEXT_PAGETYPE_AUTO,
@@ -893,12 +896,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				Constant.TEXT_PAGETYPE_PICT,
 				Constant.TEXT_PAGETYPE_COLOR,
 		});
-		pageBox.setBorder(BorderFactory.createEmptyBorder()); 
+		pageBox.setBorder(BorderFactory.createEmptyBorder());
 
 		TableColumn pageTypeColum = getColumnModel().getColumn(Constant.TABLE_COLUMN_PAGETYPE);
 		pageTypeColum.setCellEditor(new DefaultCellEditor(pageBox));
 
-		
+
 		// SplitType Column
 		JComboBox splitBox = new JComboBox(new String[]{
 			Constant.TEXT_SPLITTYPE_NONE,
@@ -909,12 +912,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			Constant.TEXT_SPLITTYPE_R2L_3x3,
 			Constant.TEXT_SPLITTYPE_L2R_3x3,
 		});
-		splitBox.setBorder(BorderFactory.createEmptyBorder()); 
-		
+		splitBox.setBorder(BorderFactory.createEmptyBorder());
+
 		TableColumn splitTypeColum = getColumnModel().getColumn(Constant.TABLE_COLUMN_SPLITTYPE);
 		splitTypeColum.setCellEditor(new DefaultCellEditor(splitBox));
-		
-		
+
+
 		// PageSpread Column
 		JComboBox spreadBox = new JComboBox(new String[]{
 				Constant.PAGESPREAD_AUTO,
@@ -922,12 +925,12 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 				Constant.PAGESPREAD_LEFT,
 				Constant.PAGESPREAD_RIGHT,
 			});
-		spreadBox.setBorder(BorderFactory.createEmptyBorder()); 
-			
+		spreadBox.setBorder(BorderFactory.createEmptyBorder());
+
 		TableColumn spreadTypeColum = getColumnModel().getColumn(Constant.TABLE_COLUMN_PAGESPREAD);
 		spreadTypeColum.setCellEditor(new DefaultCellEditor(spreadBox));
 	}
-	
+
 	public void deleteItem(int row){
 		if(mInfoList != null){
 			if(row < 0 || mInfoList.size() <= row){
@@ -938,7 +941,7 @@ public class ImageFileInfoTable extends JTable implements OnEventListener {
 			setImageFileInfoList(list);
 		}
 	}
-	
+
 	public void renewalList(){
 		if(mInfoList != null){
 			setImageFileInfoList(mInfoList.renew());

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-
 import jp.crwdev.app.constant.Constant;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.SplitFilter;
@@ -20,10 +19,10 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 
 	/** 画像ファイル情報リスト */
 	protected List<IImageFileInfo> mList = new ArrayList<IImageFileInfo>();
-	
+
 	/** ソート有効フラグ */
 	protected boolean mEnableSort = true;
-	
+
 	/**
 	 * 本文ページの最大サイズを取得
 	 * @param list
@@ -33,13 +32,13 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		if(list == null){
 			return new Dimension(0,0);
 		}
-		
+
 		Dimension max = new Dimension(0,0);
 		int size = list.size();
 		for(int i=0; i<size; i++){
 			IImageFileInfo info = list.get(i);
 			ImageFilterParam param = info.getFilterParam();
-			if(param.getPageType() == Constant.PAGETYPE_TEXT){
+			if(param.getPageType() == Constant.PAGETYPE_TEXT && info.isEnable()){
 				int width = info.getWidth();
 				int height = info.getHeight();
 				if(max.width < width){
@@ -52,21 +51,21 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 		}
 		return max;
 	}
-	
+
 	/**
 	 * renew()用共通処理。SplitTypeを反映した新しいリストを構築する
 	 * @param list
 	 * @return
 	 */
 	protected IImageFileInfoList renewInternal(IImageFileInfoList list){
-		
+
 		for(int i=0; i<mList.size(); i++){
 			IImageFileInfo info = mList.get(i);
 			ImageFilterParam param = info.getFilterParam();
 			if(info instanceof ImageFileInfoSplitWrapper){
 				// 分割中
 				ImageFileInfoSplitWrapper infow = (ImageFileInfoSplitWrapper)info;
-				
+
 				// 1つめのSplitType
 				boolean update = false;
 				ImageFileInfoSplitWrapper firstInfo = infow.getFirstSplitInfo();
@@ -111,9 +110,9 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 							break;
 						default:
 						}
-						
+
 						boolean sameCount = splitCount == infow.getRelativeSplitInfoSize();
-						
+
 						ImageFileInfoSplitWrapper first = null;
 						for(int index=0; index<splitCount; index++){
 							ImageFileInfoSplitWrapper wrapInfo = new ImageFileInfoSplitWrapper(baseInfo, index);
@@ -170,12 +169,12 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 					list.add(info);
 				}
 			}
-			
+
 		}
-		
+
 		list.setEnableSort(isEnableSort());
 		list.sort();
-		
+
 //		for(int i=0; i<mList.size(); i++){
 //			IImageFileInfo info = mList.get(i);
 //			ImageFilterParam param = info.getFilterParam();
@@ -195,7 +194,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 //				}
 //			}else{
 //				if(param.getSplitType() != Constant.SPLITTYPE_NONE){
-//					
+//
 //					list.add(new ImageFileInfoSplitWrapper(info, 0));
 //					list.add(new ImageFileInfoSplitWrapper(info, 1));
 //				}
@@ -204,7 +203,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 //				}
 //			}
 //		}
-		
+
 		return list;
 	}
 
@@ -217,7 +216,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 				public int compare(Object o1, Object o2) {
 					IImageFileInfo a = (IImageFileInfo)o1;
 					IImageFileInfo b = (IImageFileInfo)o2;
-					
+
 					int comp = a.getSortString().compareToIgnoreCase(b.getSortString());
 					if(comp == 0){
 						comp = a.getFilterParam().getSplitIndex() - b.getFilterParam().getSplitIndex();
@@ -232,7 +231,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 				public int compare(Object o1, Object o2) {
 					IImageFileInfo a = (IImageFileInfo)o1;
 					IImageFileInfo b = (IImageFileInfo)o2;
-					
+
 					int aOrder = a.getSortOrder();
 					int bOrder = b.getSortOrder();
 					if(aOrder < 0 && bOrder < 0){
@@ -255,7 +254,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 			});
 		}
 	}
-	
+
 	@Override
 	public void setEnableSort(boolean enable){
 		mEnableSort = enable;
@@ -266,12 +265,12 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isEnableSort(){
 		return mEnableSort;
 	}
-	
+
 	protected String getSuffix(String fileName) {
 	    if (fileName == null)
 	        return null;
@@ -282,7 +281,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 	    }
 	    return fileName;
 	}
-	
+
 	@Override
 	public int size() {
 		return mList.size();
@@ -297,7 +296,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 	public IImageFileInfo remove(int index) {
 		return mList.remove(index);
 	}
-	
+
 	@Override
 	public void clear(){
 		mList.clear();
@@ -307,7 +306,7 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 	public boolean add(IImageFileInfo info) {
 		return mList.add(info);
 	}
-	
+
 	@Override
 	public void insert(int index, IImageFileInfo info) {
 		mList.add(index, info);
@@ -315,6 +314,6 @@ public abstract class ImageFileInfoList implements IImageFileInfoList {
 
 	@Override
 	public void release(){
-		
+
 	}
 }
