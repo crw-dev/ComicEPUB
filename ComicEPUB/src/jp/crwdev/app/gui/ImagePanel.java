@@ -44,51 +44,51 @@ import jp.crwdev.app.util.ImageCache.ImageData;
 
 @SuppressWarnings("serial")
 public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
-	
+
 	private PreviewImageFilter mImageFilter = new PreviewImageFilter();
-	
+
 	/** Zoom用の画像を作るかどうか */
 	private float mZoomScale = 1.75f;
 	private boolean mCreateZoomImage = true;
 	private PreviewImageFilter mPreviewZoomFilter = new PreviewImageFilter();
 	private BufferedImage mPreviewZoomImage = null;
 	private Object mLockZoomImage = new Object();
-	
+
 	private boolean mFitZoom = false;
-	
+
 	private int mPreviewMargin = 20;
-	
+
 	private IImageFileInfo mFileInfo = null;
 	private int mInfoIndex = 0;
 	private BufferedImage mOriginalImage = null;
 	private BufferedImage mDisplayImage = null;
-	
+
 	private boolean mIsOutputSizePreview = false;
 	private Dimension mPreviewSize = new Dimension(600,800);
-	
+
 	private Point ptLeftTop = null;
 	private Point ptRightBottom = null;
-	
+
 	private Point ptRotateA = null;
 	private Point ptRotateB = null;
 	private boolean mIsRotateVertical = true;
-	
+
 	private LineHandleSet guideLineHandle = new LineHandleSet();
-	
+
 	private boolean mIsEditMode = false;
 	private boolean mIsZoomDrag = false;
 	private Point mZoomPoint = new Point();
 	private Rectangle mImageArea = new Rectangle();
-	
+
 	/** カスタム分割モード */
 	private boolean mIsCustomSplitMode = false;
 	private SplitLineSet splitLineHandle = new SplitLineSet();
-	
-	
+
+
 	public ImagePanel(){
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
@@ -112,11 +112,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			public void componentHidden(ComponentEvent e) {
 				// NOP
 			}
-			
+
 		});
-		
+
 	}
-	
+
 	public void onAncestorResized(){
 		if(!mIsOutputSizePreview){
 			mImageFilter.setPreviewSize(getWidth() - mPreviewMargin, getHeight() - mPreviewMargin);
@@ -130,12 +130,12 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	public void finalize(){
 		finalizeThread();
 	}
-	
+
 	private EventObserver mEventSender = null;
 	public void setEventObserver(EventObserver observer){
 		mEventSender = observer;
 	}
-	
+
 	public void setImageFilterParam(ImageFilterParamSet params){
 		mImageFilter.setImageFilterParam(params);
 		if(mCreateZoomImage){
@@ -144,7 +144,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		mIsEditMode = params.get(ImageFilterParamSet.FILTER_INDEX_BASIC).isPreview();
 		//updateDisplayImage();
 	}
-	
+
 	//@Override
 	public void paint(Graphics g){
 		super.paint(g); //JPanelのクリア
@@ -158,15 +158,15 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int x = (w - imageW)/2;
 			int y = (h - imageH)/2;
 			mImageArea.setBounds(x, y, imageW, imageH);
-			
+
 			if(mIsCustomSplitMode){
-				
+
 				g.drawImage(mDisplayImage, x, y, this);
-				
+
 				splitLineHandle.paint(g, w, h, imageW, imageH);
 			}
 			else{
-				
+
 				if(!mIsEditMode && !mIsZoomDrag){
 					if(mFitZoom){
 						int width = w - mPreviewMargin;
@@ -178,7 +178,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							do{
 								scale *= 2;
 							}while(!(ow * scale >= width && oh * scale >= height));
-							
+
 							Dimension size = ResizeFilter.getResizeDimension(ow*scale, oh*scale, width, height);
 							int zw = size.width;
 							int zh = size.height;
@@ -187,7 +187,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							Graphics2D g2 = (Graphics2D)g;
 							g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 							g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, ow, oh, null);
-							
+
 							mImageArea.setBounds(zx, zy, zx+zw, zy+zh);
 						}
 						else{
@@ -197,13 +197,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					else{
 						g.drawImage(mDisplayImage, x, y, this);
 					}
-					
+
 				}
 				else if(!mIsEditMode && mIsZoomDrag){
 					if(mCreateZoomImage){
 						createZoomImage();
 					}
-					
+
 					synchronized(mLockZoomImage){
 						float scale = mZoomScale;
 						int mx = mZoomPoint.x;
@@ -216,23 +216,23 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						int dh = (int)(imageH);
 						int zw = (int)(dw * scale);
 						int zh = (int)(dh * scale);
-						
+
 						int pw = mPreviewZoomImage.getWidth();
 						int ph = mPreviewZoomImage.getHeight();
-						
+
 						if(mPreviewZoomImage != null){
 							if(zw < pw || zh < ph){
 								zw = pw;
 								zh = ph;
 							}
 						}
-						
+
 						float panX = (float)(mx - cx) / (float)dw;
 						float panY = (float)(my - cy) / (float)dh;
 						int zx = mx - (int)(zw * (0.5f + panX));
 						int zy = my - (int)(zh * (0.5f + panY));
-						
-						
+
+
 //						if(zx > 0){
 //							g.fillRect(0, 0, zx, h);
 //						}
@@ -245,7 +245,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 //						if(zy+zh < h){
 //							g.fillRect(zx, zy+zh, zw, h);
 //						}
-						
+
 						if(mPreviewZoomImage != null){
 							if(zw != pw || zh != ph){
 								Graphics2D g2 = (Graphics2D)g;
@@ -264,9 +264,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				else{
 					g.drawImage(mDisplayImage, x, y, this);
 				}
-				
+
 				if(guideLineHandle.isDragHandle()){
-					
+
 				}
 				else if(ptLeftTop != null && ptRightBottom != null){
 					Rectangle cropRect = new Rectangle(ptLeftTop.x, ptLeftTop.y, (ptRightBottom.x-ptLeftTop.x), (ptRightBottom.y-ptLeftTop.y));
@@ -280,23 +280,23 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					g2.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
 					//g.setColor(Color.RED);
 					//g.drawLine(ptRotateA.x, ptRotateA.y, ptRotateB.x, ptRotateB.y);
-				
+
 					double angle = radian((double)(ptRotateB.x-ptRotateA.x), (double)(ptRotateB.y-ptRotateA.y));
 					System.out.println("rad=" + angle);
 				}
-	
+
 				if(mIsEditMode){
 					//guideLineHandle.setScale((float)mImageFilter.getResizedScaleW(), (float)mImageFilter.getResizedScaleH());
 					guideLineHandle.paint(g, w, h, imageW, imageH);
 				}
-			
+
 			}
 		}
 		else{
 			mImageArea.setBounds(0,0,0,0);
 		}
 	}
-	
+
 	private void createZoomImage(){
 		if(mCreateZoomImage){
 			if(ImageCache.enable){
@@ -328,9 +328,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			int imageH = mDisplayImage.getHeight();
 			int x = (w - imageW)/2;
 			int y = (h - imageH)/2;
-			
-			
-			
+
+
+
 			Rectangle cropRect = new Rectangle(ptLeftTop.x, ptLeftTop.y, (ptRightBottom.x-ptLeftTop.x), (ptRightBottom.y-ptLeftTop.y));
 			Rectangle imageRect = new Rectangle(x, y, imageW, imageH);
 			Rectangle intersect = imageRect.intersection(cropRect);
@@ -344,7 +344,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		return rect;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private float getScale(){
 		if(mOriginalImage != null && mDisplayImage != null){
@@ -356,7 +356,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		return 1.0f;
 	}
-	
+
 	private float getScaleX(float ow){
 		if(mDisplayImage != null){
 			float dw = (float)mDisplayImage.getWidth();
@@ -371,7 +371,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		return 1.0f;
 	}
-	
+
 	public void setImage(BufferedImage image, IImageFileInfo info, int rowIndex){
 		AddSpaceFilter filter = new AddSpaceFilter();
 		mOriginalImage = filter.filter(image, info.getFilterParam());
@@ -390,19 +390,19 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		if(mOriginalImage == null){
 			return;
 		}
-		
+
 		if(async){
 			startRenderImage();
 		}
 		else{
 			updateDisplayImageInternal();
 		}
-		
+
 	}
-	
+
 //	private QueueingThread mZoomThread = null;
 	public Object mLockRender = new Object();
-	
+
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
 			try {
@@ -410,7 +410,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					ImageData data = ImageCache.getInstance().getImageData(mInfoIndex);
 					mDisplayImage = data.getDisplayImage(mImageFilter, true);
 					mPreviewZoomImage = null;
-					
+
 					if(mCreateZoomImage && !mIsEditMode){
 						new Thread(){
 							@Override
@@ -426,9 +426,9 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						mDisplayImage = filtered;
 					}
 					mPreviewZoomImage = null;
-					
+
 					if(mCreateZoomImage && !mIsEditMode){
-						
+
 						new Thread(){
 							@Override
 							public void run(){
@@ -445,8 +445,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		repaint();
 		//System.out.println("updateDisplayInternal()");
 	}
-	
-	
+
+
 	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
 	private Object mThreadLock = new Object();
 	private Thread mThread = null;
@@ -500,7 +500,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			mThreadLock.notify();
 		}
 	}
-	
+
 	private void finalizeThread(){
 		if(mThread != null){
 			mThreadFinish = true;
@@ -510,7 +510,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			mThread = null;
 		}
 	}
-	
+
 	public void updateTableInfo(){
 		mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_UpdateFileInfo, mInfoIndex);
 		mEventSender.setModified();
@@ -518,25 +518,25 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+
 		if(javax.swing.SwingUtilities.isLeftMouseButton(e) && e.getClickCount() >= 2){
 			int width = this.getWidth();
 			int x = e.getX();
-			
+
 			if(x > width - 100){
 				mEventSender.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ShowSettingPanel, 0);
 				mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_ShowSettingPanel, 0);
 				updateDisplayImage(true);
 			}
-			
+
 		}
-		
+
 		if(mFileInfo == null){
 			return;
 		}
 		int x = e.getX();
 		int y = e.getY();
-		
+
 		if(mIsCustomSplitMode){
 			splitLineHandle.mouseClicked(e);
 		}
@@ -600,7 +600,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	}
 
 	private Point mBasePoint = new Point();
-	
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if(mIsCustomSplitMode){
@@ -625,7 +625,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(mIsEditMode){
 					guideLineHandle.mousePressed(e);
 					if(guideLineHandle.isDragHandle()){
-						
+
 					}
 					else{
 						ptLeftTop = new Point();
@@ -653,7 +653,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			double s =Math.acos(x/Math.sqrt(x*x+y*y));
 
 			s=(s/Math.PI)*180.0;
-		
+
 			return -(s-90.0);
 		}
 		else{
@@ -664,13 +664,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			return (s-90);
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(mFileInfo == null){
 			return;
 		}
-		
+
 		if(mIsCustomSplitMode){
 			splitLineHandle.mouseReleased(e);
 		}
@@ -715,7 +715,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							double scaleH = mImageFilter.getResizedScaleH();
 							double angle = param.isRotate() ? param.getRotateAngle() : 0.0f;
 							double radian = Math.toRadians(angle);
-							
+
 							AffineTransform af = new AffineTransform();
 							af.setToRotation(-radian);
 							double[] srcPoints = new double[]{ (double)offset.width, (double)offset.height };
@@ -732,7 +732,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							updateDisplayImage(true);
 							updateTableInfo();
 							return;
-							
+
 							/* 移動→回転の場合
 							ImageFilterParam param = mFileInfo.getFilterParam();
 							param.setTranslate(true);
@@ -751,12 +751,12 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					// Zoom end
 					mIsZoomDrag = false;
 				}
-	
+
 			}
 		}
 		repaint();
 	}
-	
+
 	private void setCropRect(){
 		Rectangle cropRect = getCropRect();
 		if(cropRect != null && mFileInfo != null){
@@ -765,18 +765,18 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			float scaleX = getScaleX(size.width);
 			float scaleY = getScaleY(size.height);
 			Rectangle dispImageRect = getDisplayImageRect();
-			
+
 			int left = cropRect.x - dispImageRect.x;
 			int top = cropRect.y - dispImageRect.y;
-			
+
 			int right = (dispImageRect.x + dispImageRect.width) - (cropRect.x + cropRect.width);
 			int bottom = (dispImageRect.y + dispImageRect.height) - (cropRect.y + cropRect.height);
-			
+
 			float orgLeft = (float)left / scaleX;
 			float orgRight = (float)right / scaleX;
 			float orgTop = (float)top / scaleY;
 			float orgBottom = (float)bottom / scaleY;
-			
+
 			ImageFilterParam param = mFileInfo.getFilterParam();
 			param.setFullPageCrop(true);
 			param.setFullPageCrop((int)orgLeft, (int)orgTop, (int)orgRight, (int)orgBottom);
@@ -784,12 +784,12 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			param.setTextPageCrop(0, 0, 0, 0);
 			param.setPictPageCrop(true);
 			param.setPictPageCrop(0, 0, 0, 0);
-			
-			
+
+
 			//if(param.getPageType() == FileInfoTable.TYPE_SPLIT_CROP){
 			updateDisplayImage(true);
 			//}
-	
+
 		}
 	}
 	private void clearCropRect(){
@@ -800,11 +800,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		param.setTextPageCrop(0, 0, 0, 0);
 		param.setPictPageCrop(false);
 		param.setPictPageCrop(0, 0, 0, 0);
-		
+
 		//if(param.getPageType() == FileInfoTable.TYPE_SPLIT_CROP){
 		updateDisplayImage(true);
 	}
-	
+
 	private Rectangle getDisplayImageRect(){
 		int w = getWidth();
 		int h = getHeight();
@@ -841,7 +841,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(mIsEditMode){
 					guideLineHandle.mouseDragged(e);
 					if(guideLineHandle.isDragHandle()){
-						
+
 					}
 					else{
 						if(x < mBasePoint.x){
@@ -866,7 +866,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				else{
 					// Zoom
 					mZoomPoint.setLocation(x, y);
-					
+
 					repaint();
 				}
 			}
@@ -890,15 +890,27 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		if(mFileInfo == null){
 			return;
 		}
-		
+
+		if(!mIsEditMode){
+
+			int step = 1;
+			if(e.getWheelRotation() < 0){
+				step = -1;
+			}
+
+			mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_MoveInfo, step);
+
+			return;
+		}
+
 		if(mIsCustomSplitMode){
-			
+
 		}
 		else{
-			int rotation = e.getWheelRotation();		
+			int rotation = e.getWheelRotation();
 			long when = e.getWhen();
 			System.out.println("rotation=" + rotation + " when=" + when);
-			
+
 			ImageFilterParam param = mFileInfo.getFilterParam();
 			param.setRotate(true);
 			double angle = 0.1 * rotation;
@@ -906,24 +918,24 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			updateDisplayImage(true);
 			updateTableInfo();
 
-			
+
 //			ImageFilterParam param = mFileInfo.getFilterParam();
 //			double angle = 0.5 * rotation;
-//			
+//
 //			int x = e.getX();
 //			int y = e.getY();
 //			int w = getWidth();
 //			int h = getHeight();
 //			AffineTransform af = new AffineTransform();
 //			af.rotate(-Math.toRadians(angle), w/2, h/2);
-//			
+//
 //			double[] srcPoints = new double[]{ (double)x, (double)y };
 //			double[] dstPoints = new double[2];
 //			af.transform(srcPoints, 0, dstPoints, 0, 1);
 //
 //			double offsetx = dstPoints[0] - srcPoints[0];
 //			double offsety = dstPoints[1] - srcPoints[1];
-//			
+//
 //			param.setRotate(true);
 //			param.setRotateAngle(angle + param.getRotateAngle());
 //			param.setTranslate(true);
@@ -933,7 +945,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 //			updateTableInfo();
 		}
 	}
-	
+
 	private void showSettingPopupMenu(int x, int y){
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem item1 = new JMenuItem("ガイド位置初期化");
@@ -964,7 +976,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				repaint();
 			}
 		});
-		
+
 		String check2 = guideLineHandle.isSyncLineVertical() ? "●" : "　";
 		JMenuItem item4 = new JMenuItem(check2 + "左右ガイド同期");
 		item4.addActionListener(new ActionListener(){
@@ -979,7 +991,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		popup.add(item2);
 		popup.add(item3);
 		popup.add(item4);
-		
+
 		if(mFileInfo != null){
 			final ImageFilterParam param = mFileInfo.getFilterParam();
 			if(param.isTranslate() && (param.getTranslateX() != 0 || param.getTranslateY() != 0)){
@@ -995,11 +1007,11 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 						updateTableInfo();
 					}
 				});
-				
+
 				popup.add(item5);
 			}
 		}
-		
+
 		JMenuItem item5 = new JMenuItem("傾き補正切り替え");
 		item5.addActionListener(new ActionListener(){
 			@Override
@@ -1007,10 +1019,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				mIsRotateVertical = !mIsRotateVertical;
 			}
 		});
-		
+
 		popup.add(item5);
 
-		
+
 		String check4 = guideLineHandle.isFixed() ? "●" : "　";
 		JMenuItem fixMenu1 = new JMenuItem(check4 + "ガイド枠固定");
 		fixMenu1.addActionListener(new ActionListener(){
@@ -1019,10 +1031,10 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				guideLineHandle.fixPosition(!guideLineHandle.isFixed());
 			}
 		});
-		
+
 		popup.add(fixMenu1);
 
-		
+
 		JMenu areaMenu = new JMenu("ガイド枠");
 		JMenuItem areaMenuItem1 = new JMenuItem("本文ページ切り出し領域に設定");
 		areaMenuItem1.addActionListener(new ActionListener(){
@@ -1071,7 +1083,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				if(right > 1.0f){ right = 1.0f; }
 				System.out.println("t=" + top + " l=" + left + " b=" + bottom + " r=" + right);
 				if(mFileInfo != null && mOriginalImage != null){
-					
+
 					Dimension size = SplitFilter.getSplitSize(mOriginalImage, mFileInfo.getFilterParam());
 					int imageWidth = size.width;
 					int imageHeight = size.height;
@@ -1082,7 +1094,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					int t = (int)(imageHeight * top);
 					int r = (int)(imageWidth - (int)(imageWidth * right));
 					int b = (int)(imageHeight - (int)(imageHeight * bottom));
-					
+
 					ImageFilterParam param = mFileInfo.getFilterParam();
 					param.setFullPageCrop(true);
 					param.setFullPageCrop(l, t, r, b);
@@ -1098,13 +1110,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				repaint();
 			}
 		});
-		
+
 		areaMenu.add(areaMenuItem1);
 		areaMenu.add(areaMenuItem2);
 		areaMenu.add(areaMenuItem3);
 
 		popup.add(areaMenu);
-		
+
 
 //		boolean isSplited = false;
 		if(mFileInfo instanceof ImageFileInfoSplitWrapper){
@@ -1119,7 +1131,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					//updateDisplayImage();
 				}
 			});
-			
+
 			popup.add(splitMenu);
 		}
 //		else{
@@ -1153,7 +1165,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 //					repaint();
 //				}
 //			});
-//			
+//
 //			popup.add(splitMenu1);
 //			popup.add(splitMenu2);
 //		}
@@ -1165,7 +1177,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				showOutputFolderDialog();
 			}
 		});
-		
+
 		popup.add(item9);
 
 		popup.show(this, x, y);
@@ -1174,7 +1186,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	private void showOutputFolderDialog(){
 		JFileChooser filechooser = new JFileChooser();
 		filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		
+
 		String desktopFolder = System.getProperty("user.home") + "/Desktop";
 		File defaultFolder = new File(desktopFolder);//InifileProperty.getInstance().getOutputFolder());
 		if(defaultFolder.exists() && defaultFolder.isDirectory()){
@@ -1185,7 +1197,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		if(selected == JFileChooser.APPROVE_OPTION){
 			 File file = filechooser.getSelectedFile();
 			 String path = file.getAbsolutePath();
-			 
+
 			 mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginConvertOne, mInfoIndex, path);
 		}
 	}
@@ -1199,7 +1211,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		mImageFilter.setPreviewSize(mPreviewSize.width - mPreviewMargin, mPreviewSize.height - mPreviewMargin);
 	}
-	
+
 	public void setSimpleZoom(boolean simpleZoom){
 		//mCreateZoomImage = !simpleZoom;
 		mFitZoom = simpleZoom;
@@ -1207,7 +1219,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			mPreviewZoomImage = null;
 		}
 	}
-	
+
 	@Override
 	public void onEventReceived(int type, int arg1, int arg2, Object obj) {
 		switch(type){
@@ -1218,6 +1230,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		default:
 			break;
 		}
-		
+
 	}
 }

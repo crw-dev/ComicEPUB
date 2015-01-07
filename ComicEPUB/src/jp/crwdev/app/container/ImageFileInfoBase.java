@@ -39,7 +39,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	protected String mSortText;
 	/** 並び順(ソート無効時) */
 	protected int mSortOrder = -1;
-	
+
 	/**
 	 * 基本データの読み込み
 	 * @throws Exception getFullPath(),getInputStream()の実装必須
@@ -51,7 +51,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		mSize = 0;
 		mWidth = 0;
 		mHeight = 0;
-		
+
 //		Iterator readers = ImageIO.getImageReadersBySuffix(suffix);
 //		if (readers.hasNext()) {
 //            ImageReader reader = (ImageReader)readers.next();
@@ -80,12 +80,15 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		if(mSortText == null){
 			String regex = "(\\d+)";
 			Pattern p = Pattern.compile(regex);
-			
+
 			String filename = getFileName();
 			Matcher m = p.matcher(filename);
 			if(m.find()){
 				String value = m.group();
-				value = String.format("%05d", Integer.parseInt(value));
+				try{
+					value = String.format("%05d", Integer.parseInt(value));
+				}catch(Exception e){
+				}
 				String result = m.replaceFirst(value);
 				mSortText = result;
 			}
@@ -95,12 +98,12 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 		}
 		return mSortText;
 	}
-	
+
 	@Override
 	public ImageFilterParam getFilterParam(){
 		return mPrivateFilter;
 	}
-	
+
 	@Override
 	public void setFilterParam(ImageFilterParam param){
 		mPrivateFilter = param;
@@ -110,34 +113,34 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	public String getFormat(){
 		return mFormat;
 	}
-	
+
 	@Override
 	public int getWidth(){
 		return mWidth;
 	}
-	
+
 	@Override
 	public int getHeight(){
 		return mHeight;
 	}
-	
+
 	@Override
 	public long getSize(){
 		return mSize;
 	}
-	
+
 	@Override
 	public boolean isJpeg() {
 		return "jpeg".equals(mFormat);
 	}
-	
+
 	@Override
 	public void update() {
 		if(mWidth != 0 && mHeight != 0){
 			// 読み込み済み
 			return;
 		}
-		
+
 		String suffix = getSuffix(getFullPath());
 
 		Iterator<ImageReader> readers = ImageIO.getImageReadersBySuffix(suffix);
@@ -158,37 +161,37 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 			}
 		}
 	}
-	
+
 	@Override
 	public BufferedImage getImage(boolean preview){
 		return null;
 	}
-	
+
 	@Override
 	public void setTocText(String text){
 		mTocText = text;
 	}
-	
+
 	@Override
 	public String getTocText(){
 		return mTocText;
 	}
-	
+
 	@Override
 	public void setEnable(boolean enable){
 		mIsEnable = enable;
 	}
-	
+
 	@Override
 	public boolean isEnable(){
 		return mIsEnable;
 	}
-	
+
 	@Override
 	public void setModify(boolean modify){
 		mIsModify = modify;
 	}
-	
+
 	@Override
 	public boolean isModify(){
 		return mIsModify || (mTocText != null && mTocText.length() > 0);
@@ -198,12 +201,12 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	public void setSortOrder(int order){
 		mSortOrder = order;
 	}
-	
+
 	@Override
 	public boolean isBlankPage(){
 		return false;
 	}
-	
+
 	@Override
 	public int getSortOrder(){
 		return mSortOrder;
@@ -224,7 +227,7 @@ public abstract class ImageFileInfoBase implements IImageFileInfo {
 	    }
 	    return fileName;
 	}
-	
+
 	/**
 	 * 拡張子からフォーマットを取得
 	 * @param suffix
