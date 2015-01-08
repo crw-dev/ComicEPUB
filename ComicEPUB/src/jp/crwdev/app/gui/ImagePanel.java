@@ -188,7 +188,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 							g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 							g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, ow, oh, null);
 
-							mImageArea.setBounds(zx, zy, zx+zw, zy+zh);
+							mImageArea.setBounds(zx, zy, zw, zh);
 						}
 						else{
 							g.drawImage(mDisplayImage, x, y, this);
