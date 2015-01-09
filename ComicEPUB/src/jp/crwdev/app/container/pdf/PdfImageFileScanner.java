@@ -5,6 +5,9 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import jp.crwdev.app.gui.DebugWindow;
+import jp.crwdev.app.interfaces.IImageFileInfoList;
+import jp.crwdev.app.interfaces.IImageFileScanner;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
@@ -12,22 +15,18 @@ import com.jmupdf.exceptions.DocException;
 import com.jmupdf.exceptions.DocSecurityException;
 import com.jmupdf.pdf.PdfDocument;
 
-import jp.crwdev.app.gui.DebugWindow;
-import jp.crwdev.app.interfaces.IImageFileInfoList;
-import jp.crwdev.app.interfaces.IImageFileScanner;
-
 
 public class PdfImageFileScanner implements IImageFileScanner {
 
 	/** ファイルパス */
 	private String mFilePath;
-	
+
 	private boolean mSupportJMuPDF = true;
 	private PdfDocument mPdfDocument;
 	private PdfReader mPdfReader;
-	
+
 	private boolean mSupportGS = true;
-	
+
 	@Override
 	public boolean open(String path) {
 		if(path.contains(".pdf")){
@@ -37,12 +36,12 @@ public class PdfImageFileScanner implements IImageFileScanner {
 				if(!file.exists()){
 					return false;
 				}
-				
+
 				mFilePath = path;
-				
+
 				mSupportJMuPDF = false;
 				mSupportGS = false;
-				
+
 				DebugWindow.log("open pdf " + path);
 				try {
 					mPdfDocument = new PdfDocument(path, 20);
@@ -56,19 +55,22 @@ public class PdfImageFileScanner implements IImageFileScanner {
 				} catch (UnsatisfiedLinkError e){
 					err = e.getMessage();
 					e.printStackTrace();
+				} catch (NoClassDefFoundError e){
+					err = e.getMessage();
+					e.printStackTrace();
 				}
-				
-				GhostscriptUtil gs = GhostscriptUtil.getInstance();
-				if(gs.isEnable()){
-					gs.open(path);
-					mSupportGS = true;
-					DebugWindow.log("use GhostScript");
-					return true;
-				}
-				else{
-					JOptionPane.showMessageDialog(null, "default.iniにGhostScriptのコマンドライン実行ファイルパスを設定して下さい。\n(例: ghostScriptPath=C:/gs/gs9.10/bin/gswin64c.exe)");
-				}
-				
+
+//				GhostscriptUtil gs = GhostscriptUtil.getInstance();
+//				if(gs.isEnable()){
+//					gs.open(path);
+//					mSupportGS = true;
+//					DebugWindow.log("use GhostScript");
+//					return true;
+//				}
+//				else{
+//					JOptionPane.showMessageDialog(null, "default.iniにGhostScriptのコマンドライン実行ファイルパスを設定して下さい。\n(例: ghostScriptPath=C:/gs/gs9.10/bin/gswin64c.exe)");
+//				}
+
 			} catch (OutOfMemoryError e) {
 				err = e.getMessage();
 				e.printStackTrace();

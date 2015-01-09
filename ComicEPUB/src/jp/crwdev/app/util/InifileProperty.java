@@ -19,9 +19,9 @@ import java.util.Properties;
 public class InifileProperty {
 
 	private static InifileProperty mInstance = null;
-	
+
 	private static final String INIFILE_NAME = "default.ini";
-	
+
 	private static final String PROP_OUTPUTDIR = "outputFolder";
 	private static final String PROP_IMAGESIZE = "imageSize";
 	private static final String PROP_JPEG_QUALITY = "jpegQuality";
@@ -29,12 +29,12 @@ public class InifileProperty {
 	private static final String PROP_ENABLE_FULLSCREEN = "enableFullScreen";
 	private static final String PROP_ENABLE_IMAGECACHE = "enableImageCache";
 	private static final String PROP_ENABLE_FOLDERLIST = "enableFolderList";
-	private static final String PROP_GHOSTSCRIPT = "ghostScriptPath";
+	private static final String PROP_ENABLE_FOLDERLIST_THUMBNAIL = "enableFolderListThumbnail";
 	private static final String PROP_DEBUGWINDOW = "debugWindow";
-	
+
 	private boolean mIsModified = false;
-	
-	
+
+
 	/**
 	 * Singletonインスタンス
 	 * @return
@@ -45,12 +45,12 @@ public class InifileProperty {
 		}
 		return mInstance;
 	}
-	
+
 	private Properties mProp = null;
-	
+
 	protected InifileProperty(){
 		mProp = new Properties();
-		
+
 		InputStreamReader istream = null;
 		try {
 			File file = new File(INIFILE_NAME);
@@ -73,22 +73,22 @@ public class InifileProperty {
 				}
 			}
 		}
-		
+
 		setDefaultProperties();
 	}
-	
+
     public void save(){
     	if(!mIsModified){
     		return;
     	}
-    	
+
 		FileOutputStream fos = null;
     	try {
     		fos = new FileOutputStream(INIFILE_NAME);
     		OutputStreamWriter writer = new OutputStreamWriter(fos, "UTF-8");
-    		
+
 			mProp.store(writer, null);
-			
+
 			writer.flush();
     	} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -107,7 +107,7 @@ public class InifileProperty {
     		}
     	}
     }
-    
+
 	private void setDefaultProperties(){
 		String imageSizes = mProp.getProperty(PROP_IMAGESIZE);
 		if(imageSizes == null || imageSizes.isEmpty()){
@@ -115,11 +115,11 @@ public class InifileProperty {
 			mProp.setProperty(PROP_IMAGESIZE, imageSizes);
 			mIsModified = true;
 		}
-		
+
 		boolean exist = false;
 		String jpegQuality = mProp.getProperty(PROP_JPEG_QUALITY);
 		if(jpegQuality == null || jpegQuality.isEmpty()){
-			
+
 		}else{
 			try {
 				Float floatValue = Float.parseFloat(jpegQuality);
@@ -132,16 +132,16 @@ public class InifileProperty {
 			}
 		}
 		if(!exist){
-			mProp.setProperty(PROP_JPEG_QUALITY, "0.8");
+			mProp.setProperty(PROP_JPEG_QUALITY, "0.9");
 			mIsModified = true;
 		}
-		
+
 		exist = false;
 		String insertBlank = mProp.getProperty(PROP_INSERT_BLANKPAGE);
 		if(insertBlank == null || insertBlank.isEmpty()){
 		}else{
 			if(!insertBlank.equalsIgnoreCase("false") && !insertBlank.equalsIgnoreCase("true")){
-				
+
 			}else{
 				exist = true;
 			}
@@ -150,13 +150,13 @@ public class InifileProperty {
 			mProp.setProperty(PROP_INSERT_BLANKPAGE, "true");
 			mIsModified = true;
 		}
-		
+
 		exist = false;
 		String enableFullScreen = mProp.getProperty(PROP_ENABLE_FULLSCREEN);
 		if(enableFullScreen == null || enableFullScreen.isEmpty()){
 		}else{
 			if(!enableFullScreen.equalsIgnoreCase("false") && !enableFullScreen.equalsIgnoreCase("true")){
-				
+
 			}else{
 				exist = true;
 			}
@@ -165,13 +165,13 @@ public class InifileProperty {
 			mProp.setProperty(PROP_ENABLE_FULLSCREEN, "true");
 			mIsModified = true;
 		}
-		
+
 		exist = false;
 		String enableImageCache = mProp.getProperty(PROP_ENABLE_IMAGECACHE);
 		if(enableImageCache == null || enableImageCache.isEmpty()){
 		}else{
 			if(!enableImageCache.equalsIgnoreCase("false") && !enableImageCache.equalsIgnoreCase("true")){
-				
+
 			}else{
 				exist = true;
 			}
@@ -181,20 +181,12 @@ public class InifileProperty {
 			mIsModified = true;
 		}
 
-		String ghostScriptPath = mProp.getProperty(PROP_GHOSTSCRIPT);
-		if(ghostScriptPath == null || ghostScriptPath.isEmpty()){
-			ghostScriptPath = "";
-			mProp.setProperty(PROP_GHOSTSCRIPT, "");
-			mIsModified = true;
-		}
-		
-		
 		exist = false;
 		String enableFolderList = mProp.getProperty(PROP_ENABLE_FOLDERLIST);
 		if(enableFolderList == null || enableFolderList.isEmpty()){
 		}else{
 			if(!enableFolderList.equalsIgnoreCase("false") && !enableFolderList.equalsIgnoreCase("true")){
-				
+
 			}else{
 				exist = true;
 			}
@@ -204,12 +196,27 @@ public class InifileProperty {
 			mIsModified = true;
 		}
 
+		exist = false;
+		String enableFolderListThumbnail = mProp.getProperty(PROP_ENABLE_FOLDERLIST_THUMBNAIL);
+		if(enableFolderListThumbnail == null || enableFolderListThumbnail.isEmpty()){
+		}else{
+			if(!enableFolderListThumbnail.equalsIgnoreCase("false") && !enableFolderListThumbnail.equalsIgnoreCase("true")){
+
+			}else{
+				exist = true;
+			}
+		}
+		if(!exist){
+			mProp.setProperty(PROP_ENABLE_FOLDERLIST_THUMBNAIL, "false");
+			mIsModified = true;
+		}
+
 	}
-	
+
 	public String getOutputFolder(){
 		return mProp.getProperty(PROP_OUTPUTDIR, "");
 	}
-	
+
 	public void setOutputFolder(String path){
 		if(path == null){
 			path = "";
@@ -217,7 +224,7 @@ public class InifileProperty {
 		mProp.setProperty(PROP_OUTPUTDIR, path);
 		mIsModified = true;
 	}
-	
+
 	public boolean isShowDebugWindow(){
 		String value = mProp.getProperty(PROP_DEBUGWINDOW, "false");
 		if(value.compareToIgnoreCase("true") == 0){
@@ -226,12 +233,12 @@ public class InifileProperty {
 			return false;
 		}
 	}
-	
+
 	public List<String> getImageSizeList(){
 		List<String> list = new ArrayList<String>();
-		
+
 		boolean hasError = false;
-		
+
 		String sizes = mProp.getProperty(PROP_IMAGESIZE);
 		String[] array = sizes.split(",");
 		for(int i=0; i<array.length; i++){
@@ -259,14 +266,14 @@ public class InifileProperty {
 			mProp.setProperty(PROP_IMAGESIZE, new String(sb));
 			mIsModified = true;
 		}
-		
+
 		return list;
 	}
-	
+
 	public float getJpegQuality(){
 		return Float.parseFloat(mProp.getProperty(PROP_JPEG_QUALITY));
 	}
-	
+
 	public boolean isInsertBlankPage(){
 		String value = mProp.getProperty(PROP_INSERT_BLANKPAGE, "true");
 		if(value.equalsIgnoreCase("false")){
@@ -275,7 +282,7 @@ public class InifileProperty {
 			return true;
 		}
 	}
-	
+
 	public boolean isEnableFullScreen(){
 		String value = mProp.getProperty(PROP_ENABLE_FULLSCREEN, "true");
 		if(value.equalsIgnoreCase("false")){
@@ -284,7 +291,7 @@ public class InifileProperty {
 			return true;
 		}
 	}
-	
+
 	public boolean isEnableImageCache(){
 		String value = mProp.getProperty(PROP_ENABLE_IMAGECACHE, "false");
 		if(value.equalsIgnoreCase("false")){
@@ -293,7 +300,7 @@ public class InifileProperty {
 			return true;
 		}
 	}
-	
+
 	public boolean isEnableFolderList(){
 		String value = mProp.getProperty(PROP_ENABLE_FOLDERLIST, "false");
 		if(value.equalsIgnoreCase("false")){
@@ -303,16 +310,13 @@ public class InifileProperty {
 		}
 	}
 
-	public String getGhostScriptPath(){
-		return mProp.getProperty(PROP_GHOSTSCRIPT);
-	}
-
-	public void setGhostScriptPath(String path){
-		if(path == null){
-			path = "";
+	public boolean isEnableFolderListThumbnail(){
+		String value = mProp.getProperty(PROP_ENABLE_FOLDERLIST_THUMBNAIL, "false");
+		if(value.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			return true;
 		}
-		mProp.setProperty(PROP_GHOSTSCRIPT, path);
-		mIsModified = true;
 	}
 
 }

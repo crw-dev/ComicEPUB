@@ -1,6 +1,6 @@
 ﻿自炊画像編集＆出力アプリ
 
-主にSony Reader用のEPUB3コミックを作成するためのツールです。(PRS-T3Sでの全画面化を確認)
+主にSony Reader用のEPUB3/PDFコミックを作成するためのツールです。(PRS-T3Sでの全画面化を確認)
 
 
 Download (※Javaインストール必須)
@@ -24,7 +24,7 @@ https://www.dropbox.com/sh/lla977one19xlft/lROyPm97tK
 EPUB出力時はメタデータとしてシリーズ名、巻数、タイトル、著者名を設定できます。
 Android版SonyReader用に分類指定(書籍、雑誌、コミック)可。
 見開き表示時の配置(center,left,right)もページ毎に指定可能です。
-目次指定に対応(EPUBのみ)
+目次指定に対応(EPUB/PDFのみ)
 
 画像の出力サイズは設定ファイル(default.ini)に追加可能。
 
@@ -36,9 +36,9 @@ PDF読み込みに必要なDLLはJMuPDFのページから入手出来ます。
 
 ----------------------------------------------------
 
-input - folder .zip .rar .pdf(動作確認中)
+input - folder .zip .rar .pdf
 
-output - folder .zip .epub .pdf(暫定対応)
+output - folder .zip .epub .pdf
 
 
 commons-compress (Apache License 2.0 http://www.apache.org/licenses/LICENSE-2.0)
@@ -58,5 +58,4 @@ http://itextpdf.com/
 JMuPDF (GPLv3)
 https://code.google.com/p/jmupdf/
 
-GhostScript
 

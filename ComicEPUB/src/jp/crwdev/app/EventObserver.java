@@ -4,7 +4,7 @@
 package jp.crwdev.app;
 
 public class EventObserver {
-	
+
 	public interface OnEventListener {
 		void onEventReceived(int type, int arg1, int arg2, Object obj);
 	}
@@ -15,7 +15,8 @@ public class EventObserver {
 	public static final int EventTarget_Setting = 2;
 	public static final int EventTarget_Main = 3;
 	public static final int EventTarget_Thumbnail = 4;
-	
+	public static final int EventTarget_FileList = 5;
+
 	// Event Type
 	public static final int EventType_UpdateFileInfo = 0;	// arg1: rowIndex
 	public static final int EventType_UpdateFilterParamSet = 1;	// obj: ImageFilterParamSet
@@ -40,16 +41,17 @@ public class EventObserver {
 	public static final int EventType_EndFullscreen = 20;		// no param
 	public static final int EventType_ShowSettingPanel = 21;		// no param
 	public static final int EventType_BeginConvertOne = 22;		// arg1: index, obj: outputFolder
-	public static final int EventType_OpenFile = 23;			// obj: filepath
+	public static final int EventType_OpenFile = 23;			// arg1: index, obj: filepath
+	public static final int EventType_UpdateThumbnail = 24;		// arg1: index, obj: thumbanil filename
 
-	/** イベントリスナ 4種類  */
-	private OnEventListener[] mListeners = new OnEventListener[5];
-	
+	/** イベントリスナ 6種類  */
+	private OnEventListener[] mListeners = new OnEventListener[6];
+
 	/**
 	 * コンストラクタ
 	 */
 	public EventObserver(){
-		
+
 	}
 
 	/** プログレス開始 */
@@ -60,12 +62,12 @@ public class EventObserver {
 	public void stopProgress(){
 		sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_Progress, 0);
 	}
-	
+
 	/** プログレスメッセージ */
 	public void setProgressMessage(String message){
 		sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_ProgressMessage, message);
 	}
-	
+
 	/** 編集フラグON */
 	public void setModified(){
 		sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_ModifiedSetting, 0);
@@ -81,7 +83,7 @@ public class EventObserver {
 			mListeners[target] = listener;
 		}
 	}
-	
+
 	/**
 	 * イベント通知
 	 * @param target 通知先
@@ -91,7 +93,7 @@ public class EventObserver {
 	public void sendEvent(int target, int type, int arg1){
 		sendEvent(target, type, arg1, 0, null);
 	}
-	
+
 	/**
 	 * イベント通知
 	 * @param target 通知先
@@ -102,7 +104,7 @@ public class EventObserver {
 	public void sendEvent(int target, int type, int arg1, int arg2){
 		sendEvent(target, type, arg1, arg2, null);
 	}
-	
+
 	/**
 	 * イベント通知
 	 * @param target 通知先
@@ -112,7 +114,7 @@ public class EventObserver {
 	public void sendEvent(int target, int type, Object obj){
 		sendEvent(target, type, 0, 0, obj);
 	}
-	
+
 	/**
 	 * イベント通知
 	 * @param target 通知先
@@ -125,7 +127,7 @@ public class EventObserver {
 			mListeners[target].onEventReceived(type, arg1, 0, obj);
 		}
 	}
-	
+
 	/**
 	 * イベント通知
 	 * @param target 通知先
@@ -139,5 +141,5 @@ public class EventObserver {
 			mListeners[target].onEventReceived(type, arg1, arg2, obj);
 		}
 	}
-	
+
 }

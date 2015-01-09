@@ -16,21 +16,21 @@ public class Constant {
 		SUPPORT_INPUT_PREFIX.add("rar");
 		SUPPORT_INPUT_PREFIX.add("pdf");
 	}
-	
+
 	public static final List<String> SUPPORT_IMAGE_PREFIX = new ArrayList<String>();
 	static{
 		SUPPORT_IMAGE_PREFIX.add("jpg");
 		SUPPORT_IMAGE_PREFIX.add("png");
 		SUPPORT_IMAGE_PREFIX.add("bmp");
 	}
-	
+
 	public static float jpegQuality = 0.8f;
 
 	public static final int PAGETYPE_AUTO = 0;
 	public static final int PAGETYPE_TEXT = 1;
 	public static final int PAGETYPE_PICT = 2;
 	public static final int PAGETYPE_COLOR = 3;
-	
+
 	public static final String TEXT_PAGETYPE_AUTO = "";
 	public static final String TEXT_PAGETYPE_TEXT = "本文";
 	public static final String TEXT_PAGETYPE_PICT = "挿絵";
@@ -39,7 +39,7 @@ public class Constant {
 	//public static final int SPLITTYPE_NONE = 0;
 	//public static final int SPLITTYPE_RIGHT_TO_LEFT = 1;
 	//public static final int SPLITTYPE_LEFT_TO_RIGHT = 2;
-	
+
 	public static final String TEXT_SPLITTYPE_NONE = "";
 	public static final String TEXT_SPLITTYPE_R2L = "右→左";
 	public static final String TEXT_SPLITTYPE_L2R = "左→右";
@@ -48,12 +48,12 @@ public class Constant {
 	public static final String TEXT_SPLITTYPE_R2L_3x3 = "逆Ｚ 3x3";
 	public static final String TEXT_SPLITTYPE_L2R_3x3 = "順Ｚ 3x3";
 	public static final String TEXT_SPLITTYPE_CUSTOM = "カスタム";
-	
+
 	public static final String PAGESPREAD_AUTO = "";
 	public static final String PAGESPREAD_LEFT = "left";
 	public static final String PAGESPREAD_RIGHT = "right";
 	public static final String PAGESPREAD_CENTER = "center";
-	
+
 	public static final String TABLE_HEADER_ENTRYNAME = "ファイル名";
 	public static final String TABLE_HEADER_TOC = "目次";
 	public static final String TABLE_HEADER_PAGETYPE = "種別";
@@ -64,7 +64,7 @@ public class Constant {
 	public static final String TABLE_HEADER_HEIGHT = "高さ";
 	//public static final String TABLE_HEADER_SIZE = "サイズ";
 	public static final String TABLE_HEADER_SPLITTYPE = "分割";
-	
+
 	public static final int TABLE_COLUMN_ENTRYNAME = 0;
 	public static final int TABLE_COLUMN_PAGETYPE = 1;
 	public static final int TABLE_COLUMN_PAGESPREAD = 2;
@@ -75,7 +75,7 @@ public class Constant {
 	public static final int TABLE_COLUMN_WIDTH = 7;
 	public static final int TABLE_COLUMN_HEIGHT = 8;
 	//public static final int TABLE_COLUMN_SIZE = 6;
-	
+
 	public static final String[] TABLE_HEADER_COLUMNS = new String[]{
 		TABLE_HEADER_ENTRYNAME,
 		TABLE_HEADER_PAGETYPE,
@@ -87,22 +87,22 @@ public class Constant {
 		TABLE_HEADER_WIDTH,
 		TABLE_HEADER_HEIGHT,
 	};
-	
+
 	public static final String TABLE_HEADER_FILELIST_LOCK = "保存";
 	public static final String TABLE_HEADER_FILELIST_FILENAME = "ファイル/フォルダ名";
 	public static final String TABLE_HEADER_FILELIST_FILEPATH = "パス";
-	
+
 	public static final int TABLE_HEADER_FILELIST_COLUMN_LOCK = 0;
 	public static final int TABLE_HEADER_FILELIST_COLUMN_FILENAME = 1;
 	public static final int TABLE_HEADER_FILELIST_COLUMN_FILEPATH = 2;
-	
+
 	public static final String[] TABLE_HEADER_FILELIST_COLUMNS = new String[]{
 		TABLE_HEADER_FILELIST_LOCK,
 		TABLE_HEADER_FILELIST_FILENAME,
 		TABLE_HEADER_FILELIST_FILEPATH,
 	};
-	
-	
+
+
 	public static String getPageTypeText(int pageType){
 		switch(pageType){
 		case PAGETYPE_TEXT:
@@ -128,7 +128,7 @@ public class Constant {
 		}
 		return PAGETYPE_AUTO;
 	}
-	
+
 	public static String getSplitTypeText(int splitType){
 		switch(splitType){
 		case SplitFilter.TYPE_R2L_2:
@@ -174,7 +174,7 @@ public class Constant {
 		}
 		return SplitFilter.TYPE_NONE;
 	}
-	
+
 	public static File getContentFile(File contentPath){
 		if(contentPath.isDirectory()){
 			return contentPath;
@@ -231,9 +231,9 @@ public class Constant {
 		}
 		return null;
 	}
-	
+
 	public static Object[] createRecord(IImageFileInfo info){
-		
+
 		ImageFilterParam param = info.getFilterParam();
 		String pageType = Constant.getPageTypeText(param.getPageType());
 		String rotate = Double.toString(param.getRotateAngle());
@@ -244,7 +244,7 @@ public class Constant {
 		String splitType = Constant.getSplitTypeText(param.getSplitType());
 		String pageSpread = param.getPageSpread();
 		String tocText = info.getTocText();
-		
+
 		return new String[]{info.getFileName(), pageType, pageSpread, splitType, tocText, rotate, position, width, height};
 	}
 }

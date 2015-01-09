@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SerializeArrayUtil {
 
@@ -25,9 +26,25 @@ public class SerializeArrayUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public static ArrayList load(String filepath){
+	public static void save(String filepath, HashMap map){
+		if(map == null){
+			return;
+		}
+		try {
+			FileOutputStream fos = new FileOutputStream(filepath);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(map);
+			oos.close();
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static ArrayList loadList(String filepath){
 		File file = new File(filepath);
 		if(!file.exists()){
 			return null;
@@ -45,5 +62,26 @@ public class SerializeArrayUtil {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static HashMap loadMap(String filepath){
+		File file = new File(filepath);
+		if(!file.exists()){
+			return null;
+		}
+		HashMap map = null;
+		try {
+			FileInputStream fis = new FileInputStream(filepath);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			map = (HashMap)ois.readObject();
+			ois.close();
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 }

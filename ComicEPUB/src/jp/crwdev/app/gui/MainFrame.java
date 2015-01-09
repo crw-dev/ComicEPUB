@@ -7,14 +7,18 @@ import java.awt.Dimension;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SpringLayout;
 
+import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.OutputSettingParam;
@@ -27,6 +31,7 @@ import jp.crwdev.app.container.pdf.GhostscriptUtil;
 import jp.crwdev.app.imagefilter.AddSpaceFilter;
 import jp.crwdev.app.imagefilter.ImageFilterParam;
 import jp.crwdev.app.imagefilter.OutputImageFilter;
+import jp.crwdev.app.imagefilter.ResizeFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.interfaces.IImageFileInfoList;
 import jp.crwdev.app.interfaces.IImageFileScanner;
@@ -179,6 +184,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 		mEventObserver.setEventListener(EventObserver.EventTarget_Setting, settingPanel);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Main, this);
 		mEventObserver.setEventListener(EventObserver.EventTarget_Thumbnail, mThumbnailView);
+		mEventObserver.setEventListener(EventObserver.EventTarget_FileList, filelistTable);
 
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableComponent, imagePanel);
@@ -208,105 +214,30 @@ public class MainFrame extends JFrame implements OnEventListener {
 			@Override
 			public void onDrop(String filepath) {
 
-				openFile(filepath);
+				openFile(-1, filepath);
 
 				if(InifileProperty.getInstance().isEnableFolderList()){
 					filelistTable.scanFolder(filepath);
 				}
-
-//				final String filePath = filepath;
-//
-//
-//				new Thread(){
-//					public void run(){
-//
-//						mEventObserver.startProgress();
-//						try {
-//							if(mCurrentFile != null){
-//								mCurrentFile.close();
-//								mCurrentFile = null;
-//								if(mIsSettingChanged){
-//									int ret = showSettingSaveConfirmDialog();
-//									if(ret == JOptionPane.YES_OPTION){
-//										saveSettingFile(mSettingFilePath);
-//									}
-//								}
-//							}
-//
-//							mIsSettingChanged = false;
-//
-//							IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
-//							mCurrentFile = scanner;
-//
-//							IImageFileInfoList list = scanner.getImageFileInfoList();
-//
-//							String settingFilePath = getSettingFilePath(scanner.getOpenFilePath());
-//							mSettingFilePath = settingFilePath;
-//
-//							OutputSettingParam outputParam = mSettingPanel.getOutputSettingParam();
-//							setOutputParamByFilename(outputParam, scanner.getOpenFilePath());
-//
-//
-//							//ImageFilterParam param = null;
-//							ImageFilterParamSet params = null;
-//
-//							File settingFile = new File(settingFilePath);
-//							if(settingFile.exists()){
-//
-//								XmlWriter loader = new XmlWriter();
-//								loader.openLoadSettingFile(mSettingFilePath);
-//								//param = new ImageFilterParam();
-//								params = new ImageFilterParamSet();
-//								// listに変更を反映する
-//								loader.loadSetting(outputParam, params, list);
-//
-//							}
-//							// 出力設定を設定画面に反映
-//							mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateOutputParam, outputParam);
-//
-//							list.sort();
-//							mTable.setImageFileInfoList(list);
-//							//if(mThumbnailView != null){
-//							//	mThumbnailView.setImageFileInfoList(list);
-//							//}
-//
-//							if(params != null){
-//								// 全体設定を反映
-//								mEventObserver.sendEvent(EventObserver.EventTarget_Setting, EventObserver.EventType_UpdateFilterParamSet, params);
-//
-//								mIsSettingChanged = false;	// D&Dでの変更は未変更扱いとする
-//
-//								updateBaseFilterParam(params);
-//							}
-//
-//
-//						}catch(Exception e){
-//							e.printStackTrace();
-//						}
-//
-//						mEventObserver.stopProgress();
-//
-//						mTable.selectItem(0);
-//					}
-//				}.start();
 			}
 	     }));
 
-	     //GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-	     //device.setFullScreenWindow(this);
 	}
 
 
-	public void openFile(String filepath){
+	public void openFile(int index, String filepath){
 
 		if(mCurrentFile != null && mCurrentFile.getOpenFilePath().equals(filepath)){
 			return;	// ignore same file
 		}
 
 		final String filePath = filepath;
+		final int thumbIndex = index;
 
 		new Thread(){
 			public void run(){
+
+				boolean error = false;
 
 				mEventObserver.startProgress();
 				try {
@@ -324,6 +255,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 					mIsSettingChanged = false;
 
 					IImageFileScanner scanner = ImageFileScanner.getFileScanner(filePath);
+					if(scanner == null){
+						throw new Exception("cannot get scanner");
+					}
 					mCurrentFile = scanner;
 
 					IImageFileInfoList list = scanner.getImageFileInfoList();
@@ -370,11 +304,57 @@ public class MainFrame extends JFrame implements OnEventListener {
 
 				}catch(Exception e){
 					e.printStackTrace();
+					error = true;
 				}
 
 				mEventObserver.stopProgress();
 
+				if(error){
+					return;
+				}
+
 				mTable.selectItem(0, true);
+
+				if(InifileProperty.getInstance().isEnableFolderListThumbnail()){
+					int index = thumbIndex;
+					if(index < 0){
+						if(!mFileListTable.existThumbnail(mCurrentFile.getOpenFilePath())){
+							index = 0;
+						}
+					}
+					if(index >= 0){
+						IImageFileInfoList list = mTable.getImageFileInfoList();
+						if(list != null && list.size() > 0){
+
+							IImageFileInfo info = list.get(0);
+							String thumbName = null;
+							try {
+								BufferedImage img = null;
+								InputStream stream = info.getInputStream();
+								if(stream != null){
+									img = BufferedImageIO.read(stream, info.isJpeg());
+								}
+								else{
+									img = info.getImage(true);
+								}
+								Dimension size = ResizeFilter.getResizeDimension(img.getWidth(), img.getHeight(), 128, 128);
+								BufferedImage thumbnail = new BufferedImage(size.width, size.height, img.getType());
+								thumbnail.getGraphics().drawImage(img, 0, 0, size.width, size.height, null);
+								File parent = new File("thumbnail");
+								if(!parent.exists()){
+									parent.mkdirs();
+								}
+								File thumbnailFile = File.createTempFile("thumb", ".jpg", parent);
+								ImageIO.write(thumbnail, "jpeg", thumbnailFile);
+
+								thumbName = thumbnailFile.getName();
+							}catch(Exception e){
+
+							}
+							mEventObserver.sendEvent(EventObserver.EventTarget_FileList, EventObserver.EventType_UpdateThumbnail, index, thumbName);
+						}
+					}
+				}
 			}
 		}.start();
 
@@ -784,7 +764,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 			endFullscreen();
 			break;
 		case EventObserver.EventType_OpenFile:
-			openFile((String)obj);
+			openFile(arg1, (String)obj);
 			break;
 		default:
 			break;
