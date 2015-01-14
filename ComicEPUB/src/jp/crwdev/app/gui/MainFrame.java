@@ -706,8 +706,9 @@ public class MainFrame extends JFrame implements OnEventListener {
 		 }
 	}
 
-	private void beginFullscreen(){
+	private void beginFullscreen(boolean fitZoom){
 		mFullscreenWindow = new FullscreenWindow();
+		mFullscreenWindow.setFitZoom(fitZoom);
 		mFullscreenWindow.setEventObserver(mEventObserver);
 		if(ImageCache.enable){
 			ImageCache.getInstance();
@@ -758,7 +759,7 @@ public class MainFrame extends JFrame implements OnEventListener {
 			saveSettingFileRequest();
 			break;
 		case EventObserver.EventType_BeginFullscreen:
-			beginFullscreen();
+			beginFullscreen(arg1 != 0);
 			break;
 		case EventObserver.EventType_EndFullscreen:
 			endFullscreen();

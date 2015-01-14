@@ -562,7 +562,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			if(mImageArea.contains(x, y)){
 				if(!mIsEditMode){
 					if(e.getClickCount() >= 2){
-						mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginFullscreen, 0);
+						mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_BeginFullscreen, mFitZoom ? 1 : 0);
 					}
 				}else{
 					clearCropRect();

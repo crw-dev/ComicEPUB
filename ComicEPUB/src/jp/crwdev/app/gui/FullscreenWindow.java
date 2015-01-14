@@ -1,6 +1,7 @@
 package jp.crwdev.app.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
@@ -29,23 +32,26 @@ import jp.crwdev.app.BufferedImageIO;
 import jp.crwdev.app.EventObserver;
 import jp.crwdev.app.EventObserver.OnEventListener;
 import jp.crwdev.app.imagefilter.PreviewImageFilter;
+import jp.crwdev.app.imagefilter.ResizeFilter;
 import jp.crwdev.app.interfaces.IImageFileInfo;
 import jp.crwdev.app.setting.ImageFilterParamSet;
 import jp.crwdev.app.util.ImageCache;
-import jp.crwdev.app.util.InifileProperty;
 import jp.crwdev.app.util.ImageCache.ImageData;
+import jp.crwdev.app.util.InifileProperty;
 
 @SuppressWarnings("serial")
-public class FullscreenWindow extends JFrame implements MouseListener, MouseMotionListener, OnEventListener {
+public class FullscreenWindow extends JFrame implements MouseListener, MouseMotionListener, MouseWheelListener, OnEventListener {
 
 	public static boolean mEnableFullScreen = false;
 	public int windowWidth = 640;
 	public int windowHeight = 480;
 	public float mZoomScale = 1.75f;
-	
+
+	private int mPreviewMargin = 20;
+
 	private GraphicsDevice mDevice;
 	private BufferStrategy mBufferStrategy;
-	
+
 	private int mScreenWidth = 640;
 	private int mScreenHeight = 480;
 	private Rectangle mImageArea = new Rectangle();
@@ -56,68 +62,69 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		setBounds(0, 0, 640, 480);
 		setResizable(false);
 		//setIgnoreRepaint(true); // paintイベントを無効化
-		
+
 		mEnableFullScreen = InifileProperty.getInstance().isEnableFullScreen();
-		
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 
 		// ESCキーで終了
-		InputMap imap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW); 
-		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape"); 
-		getRootPane().getActionMap().put("escape", new AbstractAction(){ 
-			@Override 
-			public void actionPerformed(ActionEvent e) { 
+		InputMap imap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+		getRootPane().getActionMap().put("escape", new AbstractAction(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				closeWindow();
 			}
 		});
-		
+
 		initFullScreen();
 		//		setUndecorated(true);
-		
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-		
+
 		createBufferStrategy(2);
 		mBufferStrategy = getBufferStrategy();
 
 		repaintEvent();
 		screenUpdate();
 	}
-	
+
 	private void initFullScreen() {
-		
+
 		GraphicsEnvironment ge =
 				GraphicsEnvironment.getLocalGraphicsEnvironment();
 		mDevice = ge.getDefaultScreenDevice();  // GraphicsDeviceの取得
-		
+
 		DisplayMode mode = mDevice.getDisplayMode();
 		int width = mode.getWidth();
 		int height = mode.getHeight();
 		int depth = mode.getBitDepth();
-		
+
 		if(mEnableFullScreen){
 
 			setUndecorated(true); // タイトルバー・ボーダー非表示
 			setIgnoreRepaint(false);
-			
+
 			if (!mDevice.isFullScreenSupported()) {
 				System.out.println("フルスクリーンモードはサポートされていません。");
 				System.exit(0);
 			}
-	
+
 			// フルスクリーン化！
 			mDevice.setFullScreenWindow(this);
-			
+
 			setDisplayMode(width, height, depth);
-			
+
 			mScreenWidth = width;
 			mScreenHeight = height;
 		}
 		else{
 			setUndecorated(true); // タイトルバー・ボーダー非表示
 			setIgnoreRepaint(true);
-			
+
 			if(InifileProperty.getInstance().isShowDebugWindow()){
 				mScreenWidth = windowWidth;
 				mScreenHeight = windowHeight;
@@ -125,16 +132,16 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				mScreenWidth = width;
 				mScreenHeight = height;
 			}
-			
+
 			setBounds(0, 0, mScreenWidth, mScreenHeight);
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * ディスプレイモードを設定
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 * @param bitDepth
@@ -149,8 +156,8 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				DisplayMode.REFRESH_RATE_UNKNOWN);
 		mDevice.setDisplayMode(dm);
 	}
-	
-	
+
+
 	/**
 	 * Same as ImagePanel
 	 */
@@ -164,9 +171,14 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 	private BufferedImage mDisplayImage = null;
 	private boolean mIsZoomDrag = false;
 	private Point mZoomPoint = new Point();
+	private boolean mFitZoom = false;
 	private EventObserver mEventSender = null;
 	public void setEventObserver(EventObserver observer){
 		mEventSender = observer;
+	}
+
+	public void setFitZoom(boolean fitZoom){
+		mFitZoom = fitZoom;
 	}
 
 	public void setImageFilterParam(ImageFilterParamSet params){
@@ -186,12 +198,12 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			updateDisplayImage(true);
 		}
 	}
-	
+
 	public void updateDisplayImage(boolean async){
 		if(mOriginalImage == null){
 			return;
 		}
-		
+
 		if(async){
 			startRenderImage();
 		}
@@ -199,7 +211,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			updateDisplayImageInternal();
 		}
 	}
-	
+
 	private LinkedList<Integer> mQueue = new LinkedList<Integer>();
 	private Object mThreadLock = new Object();
 	private Thread mThread = null;
@@ -253,7 +265,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			mThreadLock.notify();
 		}
 	}
-	
+
 //	private void finalizeThread(){
 //		if(mThread != null){
 //			mThreadFinish = true;
@@ -263,7 +275,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 //			mThread = null;
 //		}
 //	}
-	
+
 	public void updateDisplayImageInternal(){
 		if(mImageFilter != null){
 			try {
@@ -282,7 +294,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 					BufferedImage filtered = mImageFilter.filter(BufferedImageIO.copyBufferedImage(mOriginalImage), mFileInfo.getFilterParam());
 					mDisplayImage = filtered;
 					mPreviewZoomImage = null;
-					
+
 					new Thread(){
 						@Override
 						public void run(){
@@ -290,7 +302,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 						}
 					}.start();
 				}
-				
+
 			}catch(OutOfMemoryError e){
 				mEventSender.setProgressMessage(e.getMessage());
 				e.printStackTrace();
@@ -300,7 +312,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		screenUpdate();
 //		repaint();
 	}
-	
+
 	private void createZoomImage(){
 		synchronized(mLockZoomImage){
 			if(mPreviewZoomImage == null){
@@ -326,10 +338,10 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 	@Override
 	public void paint(Graphics g){
 		//super.paint(g);
-		
+
 		repaintEvent(g);
 	}
-	
+
 	private void repaintEvent(){
 		if(mEnableFullScreen){
 			repaintEvent(mBufferStrategy.getDrawGraphics());
@@ -337,15 +349,15 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			repaint();
 		}
 	}
-	
-	
-	
+
+
+
 	private void repaintEvent(Graphics g){
-		
+
 		// 背景
-		g.setColor(Color.BLACK);
-		//g.fillRect(0, 0, mScreenWidth, mScreenHeight);
-		
+		g.setColor(Color.DARK_GRAY);//BLACK);
+		g.fillRect(0, 0, mScreenWidth, mScreenHeight);
+
 		int w = getWidth();
 		int h = getHeight();
 
@@ -356,11 +368,44 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			int x = (w - imageW)/2;
 			int y = (h - imageH)/2;
 			mImageArea.setBounds(x, y, imageW, imageH);
-			
-			
-			if(mIsZoomDrag){
+
+
+			if(!mIsZoomDrag){
+
+				if(mFitZoom){
+					int width = w - mPreviewMargin;
+					int height = h - mPreviewMargin;
+					int ow = mDisplayImage.getWidth();
+					int oh = mDisplayImage.getHeight();
+					if(width > ow && height > oh){
+						int scale = 1;
+						do{
+							scale *= 2;
+						}while(!(ow * scale >= width && oh * scale >= height));
+
+						Dimension size = ResizeFilter.getResizeDimension(ow*scale, oh*scale, width, height);
+						int zw = size.width;
+						int zh = size.height;
+						int zx = width / 2 - zw / 2 + mPreviewMargin / 2;
+						int zy = height / 2 - zh / 2 + mPreviewMargin / 2;
+						Graphics2D g2 = (Graphics2D)g;
+						g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+						g.drawImage(mDisplayImage, zx, zy, zx+zw, zy+zh, 0, 0, ow, oh, null);
+
+						mImageArea.setBounds(zx, zy, zw, zh);
+					}
+					else{
+						g.drawImage(mDisplayImage, x, y, this);
+					}
+				}
+				else{
+					g.drawImage(mDisplayImage, x, y, this);
+				}
+
+			}
+			else if(mIsZoomDrag){
 				//createZoomImage();
-				
+
 				float scale = mZoomScale;
 				int mx = mZoomPoint.x;
 				int my = mZoomPoint.y;
@@ -372,23 +417,23 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				int dh = (int)(imageH);
 				int zw = (int)(dw * scale);
 				int zh = (int)(dh * scale);
-				
+
 				int pw = mPreviewZoomImage.getWidth();
 				int ph = mPreviewZoomImage.getHeight();
-				
+
 				if(mPreviewZoomImage != null){
 					if(zw < pw || zh < ph){
 						zw = pw;
 						zh = ph;
 					}
 				}
-				
+
 				float panX = (float)(mx - cx) / (float)dw;
 				float panY = (float)(my - cy) / (float)dh;
 				int zx = mx - (int)(zw * (0.5f + panX));
 				int zy = my - (int)(zh * (0.5f + panY));
-				
-				
+
+
 				if(zx > 0){
 					g.fillRect(0, 0, zx, h);
 				}
@@ -401,7 +446,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				if(zy+zh < h){
 					g.fillRect(zx, zy+zh, zw, h);
 				}
-				
+
 				if(mPreviewZoomImage != null){
 					if(zw != pw || zh != ph){
 						Graphics2D g2 = (Graphics2D)g;
@@ -420,12 +465,12 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				g.fillRect(0, 0, w, h);
 				g.drawImage(mDisplayImage, x, y, this);
 			}
-			
+
 		}
 		else{
 			mImageArea.setBounds(0,0,0,0);
 		}
-		
+
 		if(mEnableFullScreen){
 			g.dispose();
 		}
@@ -433,7 +478,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 
 	/**
 	 * スクリーンの更新（BufferStrategyを使用）
-	 * 
+	 *
 	 */
 	private void screenUpdate() {
 		if(mEnableFullScreen){
@@ -452,10 +497,10 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		}
 		mEventSender.sendEvent(EventObserver.EventTarget_Main, EventObserver.EventType_EndFullscreen, 0);
 	}
-	
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+
 		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
 			if(e.getClickCount() >= 2){
 				closeWindow();
@@ -469,7 +514,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 				mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_MoveInfo, 1);
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -483,7 +528,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 			if(mImageArea.contains(x, y)){
 				mIsZoomDrag = true;
 				mZoomPoint.setLocation(x, y);
-				
+
 				repaintEvent();
 				screenUpdate();
 			}
@@ -495,7 +540,7 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		if(mFileInfo == null){
 			return;
 		}
-		
+
 		if(javax.swing.SwingUtilities.isRightMouseButton(e)){
 		}
 		else {
@@ -510,12 +555,12 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		
+
 	}
 
 	@Override
@@ -527,19 +572,31 @@ public class FullscreenWindow extends JFrame implements MouseListener, MouseMoti
 		else{
 			// Zoom
 			mZoomPoint.setLocation(x, y);
-			
+
 			repaintEvent();
 			screenUpdate();
 		}
 	}
 
-	
+
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		
-		
+
+
 //		repaintEvent();
 //		screenUpdate();
+
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+
+		int step = 1;
+		if(e.getWheelRotation() < 0){
+			step = -1;
+		}
+
+		mEventSender.sendEvent(EventObserver.EventTarget_Table, EventObserver.EventType_MoveInfo, step);
 
 	}
 
